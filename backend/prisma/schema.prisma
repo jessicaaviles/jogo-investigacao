@@ -1,0 +1,296 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model anonymous_users {
+  id                  String    @id @default(uuid())
+  device_token_hash   String    @unique
+  default_display_name String?
+  locale              String?   @default("pt-BR")
+  timezone            String?
+  created_at          DateTime  @default(now())
+  updated_at          DateTime  @updatedAt
+  last_active_at      DateTime  @default(now())
+  deleted_at          DateTime?
+  
+  room_players        room_players[]
+  rooms_hosted        rooms[]
+}
+
+model cases {
+  id                        String    @id @default(uuid())
+  slug                      String    @unique
+  title                     String
+  short_synopsis            String
+  case_type                 String
+  difficulty                String
+  estimated_duration_minutes Int
+  min_players               Int
+  max_players               Int
+  tension_level             Int
+  status                    String
+  created_at                DateTime  @default(now())
+  updated_at                DateTime  @updatedAt
+  deleted_at                DateTime?
+
+  versions                  case_versions[]
+}
+
+model case_versions {
+  id                        String    @id @default(uuid())
+  case_id                   String    
+  version_number            String
+  opening                   String // JSON string
+  master_style              String // JSON string
+  scoring_rules             String // JSON string
+  solution_summary_encrypted String
+  full_solution_encrypted    String
+  chronology_encrypted      String // JSON string
+  publication_status        String
+  published_at              DateTime?
+  created_at                DateTime  @default(now())
+  updated_at                DateTime  @updatedAt
+
+  case_ref                  cases     @relation(fields: [case_id], references: [id])
+  rooms                     rooms[]
+  facts                     case_facts[]
+  answer_rules              case_answer_rules[]
+  hints                     case_hints[]
+  solution_fields           case_solution_fields[]
+
+  @@unique([case_id, version_number])
+}
+
+model case_facts {
+  id                        String    @id @default(uuid())
+  case_version_id           String    
+  fact_key                  String
+  statement                 String
+  visibility                String
+  pre_unlock_policy         String
+  unlock_conditions         String? // JSON string
+  allowed_response          String? // JSON string
+  is_solution_critical      Boolean   @default(false)
+  created_at                DateTime  @default(now())
+  updated_at                DateTime  @updatedAt
+
+  version_ref               case_versions @relation(fields: [case_version_id], references: [id])
+
+  @@unique([case_version_id, fact_key])
+}
+
+model case_answer_rules {
+  id                        String    @id @default(uuid())
+  case_version_id           String    
+  intent_key                String
+  semantic_examples         String // JSON string
+  related_fact_keys         String // JSON string
+  default_classification    String
+  response_constraints      String? // JSON string
+  unlock_payload            String? // JSON string
+  created_at                DateTime  @default(now())
+  updated_at                DateTime  @updatedAt
+
+  version_ref               case_versions @relation(fields: [case_version_id], references: [id])
+}
+
+model case_hints {
+  id                        String    @id @default(uuid())
+  case_version_id           String    
+  hint_index                Int
+  content_encrypted         String
+  unlock_rule               String // JSON string
+  penalty_points            Int
+  is_available_from_start   Boolean   @default(false)
+  created_at                DateTime  @default(now())
+
+  version_ref               case_versions @relation(fields: [case_version_id], references: [id])
+
+  @@unique([case_version_id, hint_index])
+}
+
+model case_solution_fields {
+  id                        String    @id @default(uuid())
+  case_version_id           String    
+  field_key                 String
+  label                     String
+  is_required               Boolean
+  evaluation_weight         Decimal
+  accepted_answers_encrypted String // JSON string
+  contradictory_answers_encrypted String? // JSON string
+  display_order             Int
+
+  version_ref               case_versions @relation(fields: [case_version_id], references: [id])
+
+  @@unique([case_version_id, field_key])
+}
+
+model rooms {
+  id                        String    @id @default(uuid())
+  public_code               String    @unique
+  recovery_code_hash        String
+  host_user_id              String    
+  case_version_id           String    
+  status                    String
+  settings                  String // JSON string
+  current_round             Int       @default(0)
+  current_turn_id           String?   
+  max_players               Int       @default(6)
+  created_at                DateTime  @default(now())
+  updated_at                DateTime  @updatedAt
+  last_activity_at          DateTime  @default(now())
+  expires_at                DateTime
+  completed_at              DateTime?
+  cancelled_at              DateTime?
+  deleted_at                DateTime?
+
+  host                      anonymous_users @relation(fields: [host_user_id], references: [id])
+  case_version              case_versions   @relation(fields: [case_version_id], references: [id])
+  players                   room_players[]
+  events                    room_events[]
+  turns                     turns[]
+  questions                 questions[]
+  theories                  theories[]
+}
+
+model room_players {
+  id                        String    @id @default(uuid())
+  room_id                   String    
+  anonymous_user_id         String    
+  display_name              String
+  is_host                   Boolean   @default(false)
+  connection_status         String
+  ready_status              String
+  turn_order                Int?
+  joined_at                 DateTime  @default(now())
+  last_seen_at              DateTime  @default(now())
+  left_at                   DateTime?
+  removed_at                DateTime?
+
+  room                      rooms           @relation(fields: [room_id], references: [id])
+  user                      anonymous_users @relation(fields: [anonymous_user_id], references: [id])
+  turns                     turns[]
+  questions                 questions[]
+  theories                  theories[]
+
+  @@unique([room_id, anonymous_user_id])
+}
+
+model room_events {
+  id                        String    @id @default(uuid())
+  room_id                   String    
+  event_type                String
+  actor_player_id           String?   
+  aggregate_type            String
+  aggregate_id              String?   
+  event_version             Int
+  idempotency_key           String    @unique
+  payload                   String // JSON string
+  created_at                DateTime  @default(now())
+
+  room                      rooms     @relation(fields: [room_id], references: [id])
+
+  @@unique([room_id, event_version])
+}
+
+model turns {
+  id                        String    @id @default(uuid())
+  room_id                   String    
+  player_id                 String    
+  round_number              Int
+  order_index               Int
+  status                    String
+  started_at                DateTime?
+  completed_at              DateTime?
+  passed_at                 DateTime?
+  error_code                String?
+  created_at                DateTime  @default(now())
+
+  room                      rooms        @relation(fields: [room_id], references: [id])
+  player                    room_players @relation(fields: [player_id], references: [id])
+  questions                 questions[]
+
+  @@unique([room_id, round_number, order_index])
+}
+
+model questions {
+  id                        String    @id @default(uuid())
+  room_id                   String    
+  turn_id                   String    
+  player_id                 String    
+  sequence_number           Int
+  original_text             String
+  normalized_text           String?
+  status                    String
+  similarity_group_id       String?   
+  repeated_question_id      String?   
+  submitted_at              DateTime  @default(now())
+  processed_at              DateTime?
+  cancelled_at              DateTime?
+
+  room                      rooms        @relation(fields: [room_id], references: [id])
+  turn                      turns        @relation(fields: [turn_id], references: [id])
+  player                    room_players @relation(fields: [player_id], references: [id])
+  repeated_question         questions?   @relation("RepeatedQuestion", fields: [repeated_question_id], references: [id])
+  repeated_by               questions[]  @relation("RepeatedQuestion")
+  interpretation            question_interpretations?
+  master_answers            master_answers[]
+
+  @@unique([room_id, sequence_number])
+}
+
+model question_interpretations {
+  id                        String    @id @default(uuid())
+  question_id               String    @unique 
+  intent_key                String?
+  entities                  String // JSON string
+  premises                  String // JSON string
+  ambiguity_reason          String?
+  related_fact_keys         String // JSON string
+  related_answer_rule_ids   String // JSON string
+  possible_unlocks          String? // JSON string
+  confidence                Decimal?
+  model_name                String
+  created_at                DateTime  @default(now())
+
+  question                  questions @relation(fields: [question_id], references: [id])
+}
+
+model master_answers {
+  id                        String    @id @default(uuid())
+  question_id               String    
+  classification            String
+  factual_payload           String // JSON string
+  rendered_text             String
+  validation_status         String
+  model_name                String?
+  fallback_used             Boolean   @default(false)
+  is_correction             Boolean   @default(false)
+  corrected_answer_id       String?   
+  created_at                DateTime  @default(now())
+
+  question                  questions @relation(fields: [question_id], references: [id])
+  corrected_answer          master_answers? @relation("CorrectedAnswer", fields: [corrected_answer_id], references: [id])
+  corrections               master_answers[] @relation("CorrectedAnswer")
+}
+
+model theories {
+  id                        String    @id @default(uuid())
+  room_id                   String    
+  player_id                 String    
+  attempt_number            Int
+  answers                   String // JSON string
+  status                    String
+  submitted_at              DateTime?
+  revealed_at               DateTime?
+  created_at                DateTime  @default(now())
+  updated_at                DateTime  @updatedAt
+
+  room                      rooms        @relation(fields: [room_id], references: [id])
+  player                    room_players @relation(fields: [player_id], references: [id])
+}

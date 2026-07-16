@@ -11,12 +11,15 @@ import { normalizeQuestion } from './game/rules';
 
 dotenv.config();
 
+const frontendUrl = process.env.FRONTEND_URL;
+
 const app = express();
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: '*', // For development
-    methods: ['GET', 'POST']
+    origin: frontendUrl || '*',
+    methods: ['GET', 'POST'],
+    credentials: true
   }
 });
 
@@ -55,7 +58,10 @@ const recordRoomEvent = async (room_id: string, event_type: string, payload: obj
   await prisma.room_events.create({ data: { room_id, event_type, actor_player_id, aggregate_type: 'ROOM', event_version, idempotency_key: `${room_id}:${event_type}:${event_version}`, payload: JSON.stringify(payload) } }).catch(() => undefined);
 };
 
-app.use(cors());
+app.use(cors({
+  origin: frontendUrl ? [frontendUrl] : '*',
+  credentials: true
+}));
 app.use(express.json({ limit: '7mb' }));
 app.use('/api', (req, res, next) => {
   const key = req.ip || 'unknown'; const now = Date.now(); const current = requestWindows.get(key);
@@ -614,6 +620,6 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 3001;
 
-server.listen(PORT, () => {
+server.listen(Number(PORT), '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
 });

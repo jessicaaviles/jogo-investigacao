@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSocket } from '../contexts/SocketContext';
+import { QRCodeCanvas } from 'qrcode.react';
 
 const Lobby: React.FC = () => {
   const { roomId } = useParams();
   const navigate = useNavigate();
   const socket = useSocket();
   const [roomData, setRoomData] = useState<any>(null);
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     if (!socket || !roomId) return;
@@ -18,8 +20,8 @@ const Lobby: React.FC = () => {
       setRoomData(data);
     });
 
-    socket.on('game_started', (data) => {
-      navigate(`/room/${roomId}/game`);
+    socket.on('game_started', () => {
+      navigate(`/room/${roomId}/briefing`);
     });
 
     return () => {
@@ -37,42 +39,76 @@ const Lobby: React.FC = () => {
     socket?.emit('start_game', { roomId, userId: localStorage.getItem('userId') });
   };
 
+  const handleReady = () => {
+    const next = !isReady; setIsReady(next); socket?.emit('player_ready', { roomId, userId: localStorage.getItem('userId'), ready: next });
+  };
+
   return (
-    <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      <div style={{ marginBottom: '32px', marginTop: '24px' }}>
-        <h2 style={{ fontSize: '28px', marginBottom: '8px' }}>Lobby</h2>
-        <p style={{ color: 'var(--text-secondary)' }}>Aguardando os investigadores.</p>
-        <div style={{ marginTop: '16px', background: 'var(--bg-tertiary)', padding: '12px', borderRadius: '8px' }}>
-          Código da Sala: <strong style={{ color: 'var(--text-accent)' }}>{roomData.public_code}</strong>
+    <div className="immersive-page" style={{ 
+      display: 'flex', 
+      flexDirection: 'column', 
+      height: '100%', 
+      backgroundColor: 'var(--bg-primary)',
+      backgroundImage: `url(/backgrounds/lobby.png)`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      position: 'relative'
+    }}>
+      {/* Overlay Escuro para Legibilidade */}
+      <div style={{
+        position: 'absolute',
+        top: 0, left: 0, right: 0, bottom: 0,
+        background: 'linear-gradient(to bottom, rgba(31,42,48,0.7) 0%, rgba(31,42,48,0.95) 100%)',
+        zIndex: 0
+      }}></div>
+
+      <div style={{ position: 'relative', zIndex: 1, padding: '24px', display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
+        <div style={{ marginBottom: '32px', marginTop: '24px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '24px' }}>
+          <h2 style={{ fontSize: '32px', marginBottom: '8px', fontFamily: 'var(--font-serif)', lineHeight: 1.2 }}>
+            Sala de Briefing · {roomData.case_version?.case_ref?.title || 'O Quarto 7'}
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '15px' }}>Aguardando os investigadores da equipe.</p>
+          
+          <div style={{ marginTop: '24px', display: 'flex', alignItems: 'center', gap: '12px', backgroundColor: 'rgba(255,255,255,0.03)', padding: '12px 16px', borderRadius: '8px', width: 'fit-content', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <div style={{ fontSize: '11px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '2px' }}>Código de Acesso:</div>
+            <div style={{ fontSize: '20px', color: 'var(--accent-gold)', letterSpacing: '4px', fontWeight: 600, fontFamily: 'var(--font-serif)' }}>
+              {roomData.public_code}
+            </div>
+          </div>
+          <div className="lobby-invite"><QRCodeCanvas value={`${window.location.origin}/join?room=${roomData.public_code}`} size={88} bgColor="#f2eee5" fgColor="#182126" /><div><span className="eyebrow">Convite</span><p>Compartilhe o código ou o QR Code com a equipe.</p><button className="btn-secondary" onClick={() => navigator.clipboard?.writeText(`${window.location.origin}/join?room=${roomData.public_code}`)}>Copiar link</button></div></div>
         </div>
-      </div>
 
-      <div style={{ flex: 1 }}>
-        <h3 style={{ marginBottom: '16px', fontSize: '18px' }}>Equipe ({players.length}/{roomData.max_players})</h3>
-        <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {players.map((p: any) => (
-            <li key={p.id} className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <span style={{ fontWeight: 500 }}>{p.display_name}</span>
-                {p.is_host && <span style={{ marginLeft: '8px', fontSize: '12px', color: 'var(--text-accent)' }}>(Anfitrião)</span>}
+        <div style={{ flex: 1, overflowY: 'auto' }}>
+          <h3 style={{ marginBottom: '24px', fontSize: '12px', color: 'var(--accent-olive)', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 600 }}>
+            Equipe Designada ({players.length}/{roomData.max_players})
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {players.map((p: any) => (
+              <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '12px 16px', backgroundColor: 'rgba(31,42,48,0.4)', borderRadius: '12px', border: `1px solid ${p.connection_status === 'CONNECTED' ? 'rgba(132,147,107,0.3)' : 'rgba(138,51,36,0.3)'}`, backdropFilter: 'blur(8px)' }}>
+                <div style={{ width: '48px', height: '48px', borderRadius: '8px', backgroundColor: 'rgba(0,0,0,0.2)', border: `1px solid ${p.connection_status === 'CONNECTED' ? 'var(--accent-olive)' : 'var(--error-color)'}` }}></div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 600, fontSize: '16px', color: 'var(--text-primary)', fontFamily: 'var(--font-serif)' }}>{p.display_name}</div>
+                  <div style={{ fontSize: '11px', color: p.connection_status === 'CONNECTED' ? 'var(--accent-olive)' : 'var(--text-secondary)', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                    {p.connection_status === 'CONNECTED' ? 'Online' : 'Offline'}
+                    {p.is_host && <span style={{ color: 'var(--accent-gold)', marginLeft: '8px' }}>• Anfitrião</span>}
+                  </div>
+                </div>
               </div>
-              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-                {p.connection_status === 'CONNECTED' ? '🟢 Online' : '⚪ Offline'}
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
+            ))}
+          </div>
+        </div>
 
-      <div style={{ marginTop: 'auto', marginBottom: '24px' }}>
-        {isHost ? (
-          <button className="btn-primary" onClick={handleStart} disabled={players.length < 2}>
-            {players.length < 2 ? 'Aguardando mais jogadores...' : 'Iniciar Caso'}
-            <span>→</span>
-          </button>
-        ) : (
-          <p style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>Aguardando o anfitrião iniciar a partida...</p>
-        )}
+        <div style={{ marginTop: 'auto', marginBottom: '80px', paddingTop: '24px' }}>
+          <button className="btn-secondary lobby-ready" onClick={handleReady}>{isReady ? 'Estou pronto' : 'Marcar como pronto'}</button>
+          {isHost ? (
+            <button className="btn-primary" onClick={handleStart} disabled={players.length < 2} style={{ padding: '16px 24px', fontSize: '16px' }}>
+              {players.length < 2 ? 'Aguardando Equipe...' : 'Iniciar Investigação'}
+              <span style={{ color: 'var(--accent-gold)' }}>→</span>
+            </button>
+          ) : (
+            <p style={{ textAlign: 'center', color: 'var(--text-secondary)', fontStyle: 'italic', fontSize: '14px' }}>Aguardando o anfitrião iniciar...</p>
+          )}
+        </div>
       </div>
     </div>
   );

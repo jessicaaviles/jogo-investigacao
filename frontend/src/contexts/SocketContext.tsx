@@ -11,11 +11,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
-    // Only connect if we have a user
-    const userId = localStorage.getItem('userId');
-    if (!userId) return;
-
-    const newSocket = io('http://localhost:3001');
+    const newSocket = io('http://localhost:3001', { reconnection: true, reconnectionAttempts: Infinity, timeout: 8000 });
     setSocket(newSocket);
 
     return () => {

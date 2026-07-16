@@ -9,7 +9,7 @@ export const setupSockets = (io: Server) => {
     
     socket.on('join_room', async ({ roomId, userId }) => {
       socket.join(roomId);
-      console.log(`User ${userId} joined room ${roomId}`);
+      console.log('Player joined a room');
       
       // Emit the latest room state
       const room = await prisma.rooms.findUnique({
@@ -53,7 +53,7 @@ export const setupSockets = (io: Server) => {
     });
 
     socket.on('disconnect', () => {
-      console.log('User disconnected:', socket.id);
+      console.log('Socket disconnected');
     });
   });
 };

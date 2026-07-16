@@ -13,6 +13,11 @@ model anonymous_users {
   default_display_name String?
   locale              String?   @default("pt-BR")
   timezone            String?
+  profile_active      Boolean   @default(true)
+  bio                 String?
+  profile_photo_data  String?
+  generated_profile_photo_data String?
+  profile_photo_updated_at DateTime?
   created_at          DateTime  @default(now())
   updated_at          DateTime  @updatedAt
   last_active_at      DateTime  @default(now())
@@ -232,6 +237,8 @@ model questions {
   submitted_at              DateTime  @default(now())
   processed_at              DateTime?
   cancelled_at              DateTime?
+  idempotency_key           String?   @unique
+  clarification_count      Int       @default(0)
 
   room                      rooms        @relation(fields: [room_id], references: [id])
   turn                      turns        @relation(fields: [turn_id], references: [id])
@@ -293,4 +300,113 @@ model theories {
 
   room                      rooms        @relation(fields: [room_id], references: [id])
   player                    room_players @relation(fields: [player_id], references: [id])
+  evaluations               theory_evaluations[]
+}
+
+model hint_usages {
+  id              String   @id @default(uuid())
+  room_id         String
+  hint_index      Int
+  requested_by    String
+  penalty         Int
+  used_at         DateTime @default(now())
+  idempotency_key String   @unique
+}
+
+model votes {
+  id         String   @id @default(uuid())
+  room_id    String
+  type       String
+  options    String
+  status     String
+  created_at DateTime @default(now())
+  closed_at  DateTime?
+  responses  vote_responses[]
+}
+
+model vote_responses {
+  id         String   @id @default(uuid())
+  vote_id    String
+  player_id  String
+  option_id  String
+  created_at DateTime @default(now())
+
+  vote       votes @relation(fields: [vote_id], references: [id])
+  @@unique([vote_id, player_id])
+}
+
+model theory_evaluations {
+  id                String   @id @default(uuid())
+  theory_id         String
+  room_id           String
+  attempt_number    Int
+  result            String
+  dimension_results String
+  feedback          String
+  score_delta       Int
+  created_at        DateTime @default(now())
+
+  theory            theories @relation(fields: [theory_id], references: [id])
+  @@unique([theory_id, attempt_number])
+}
+
+model game_results {
+  id                      String   @id @default(uuid())
+  room_id                 String   @unique
+  status                  String
+  score                   Int
+  title                   String
+  duration_seconds        Int
+  question_count          Int
+  repeated_question_count Int
+  hints_used              Int
+  attempts                Int
+  completed_at            DateTime @default(now())
+}
+
+model feedback {
+  id                   String   @id @default(uuid())
+  room_id              String
+  anonymous_player_hash String
+  rating               Int
+  fair_solution        Boolean
+  master_error         Boolean
+  confusion            Boolean
+  play_another         Boolean
+  recommendation_score Int
+  best_moment          String?
+  worst_moment         String?
+  hardest_part         String?
+  created_at           DateTime @default(now())
+  @@unique([room_id, anonymous_player_hash])
+}
+
+model analytics_events {
+  id             String   @id @default(uuid())
+  event_name     String
+  room_id        String?
+  anonymous_hash String?
+  payload        String
+  created_at     DateTime @default(now())
+}
+
+model question_clarifications {
+  id             String   @id @default(uuid())
+  question_id    String
+  requested_by   String
+  response_text  String
+  created_at     DateTime @default(now())
+  @@unique([question_id, requested_by])
+}
+
+model answer_contestations {
+  id                 String   @id @default(uuid())
+  question_id        String
+  reported_by        String
+  reason             String
+  comment            String?
+  status             String
+  correction_text    String?
+  created_at         DateTime @default(now())
+  resolved_at        DateTime?
 }

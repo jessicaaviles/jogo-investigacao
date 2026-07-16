@@ -1,90 +1,44 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ArrowUpRight } from 'lucide-react';
 import { registerAnonymousUser } from '../services/api';
+
+const featuredCases = [
+  { title: 'O Quarto 7', subtitle: 'Hotel Vesper · Mistério clássico', level: 'Fácil', image: '/capa_quarto_7.png', description: 'Uma chave, uma câmera e a última noite de Helena Duarte.' },
+  { title: 'Delegacia Central', subtitle: 'Arquivo · Linha do tempo', level: 'Médio', image: '/backgrounds/equipe-investigadores.png', description: 'Os depoimentos do Hotel Vesper não concordam entre si.' },
+  { title: 'Laboratório Forense', subtitle: 'Evidências · Análise', level: 'Difícil', image: '/backgrounds/cena-do-crime.png', description: 'Uma digital parcial pode mudar a leitura do quarto.' },
+];
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-
+  const [, setUserData] = useState<{ userId: string; deviceToken: string } | null>(null);
   useEffect(() => {
-    // Generate anonymous token on first load if it doesn't exist
-    const token = localStorage.getItem('deviceToken');
-    if (!token) {
-      registerAnonymousUser().then((res) => {
-        if (res.success) {
-          localStorage.setItem('deviceToken', res.data.deviceToken);
-          localStorage.setItem('userId', res.data.userId);
-        }
-      });
-    }
+    const token = localStorage.getItem('deviceToken'); const userId = localStorage.getItem('userId');
+    if (!token || !userId) registerAnonymousUser().then((res) => { if (res.success) { localStorage.setItem('deviceToken', res.data.deviceToken); localStorage.setItem('userId', res.data.userId); setUserData({ userId: res.data.userId, deviceToken: res.data.deviceToken }); } }).catch(() => undefined);
+    else setUserData({ userId, deviceToken: token });
   }, []);
 
-  return (
-    <div style={{ 
-      display: 'flex', 
-      flexDirection: 'column', 
-      minHeight: '100vh',
-      backgroundImage: `url(/src/assets/hero.png)`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat',
-      position: 'relative'
-    }}>
-      {/* Overlay gradiente */}
-      <div style={{
-        position: 'absolute',
-        top: 0, left: 0, right: 0, bottom: 0,
-        background: 'linear-gradient(to bottom, rgba(18,20,19,0.3) 0%, rgba(18,20,19,0.8) 60%, rgba(18,20,19,1) 100%)',
-        zIndex: 0
-      }}></div>
-
-      <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', flex: 1, zIndex: 1 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--bg-tertiary)', border: '2px solid var(--text-accent)' }}></div>
-            <div>
-              <div style={{ fontSize: '16px', fontWeight: 500, fontFamily: 'var(--font-serif)' }}>Investigador</div>
-              <div style={{ fontSize: '12px', color: 'var(--text-accent)' }}>Nível Inicial</div>
-            </div>
-          </div>
-        </div>
-
-        <div style={{ marginTop: '80px' }}>
-          <h5 style={{ color: 'var(--text-accent)', letterSpacing: '2px', fontSize: '12px', textTransform: 'uppercase', marginBottom: '8px', fontWeight: 600 }}>
-            CASO RECOMENDADO
-          </h5>
-          <h1 style={{ fontSize: '42px', lineHeight: 1.1, marginBottom: '16px', fontFamily: 'var(--font-serif)', maxWidth: '80%' }}>
-            O Segredo de Blackwell House
-          </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '16px', maxWidth: '85%' }}>
-            Uma carta anônima. Uma casa isolada. Muitas perguntas.
-          </p>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: 'auto', marginBottom: '32px' }}>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '12px', letterSpacing: '1px', textTransform: 'uppercase', marginTop: '32px', marginBottom: '8px' }}>Escolha o Modo</p>
-          <button 
-            className="btn-primary" 
-            onClick={() => navigate('/create')}
-            disabled={loading}
-          >
-            Multiplayer (Criar Sala)
-            <span>→</span>
-          </button>
-
-          <button 
-            className="btn-primary" 
-            style={{ backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-light)' }}
-            onClick={() => navigate('/join')}
-            disabled={loading}
-          >
-            Entrar com Código
-            <span>→</span>
-          </button>
-        </div>
+  return <div className="home route-page">
+    <section className="home-hero">
+      <div className="home-hero-image" />
+      <div className="home-hero-copy">
+        <span className="eyebrow">Dossiê aberto · Temporada 01</span>
+        <h1>A verdade está nos detalhes.</h1>
+        <p>Investigue em equipe. Conecte os fatos. Encontre o último vestígio.</p>
+        <div className="home-actions"><button className="btn-primary" onClick={() => navigate('/cases')}>Explorar casos <ArrowUpRight size={17} /></button><button className="btn-secondary" onClick={() => navigate('/join')}>Entrar com código</button></div>
+        <button className="home-tutorial" onClick={() => navigate('/tutorial')}>Como funciona?</button>
       </div>
-    </div>
-  );
+      <div className="home-hero-caption"><span>HOTEL VESPER</span><span>LAT. 41°23'N · 2026</span></div>
+    </section>
+    <section className="home-featured">
+      <div className="section-heading"><div><span className="eyebrow">Arquivo municipal</span><h2>Investigações em destaque</h2></div><button className="text-link" onClick={() => navigate('/cases')}>Ver arquivo <ArrowUpRight size={15} /></button></div>
+      <div className="case-rail">{featuredCases.map((item, index) => <article className={`featured-card ${index === 0 ? 'featured-card-primary' : ''}`} key={item.title} onClick={() => navigate('/cases')}>
+        <div className="featured-image" style={{ backgroundImage: `url(${item.image})` }}><span className="case-index">0{index + 1}</span><span className="case-level">{item.level}</span></div>
+        <div className="featured-info"><h3>{item.title}</h3><p>{item.subtitle}</p><span>{item.description}</span></div>
+      </article>)}</div>
+    </section>
+    <section className="home-note"><div className="note-rule" /><div><span className="eyebrow">Método de investigação</span><p>“A IA aponta conexões. A decisão continua sendo sua.”</p></div></section>
+  </div>;
 };
 
 export default Home;

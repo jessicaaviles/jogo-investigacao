@@ -1,58 +1,160 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { createRoom } from '../services/api';
+import { useNavigate, useLocation } from 'react-router-dom';
+import * as apiService from '../services/api';
+import { Clock3, UsersRound } from 'lucide-react';
+
+const CASES_MAP: Record<string, { title: string; synopsis: string; players: string; duration: string; image: string }> = {
+  'o-quarto-7': {
+    title: 'O Quarto 7',
+    synopsis: 'Helena Duarte foi encontrada no Hotel Vesper. Uma chave, uma câmera e um relógio quebrado aguardam uma explicação.',
+    players: '2-6 Jogadores',
+    duration: '~20 min',
+    image: '/capa_quarto_7.png'
+  },
+  'o-guarda-chuva-molhado': {
+    title: 'O Guarda-chuva Molhado',
+    synopsis: 'Uma pessoa entra em uma sala vazia e encontra um guarda-chuva completamente molhado. O céu está limpo e não choveu.',
+    players: '2-6 Jogadores',
+    duration: '~5 min',
+    image: '/backgrounds/mapa-da-investigacao.png'
+  },
+  'o-presente-desaparecido': {
+    title: 'O Presente Desaparecido',
+    synopsis: 'Durante uma comemoração em família, um presente desaparece de uma mesa diante de todos. Ninguém saiu do ambiente.',
+    players: '2-6 Jogadores',
+    duration: '~8 min',
+    image: '/backgrounds/cena-do-crime.png'
+  },
+  'o-elevador-que-nao-parou': {
+    title: 'O Elevador que Não Parou',
+    synopsis: 'Uma mulher entra sozinha em um elevador. Ele não para em nenhum andar e, quando retorna, está vazio.',
+    players: '2-6 Jogadores',
+    duration: '~12 min',
+    image: '/backgrounds/lobby.png'
+  },
+  'a-mensagem-das-23h17': {
+    title: 'A Mensagem das 23h17',
+    synopsis: 'Às 23h17, uma pessoa envia uma mensagem dizendo: "Agora todos vão entender". Poucos minutos depois, desaparece.',
+    players: '3-6 Jogadores',
+    duration: '~15 min',
+    image: '/backgrounds/equipe-investigadores.png'
+  },
+  'o-retrato-que-piscou': {
+    title: 'O Retrato que Piscou',
+    synopsis: 'Durante um jantar, todos veem o retrato antigo da sala piscar. Segundos depois, uma joia desaparece de uma mesa próxima.',
+    players: '2-6 Jogadores',
+    duration: '~12 min',
+    image: '/capa_carta_anonima.png'
+  }
+};
 
 const CreateRoom: React.FC = () => {
   const navigate = useNavigate();
+  const { search } = useLocation();
+  const query = new URLSearchParams(search);
+  const selectedCaseId = query.get('caseId') || 'o-quarto-7';
+  
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [timer, setTimer] = useState<number | null>(null);
+
+  const caseInfo = CASES_MAP[selectedCaseId] || CASES_MAP['o-quarto-7'];
 
   const handleCreate = async () => {
-    setLoading(true);
-    const userId = localStorage.getItem('userId');
-    if (!userId) {
-      alert("Erro de identificação. Retorne à home.");
-      return;
-    }
-
     try {
-      const res = await createRoom(userId);
-      if (res.success) {
-        navigate(`/room/${res.data.roomId}/lobby`);
-      } else {
-        alert("Falha ao criar sala");
+      setLoading(true);
+      
+      const hostName = localStorage.getItem('userName') || 'Investigador';
+      const userId = localStorage.getItem('userId');
+      
+      if (!userId) {
+        setError("Sua identidade local não está disponível. Retorne à Home.");
+        return;
       }
-    } catch (e) {
-      console.error(e);
-      alert("Erro de conexão");
+
+      const response = await apiService.createRoom(selectedCaseId, userId, hostName, { turn_timer_seconds: timer });
+      if (response && response.roomId) {
+        navigate(`/room/${response.roomId}/recovery?code=${encodeURIComponent(response.recoveryCode || '')}&publicCode=${encodeURIComponent(response.publicCode || '')}&invite=${encodeURIComponent(response.inviteUrl || '')}`);
+      }
+    } catch (error) {
+      console.error(error);
+      setError('Não foi possível criar a sala. Nenhuma configuração foi perdida.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      <div style={{ marginBottom: '32px', marginTop: '24px' }}>
-        <button onClick={() => navigate(-1)} style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>← Voltar</button>
-        <h2 style={{ fontSize: '28px', marginBottom: '8px' }}>Configurar Partida</h2>
-        <p style={{ color: 'var(--text-secondary)' }}>Um novo caso o aguarda. Prepare sua equipe.</p>
+    <div className="immersive-page" style={{ 
+      display: 'flex', 
+      flexDirection: 'column', 
+      height: '100vh', 
+      backgroundColor: '#0F1417',
+      backgroundImage: `url(${caseInfo.image})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      position: 'relative'
+    }}>
+      {/* Overlay gradiente forte na parte inferior para a interface flutuar */}
+      <div style={{
+        position: 'absolute',
+        top: 0, left: 0, right: 0, bottom: 0,
+        background: 'linear-gradient(to bottom, rgba(15, 20, 23, 0.3) 0%, rgba(15, 20, 23, 0.95) 60%, #0F1417 100%)',
+        zIndex: 0
+      }}></div>
+
+      {/* Top Bar / Voltar */}
+      <div style={{ position: 'relative', zIndex: 1, padding: '24px', marginTop: '64px' }}>
+        <button onClick={() => navigate(-1)} style={{ color: '#8E989F', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px', background: 'transparent', border: 'none', cursor: 'pointer' }}>
+          <span style={{ fontSize: '14px' }}>←</span> Voltar
+        </button>
       </div>
 
-      <div className="card" style={{ marginBottom: '32px' }}>
-        <h3 style={{ marginBottom: '16px', fontSize: '20px' }}>O Presente Desaparecido</h3>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '16px' }}>
-          Um caso rápido recomendado para iniciantes. A festa estava pronta, mas o item principal sumiu do cofre fechado.
-        </p>
-        <div style={{ display: 'flex', gap: '16px', fontSize: '14px', color: 'var(--text-accent)' }}>
-          <span>2-6 Jogadores</span>
-          <span>•</span>
-          <span>~30 min</span>
+      {/* Bottom Sheet UI */}
+      <div style={{ position: 'relative', zIndex: 1, padding: '0 24px 32px 24px', display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'flex-end' }}>
+        <h2 style={{ fontSize: '32px', marginBottom: '8px', fontFamily: 'var(--font-serif)', lineHeight: 1.1, fontWeight: 400 }}>Configurar Partida</h2>
+        <p style={{ color: '#8E989F', fontSize: '14px', marginBottom: '32px', maxWidth: '85%', fontWeight: 300 }}>Um novo caso o aguarda. Escolha quem participará desta investigação.</p>
+
+        <div style={{ padding: '24px 0', borderTop: '1px solid rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)', marginBottom: '32px' }}>
+          <h5 style={{ color: '#C5A880', letterSpacing: '2px', fontSize: '10px', textTransform: 'uppercase', marginBottom: '8px', fontWeight: 600 }}>
+            CASO SELECIONADO
+          </h5>
+          <h3 style={{ marginBottom: '12px', fontSize: '24px', fontFamily: 'var(--font-serif)', fontWeight: 400 }}>{caseInfo.title}</h3>
+          <p style={{ color: '#8E989F', fontSize: '13px', marginBottom: '20px', lineHeight: 1.5, fontWeight: 300 }}>
+            {caseInfo.synopsis}
+          </p>
+          
+          <div style={{ display: 'flex', gap: '24px', fontSize: '10px', color: '#F8F9FA', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 600 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <UsersRound size={14} color="var(--gold-soft)" /> {caseInfo.players}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Clock3 size={14} color="var(--gold-soft)" /> {caseInfo.duration}
+            </div>
+          </div>
+          <label className="timer-setting">Tempo por turno<select value={timer ?? ''} onChange={(event) => setTimer(event.target.value ? Number(event.target.value) : null)}><option value="">Sem limite</option><option value="30">30 segundos</option><option value="60">60 segundos</option><option value="90">90 segundos</option></select></label>
         </div>
-      </div>
 
-      <div style={{ marginTop: 'auto', marginBottom: '24px' }}>
-        <button className="btn-primary" onClick={handleCreate} disabled={loading}>
-          {loading ? 'Criando...' : 'Criar Sala'}
-          <span>→</span>
+        {error && <div role="alert" style={{ color: '#d79b8e', marginBottom: '12px' }}>{error}</div>}
+        <button 
+          className="btn-primary" 
+          onClick={handleCreate} 
+          disabled={loading}
+          style={{ 
+            padding: '16px 24px', 
+            fontSize: '14px',
+            backgroundColor: 'var(--olive)',
+            color: 'var(--paper)',
+            border: 'none',
+            borderRadius: '8px',
+            fontWeight: 600,
+            textTransform: 'uppercase',
+            letterSpacing: '1px',
+            cursor: 'pointer'
+          }}
+        >
+          {loading ? 'Preparando Sala...' : 'Criar Sala'}
+          <span style={{ color: 'var(--gold-soft)', marginLeft: '8px' }}>→</span>
         </button>
       </div>
     </div>

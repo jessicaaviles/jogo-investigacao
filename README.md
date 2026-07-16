@@ -4,7 +4,13 @@ PWA multiplayer para partidas de investigação com uma IA atuando como Mestre d
 
 ## Documentação
 
-A documentação está na pasta `/docs`.
+ A documentação está na pasta `/docs`.
+
+## Continuous Integration (CI)
+- Este repositório utiliza GitHub Actions para build e testes automáticos (workflow Build and Test).
+- O status do CI pode ser visto em GitHub > Actions > Build and Test.
+- Veja docs/CI101.md para entender o que o CI executa e como replicar localmente.
+ - Observação: esta PR adiciona documentação de CI para facilitar o onboarding.
 
 Ordem principal de leitura:
 

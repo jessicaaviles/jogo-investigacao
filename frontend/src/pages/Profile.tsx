@@ -315,8 +315,8 @@ const Profile: React.FC = () => {
               <X size={20} />
             </button>
           </div>
-          <div style={{ maxWidth: '90%', maxHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <img src={profile.photo} alt={`Retrato de ${profile.displayName}`} style={{ maxWidth: '100%', maxHeight: '70vh', objectFit: 'contain', borderRadius: 4 }} />
+          <div style={{ width: '80%', maxWidth: 600, height: '60vh', borderRadius: 4, overflow: 'hidden' }}>
+            <img src={profile.photo} alt={`Retrato de ${profile.displayName}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
           <div style={{ display: 'flex', gap: 12 }}>
             <button onClick={() => setPhotoViewer(false)} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', padding: '10px 20px', borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>

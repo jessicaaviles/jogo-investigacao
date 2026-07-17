@@ -24,7 +24,7 @@ Cadastre as seguintes variáveis no painel do seu serviço no Railway:
 | `GEMINI_API_KEY` | Chave de acesso à API do Gemini. | `AIzaSy...` |
 | `OPENAI_API_KEY` | Chave de acesso à API do OpenAI. | `sk-proj-...` |
 | `OPENAI_IMAGE_MODEL` | Modelo de imagem da OpenAI. | `gpt-image-1` |
-| `GEMINI_IMAGE_MODEL` | Modelo de imagem da Gemini. | `gemini-2.5-flash-image` |
+| `GEMINI_IMAGE_MODEL` | Modelo de imagem da Gemini. | `gemini-3.1-flash-image` |
 | `SOLUTION_ENCRYPTION_KEY` | Chave secreta de criptografia para a solução do caso. | Qualquer string secreta longa e segura. |
 
 ---

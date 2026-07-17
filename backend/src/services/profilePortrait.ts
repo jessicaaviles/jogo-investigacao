@@ -3,303 +3,38 @@ import { GoogleGenAI } from '@google/genai';
 const allowedMimeTypes = new Set(['image/jpeg', 'image/png', 'image/webp']);
 const imageModels = [
   process.env.GEMINI_IMAGE_MODEL,
-  'gemini-2.5-flash-image',
   'gemini-3.1-flash-image',
+  'gemini-2.5-flash-image',
   'gemini-3-pro-image'
 ].filter(Boolean) as string[];
 
-const profilePortraitPrompt = `EDIT THE PROVIDED REFERENCE PHOTOGRAPH — do NOT generate a new person.
+const profilePortraitPrompt = `EDIT THIS PHOTO — do NOT generate a new person.
 
-This is strictly an image-editing task: take the supplied reference photograph and edit only its clothing, background, lighting and color grading. The face, hair, body, age and all physical characteristics must remain pixel-identical to the reference. Do not recreate, reinterpret or generate the person from scratch.
+Take the supplied reference photograph and transform it according to the description below. The face, hair, body, age and all physical characteristics must remain exactly as in the reference photo. Do not recreate or reinterpret the person — edit the existing photo.
 
-Create an ultra-realistic photographic portrait of the SAME person from the reference image, preserving exact facial structure, proportions, skin texture and natural asymmetries.
+Now apply this transformation:
 
-This is an official investigator profile portrait for the premium mystery game "Último Vestígio".
+Instruction for the AI: Generate a high-quality, circular-framed profile image, strictly based on the input photograph.
 
-ABSOLUTE RULE: The person's age must remain exactly as in the reference photo. Do NOT add any wrinkles, aging, or maturity that is not already present. This is the most important rule.
+Subject: Accurately preserve the facial features, bone structure, hairstyle, and any distinctive accessories (such as glasses or piercings) of the person in the original image.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-01. IDENTITY — VARIABLE PER USER
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Attire: The person must be wearing a dark, utilitarian trench coat. On the lapel or chest of the coat, there must be a circular, embossed gold metal badge, featuring the number "12" in a classic style.
 
-Preserve the exact identity and physical characteristics of the person shown in the reference image.
+Setting: The original background is replaced by a dark, rugged, and stormy coastal landscape. On a distant cliff, an ancient, gloomy manor house is visible, with a few faint, yellow lights in its windows.
 
-The final portrait must be immediately recognizable as the same real person.
+Lighting and Atmosphere: The lighting must be dramatic, chiaroscuro style, with a strong contrast between deep shadows (navy blue/black) and warm light highlights (gold). The mood is melancholic and mysterious.
 
-CRITICAL: Do NOT alter the person's apparent age. Do NOT add wrinkles, creases, age spots, gray hair, receded hairline, sagging skin, or any other aging effects that are not present in the reference photograph. The person must look exactly the same age as in the supplied photo.
-
-Keep unchanged:
-
-- facial structure and proportions
-- face width and length
-- forehead
-- cheekbones and cheeks
-- jawline and chin
-- eye shape, size, spacing and eyelids
-- eyebrows
-- nose shape, width and proportions
-- nostrils
-- lips, mouth shape and teeth
-- ears
-- skin tone
-- freckles, pores, expression lines and natural imperfections
-- natural facial asymmetries
-- hairline
-- hair color, texture, curl pattern, density and volume
-- neck and visible body proportions
-- apparent age
-
-Do not reinterpret the face.
-
-Do not generate a look-alike.
-
-Do not beautify or idealize.
-
-Do not slim or elongate the face.
-
-Do not modify the eyes, nose, mouth, jaw or skin tone.
-
-Do not smooth the skin.
-
-Do not change ethnicity, age or body type.
-
-Preserve the person's natural expression whenever possible.
-
-FACE:
-
-- realistic skin texture — pores, light freckles and natural imperfections must be visible
-- neutral, soft makeup or no-makeup look
-- do not smooth, airbrush or plasticize the skin
-- do not add foundation or heavy makeup
-
-The result must look like the original person photographed during the same professional photo session used for every investigator in the game.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-02. FIXED PORTRAIT STANDARD
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Apply exactly the same portrait standard used for every investigator:
-
-- square image
-- 1:1 aspect ratio
-- chest-up portrait
-- head centered horizontally
-- eyes positioned slightly above the vertical center
-- camera at eye level
-- body turned approximately 10 degrees
-- face directed toward the camera
-- natural upright posture
-- neutral, attentive and approachable expression
-- no dramatic pose
-- no exaggerated smile
-
-Do not crop the top of the hair.
-
-Maintain comfortable negative space around the head and shoulders.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-03. VARIABLE WARDROBE — DIFFERENT PER PERSON
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Replace only the visible clothing. Each investigator must have a distinct color combination so no two portraits share the same outfit colors.
-
-For every new portrait, choose a unique color combination from the game's palette. Vary both the outer and inner layer. Examples of possible combinations (pick ONE per portrait, rotate across users):
-
-- charcoal overshirt + cream shirt underneath
-- dark olive overshirt + light beige shirt underneath
-- muted burgundy overshirt + warm gray shirt underneath
-- deep blue-gray overshirt + off-white shirt underneath
-- warm brown overshirt + sand shirt underneath
-- dark slate overshirt + pale ivory shirt underneath
-- desaturated teal overshirt + light stone shirt underneath
-- black-brown overshirt + soft ecru shirt underneath
-
-Rules:
-- matte natural fabrics only
-- no logos
-- no text
-- no uniform
-- no tie
-- no police badge
-- no costume
-- no visible investigative accessories
-- the portrait must not look like a school photo or corporate ID
-
-Each portrait's clothing must look intentional and curated, not random.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-04. FIXED LIGHTING
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Use the same lighting setup for every portrait:
-
-- large soft light coming from the front-left side of the camera
-- subtle natural shadow on the opposite side of the face
-- gentle fill light
-- soft contrast
-- realistic skin exposure
-- slightly warm highlights
-- neutral shadows
-- no harsh light
-- no strong rim light
-- no colored light
-- no theatrical chiaroscuro
-- no face partially hidden in darkness
-
-Both eyes and all identity-defining facial features must remain clearly visible.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-05. FIXED BACKGROUND
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Replace the original background with the same standardized investigative environment:
-
-- contemporary private investigation workspace
-- soft charcoal and muted blue-gray base
-- subtle dark olive and warm-beige elements
-- a restrained dark-burgundy detail
-- blurred investigation board
-- indistinct documents and archival folders
-- subtle map or case-material shapes
-- no people in the background
-- no readable text
-- no logos
-- no crime-scene tape
-- no weapons
-- no police-station clichés
-
-Keep the environment heavily blurred and understated.
-
-The background must never compete with the person.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-06. FIXED GAME COLOR DIRECTION
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Use the official "Último Vestígio" visual palette:
-
-- muted blue-gray
-- desaturated olive green
-- warm beige
-- soft charcoal
-- restrained dark burgundy
-
-Apply low saturation and balanced cinematic color grading.
-
-Avoid:
-
-- pure black
-- neon colors
-- purple glow
-- saturated blue
-- orange-and-teal blockbuster grading
-- cyberpunk aesthetics
-- horror aesthetics
-- fantasy aesthetics
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-07. FIXED PHOTOGRAPHIC TREATMENT
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Premium contemporary editorial photography — ultra-realistic, photographic, 8K quality.
-
-Camera:
-- natural full-frame camera appearance
-- 85 mm portrait lens
-- shallow depth of field
-- sharp focus on the eyes
-- eyes must be the sharpest point of the image
-
-Skin:
-- realistic skin texture with visible pores and natural detail
-- no beauty filter
-- no artificial sharpening
-- no plastic skin
-- no skin smoothing
-
-Treatment:
-- subtle cinematic grain
-- controlled dynamic range
-- natural colors
-- no illustration
-- no painterly effect
-- no 3D-rendered appearance
-- no AI artifacts
-- no cartoon style
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-08. EDITING BOUNDARIES — EDIT, DO NOT REGENERATE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-This is a photo-editing task. Edit the existing photograph. Do not discard it and generate a new synthetic person.
-
-Change only:
-
-- clothing (colors and style per section 03)
-- background
-- lighting treatment
-- framing adjustments required by the fixed portrait standard
-- color grading
-
-Preserve the original person's identity, face, age, hair and physical characteristics exactly as they appear in the reference.
-
-When a requested stylistic change conflicts with identity preservation, preserve identity and reduce the stylistic transformation.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-09. FINAL VALIDATION
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-The result must satisfy all of these conditions:
-
-1. It is unmistakably the same person as the reference photograph — the face, hair, skin and age are identical.
-2. It matches the same framing used for every investigator.
-3. It uses a distinct color combination from other portraits, with matte fabrics and no logos.
-4. It uses the same lighting setup — soft front-left light, both eyes clearly visible.
-5. It uses the same background environment.
-6. It uses the same game color palette and photographic treatment.
-7. It looks like part of one cohesive investigator roster.
-8. It does not look like an independently generated cinematic character.
-9. The person's apparent age is exactly the same as in the reference photograph — no added wrinkles, aging or maturity.
-10. The original photograph was edited, not discarded — the person was not regenerated from scratch.
-11. The skin has realistic texture — pores, freckles and natural imperfections are visible, not smoothed or airbrushed.
-12. The eyes are in sharp focus — the sharpest point of the entire image.
-
-The final image must feel like the original photograph was professionally reshot inside the visual universe of "Último Vestígio", not like the person was redesigned by AI.`;
-
-const generateWithOpenAI = async (mimeType: string, base64Data: string) => {
-  const apiKey = process.env.OPENAI_API_KEY || process.env.OPEN_API_KEY;
-  if (!apiKey) throw new Error('OpenAI image generation is unavailable');
-  const imageBuffer = Buffer.from(base64Data, 'base64');
-  const form = new FormData();
-  form.append('model', process.env.OPENAI_IMAGE_MODEL || 'gpt-image-1');
-  form.append('prompt', profilePortraitPrompt);
-  form.append('size', '1024x1024');
-  form.append('image', new Blob([imageBuffer], { type: mimeType }), `profile.${mimeType.split('/')[1]}`);
-  const response = await fetch('https://api.openai.com/v1/images/edits', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${apiKey}` },
-    body: form
-  });
-  const payload = await response.json() as any;
-  if (!response.ok) throw new Error(payload?.error?.message || 'OpenAI image generation failed');
-  const image = payload?.data?.[0]?.b64_json;
-  if (!image) throw new Error('OpenAI returned no portrait');
-  return `data:image/png;base64,${image}`;
-};
+Style: The final image must have a tactile film texture, with visible grain, emulated from high-caliber photographic film.`;
 
 export const generateProfilePortrait = async (sourceDataUrl: string) => {
   const match = sourceDataUrl.match(/^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/);
   if (!match || !allowedMimeTypes.has(match[1])) throw new Error('Unsupported profile image');
   if (Buffer.byteLength(match[2], 'base64') > 4 * 1024 * 1024) throw new Error('Profile image is too large');
-  let lastError: unknown;
-  if (process.env.OPENAI_API_KEY || process.env.OPEN_API_KEY) {
-    try { return await generateWithOpenAI(match[1], match[2]); }
-    catch (error) { lastError = error; }
-  }
 
-  if (!process.env.GEMINI_API_KEY) throw lastError instanceof Error ? lastError : new Error('Image generation is unavailable');
+  if (!process.env.GEMINI_API_KEY) throw new Error('Image generation is unavailable');
 
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  let lastError: unknown;
   for (const model of imageModels) {
     try {
       const response: any = await ai.models.generateContent({

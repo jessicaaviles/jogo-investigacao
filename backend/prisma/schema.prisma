@@ -20,6 +20,7 @@ model anonymous_users {
   bio                 String?
   profile_photo_data  String?
   generated_profile_photo_data String?
+  portrait_generations    Int       @default(0)
   profile_photo_updated_at DateTime?
   created_at          DateTime  @default(now())
   updated_at          DateTime  @updatedAt

@@ -4,6 +4,8 @@ import { generateProfilePortrait } from '../services/profilePortrait';
 
 const prisma = new PrismaClient();
 
+const MAX_PORTRAIT_GENERATIONS = 3;
+
 const publicProfile = (user: any) => ({
   id: user.id,
   displayName: user.default_display_name || 'Investigador',
@@ -12,7 +14,9 @@ const publicProfile = (user: any) => ({
   photo: user.generated_profile_photo_data || user.profile_photo_data || null,
   hasGeneratedPortrait: Boolean(user.generated_profile_photo_data),
   hasProfile: Boolean(user.default_display_name) || Boolean(user.bio) || Boolean(user.profile_photo_data) || Boolean(user.generated_profile_photo_data),
-  photoUpdatedAt: user.profile_photo_updated_at
+  photoUpdatedAt: user.profile_photo_updated_at,
+  portraitGenerations: user.portrait_generations ?? 0,
+  portraitGenerationsRemaining: Math.max(0, MAX_PORTRAIT_GENERATIONS - (user.portrait_generations ?? 0)),
 });
 
 export const getProfile = async (req: Request, res: Response) => {
@@ -34,6 +38,10 @@ export const updateProfile = async (req: Request, res: Response) => {
   if (photoData) {
     if (!/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(String(photoData)) || Buffer.byteLength(String(photoData).split(',')[1], 'base64') > 4 * 1024 * 1024)
       return res.status(400).json({ success: false, error: 'Invalid profile image' });
+    const gensUsed = current.portrait_generations ?? 0;
+    if (generatePortrait !== false && gensUsed >= MAX_PORTRAIT_GENERATIONS) {
+      return res.status(400).json({ success: false, error: 'Limite de retratos atingido (máximo 3). Remova a foto ou use uma foto já existente.', portraitLimitReached: true });
+    }
   }
 
   let generatedPortrait: string | null | undefined;
@@ -64,10 +72,12 @@ export const updateProfile = async (req: Request, res: Response) => {
     try {
       generatedPortrait = await generateProfilePortrait(String(photoData));
       portraitStatus = 'READY';
-      // Update the DB with the generated portrait
       await prisma.anonymous_users.update({
         where: { id: current.id },
-        data: { generated_profile_photo_data: generatedPortrait }
+        data: {
+          generated_profile_photo_data: generatedPortrait,
+          portrait_generations: { increment: 1 },
+        }
       });
     } catch (error) {
       portraitStatus = 'UNAVAILABLE';

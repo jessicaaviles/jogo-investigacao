@@ -13,6 +13,8 @@ interface ProfileData {
   photo: string | null;
   hasGeneratedPortrait: boolean;
   hasProfile: boolean;
+  portraitGenerations?: number;
+  portraitGenerationsRemaining?: number;
 }
 
 const Profile: React.FC = () => {
@@ -181,6 +183,8 @@ const Profile: React.FC = () => {
     if (!file) return;
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 4 * 1024 * 1024)
       return setStatus('Use uma imagem JPG, PNG ou WEBP de até 4 MB.');
+    if ((profile?.portraitGenerationsRemaining ?? 3) <= 0)
+      return setStatus('Limite de retratos atingido (máximo 3).');
     const reader = new FileReader();
     reader.onload = () => {
       const value = String(reader.result);
@@ -293,6 +297,11 @@ const Profile: React.FC = () => {
             {generatingPortrait && <div className="profile-avatar-spinner" />}
           </div>
           {profile?.hasGeneratedPortrait && <span className="portrait-badge" title="Retrato gerado pela IA"><Check size={12} /></span>}
+          {profile?.portraitGenerationsRemaining !== undefined && (
+            <span style={{ position: 'absolute', bottom: -16, left: '50%', transform: 'translateX(-50%)', fontSize: 10, color: 'var(--muted)', whiteSpace: 'nowrap' }}>
+              {profile.portraitGenerationsRemaining}/3 gerações
+            </span>
+          )}
         </div>
         <div>
           <span className="eyebrow">Arquivo do investigador</span>
@@ -309,11 +318,16 @@ const Profile: React.FC = () => {
       {editing && (
         <form className="profile-form" onSubmit={save}>
           <div className="profile-form-photo">
-            <label className="photo-picker">
-              <Camera size={18} /> Escolher foto
-              <input type="file" accept="image/jpeg,image/png,image/webp" onChange={choosePhoto} />
+            <label className="photo-picker" style={{ opacity: (profile?.portraitGenerationsRemaining ?? 3) <= 0 ? 0.4 : 1 }}>
+              <Camera size={18} /> {profile?.portraitGenerationsRemaining !== undefined && profile.portraitGenerationsRemaining <= 0 ? 'Limite atingido' : 'Escolher foto'}
+              <input type="file" accept="image/jpeg,image/png,image/webp" onChange={choosePhoto} disabled={(profile?.portraitGenerationsRemaining ?? 3) <= 0} />
             </label>
             <small>A IA preservará suas características e aplicará a direção cinematográfica do jogo.</small>
+            {profile?.portraitGenerationsRemaining !== undefined && (
+              <small style={{ color: 'var(--gold-soft)', fontWeight: 600 }}>
+                Gerações restantes: {profile.portraitGenerationsRemaining} de 3
+              </small>
+            )}
           </div>
           <label>
             Nome de investigador

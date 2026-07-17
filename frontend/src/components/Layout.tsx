@@ -32,7 +32,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       ) : (
         <div style={{ width: '72px' }} />
       )}
-      <button className="menu-button" aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'} aria-expanded={menuOpen} onClick={() => setMenuOpen((open) => !open)}>
+      <button className="menu-button" style={{ position: 'relative', zIndex: menuOpen ? 42 : undefined }} aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'} aria-expanded={menuOpen} onClick={() => setMenuOpen((open) => !open)}>
         <div className="menu-button-icon">
           <Menu size={19} strokeWidth={1.5} className={`menu-icon ${menuOpen ? 'menu-icon--hidden' : ''}`} />
           <X size={19} strokeWidth={1.5} className={`menu-icon menu-icon--x ${menuOpen ? 'menu-icon--visible' : ''}`} />

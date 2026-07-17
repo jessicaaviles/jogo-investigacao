@@ -8,138 +8,241 @@ const imageModels = [
   'gemini-3-pro-image'
 ].filter(Boolean) as string[];
 
-const profilePortraitPrompt = `Create an ultra-realistic cinematic investigator profile portrait using the reference photos.
+const profilePortraitPrompt = `EDIT THE PROVIDED REFERENCE PHOTOGRAPH.
 
-The portrait MUST preserve the exact identity of the person.
+Create an official investigator profile portrait for the premium mystery game "Último Vestígio".
 
-Do not alter facial structure, bone proportions, eyes, nose, mouth, jawline, ears, skin tone, age, body type or any distinctive facial characteristics.
+This is an image-editing task, not a new character generation.
 
-Do not beautify, idealize or stylize the person.
-Maintain natural asymmetries, pores, skin texture, freckles, expression lines and all individual identity traits.
+The reference photograph is the absolute ground truth for the person's identity.
 
-The result should look exactly like the same real person photographed professionally.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+01. IDENTITY — VARIABLE PER USER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-STYLE
+Preserve the exact identity and physical characteristics of the person shown in the reference image.
 
-Premium contemporary investigative thriller.
+The final portrait must be immediately recognizable as the same real person.
 
-Inspired by high-end streaming crime dramas and cinematic photography.
+Keep unchanged:
 
-The image should feel sophisticated, realistic and mysterious without looking like horror, cyberpunk or fantasy.
+- facial structure and proportions
+- face width and length
+- forehead
+- cheekbones and cheeks
+- jawline and chin
+- eye shape, size, spacing and eyelids
+- eyebrows
+- nose shape, width and proportions
+- nostrils
+- lips, mouth shape and teeth
+- ears
+- skin tone
+- freckles, pores, expression lines and natural imperfections
+- natural facial asymmetries
+- hairline
+- hair color, texture, curl pattern, density and volume
+- neck and visible body proportions
+- apparent age
 
-COLOR PALETTE
+Do not reinterpret the face.
 
-Muted blue-gray
+Do not generate a look-alike.
 
-Olive green
+Do not beautify or idealize.
 
-Warm beige
+Do not slim or elongate the face.
 
-Dark burgundy
+Do not modify the eyes, nose, mouth, jaw or skin tone.
 
-Soft charcoal
+Do not smooth the skin.
 
-Avoid neon colors, saturated blues, glowing effects and pure black.
+Do not change ethnicity, age or body type.
 
-WARDROBE
+Preserve the person's natural expression whenever possible.
 
-Simple contemporary investigator clothing.
+The result must look like the original person photographed during the same professional photo session used for every investigator in the game.
 
-Dark jacket or overshirt.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+02. FIXED PORTRAIT STANDARD
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Neutral t-shirt or shirt underneath.
+Apply exactly the same portrait standard used for every investigator:
 
-No visible logos.
+- square image
+- 1:1 aspect ratio
+- chest-up portrait
+- head centered horizontally
+- eyes positioned slightly above the vertical center
+- camera at eye level
+- body turned approximately 10 degrees
+- face directed toward the camera
+- natural upright posture
+- neutral, attentive and approachable expression
+- no dramatic pose
+- no exaggerated smile
 
-Minimal accessories.
+Do not crop the top of the hair.
 
-POSE
+Maintain comfortable negative space around the head and shoulders.
 
-Chest-up portrait.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+03. FIXED WARDROBE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Body slightly turned (3/4 angle).
+Replace only the visible clothing with:
 
-Eyes looking directly at camera.
+- dark desaturated olive overshirt
+- warm light-beige crew-neck shirt underneath
+- matte natural fabrics
+- no logos
+- no text
+- no uniform
+- no tie
+- no police badge
+- no costume
+- no visible investigative accessories
 
-Calm, intelligent and observant expression.
+The clothing must be identical in style, color family and visual weight across all investigator portraits.
 
-Subtle confidence.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+04. FIXED LIGHTING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-No exaggerated smile.
+Use the same lighting setup for every portrait:
 
-LIGHTING
+- large soft light coming from the front-left side of the camera
+- subtle natural shadow on the opposite side of the face
+- gentle fill light
+- soft contrast
+- realistic skin exposure
+- slightly warm highlights
+- neutral shadows
+- no harsh light
+- no strong rim light
+- no colored light
+- no theatrical chiaroscuro
+- no face partially hidden in darkness
 
-Soft cinematic lighting.
+Both eyes and all identity-defining facial features must remain clearly visible.
 
-Natural window-light feeling.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+05. FIXED BACKGROUND
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Gentle shadows.
+Replace the original background with the same standardized investigative environment:
 
-High dynamic range.
+- contemporary private investigation workspace
+- soft charcoal and muted blue-gray base
+- subtle dark olive and warm-beige elements
+- a restrained dark-burgundy detail
+- blurred investigation board
+- indistinct documents and archival folders
+- subtle map or case-material shapes
+- no people in the background
+- no readable text
+- no logos
+- no crime-scene tape
+- no weapons
+- no police-station clichés
 
-No dramatic rim light.
+Keep the environment heavily blurred and understated.
 
-BACKGROUND
+The background must never compete with the person.
 
-Softly blurred investigative environment.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+06. FIXED GAME COLOR DIRECTION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Hints of evidence boards, archived documents, maps, detective office, police files or research materials.
+Use the official "Último Vestígio" visual palette:
 
-Everything heavily out of focus.
+- muted blue-gray
+- desaturated olive green
+- warm beige
+- soft charcoal
+- restrained dark burgundy
 
-The person remains the visual focus.
+Apply low saturation and balanced cinematic color grading.
 
-CAMERA
+Avoid:
 
-Professional full-frame camera.
+- pure black
+- neon colors
+- purple glow
+- saturated blue
+- orange-and-teal blockbuster grading
+- cyberpunk aesthetics
+- horror aesthetics
+- fantasy aesthetics
 
-85mm lens.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+07. FIXED PHOTOGRAPHIC TREATMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Shallow depth of field.
+Premium contemporary editorial photography.
 
-Extremely sharp eyes.
+Natural full-frame camera appearance.
 
-Natural skin rendering.
+85 mm portrait-lens look.
 
-EDITORIAL DIRECTION
+Moderately shallow depth of field.
 
-Looks like an official investigator profile from a premium investigation game.
+Eyes and facial features in sharp focus.
 
-Elegant.
+Background softly blurred.
 
-Minimal.
+Realistic skin texture.
 
-Believable.
+Subtle cinematic grain.
 
-Cinematic.
-
-Timeless.
-
-IMAGE QUALITY
-
-Ultra realistic.
-
-Photographic.
-
-8K.
+Controlled dynamic range.
 
 Natural colors.
 
-No AI artifacts.
+No beauty filter.
 
-No cartoon style.
+No artificial sharpening.
+
+No plastic skin.
 
 No illustration.
 
-No fantasy armor.
+No painterly effect.
 
-No exaggerated contrast.
+No 3D-rendered appearance.
 
-No beauty filter.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+08. EDITING BOUNDARIES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-No skin smoothing.
+Change only:
 
-Identity preservation is the highest priority.`;
+- clothing
+- background
+- lighting treatment
+- framing adjustments required by the fixed portrait standard
+- color grading
+
+Preserve the original person's identity, face, hair and physical characteristics.
+
+When a requested stylistic change conflicts with identity preservation, preserve identity and reduce the stylistic transformation.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+09. FINAL VALIDATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+The result must satisfy all of these conditions:
+
+1. It is unmistakably the same person as the reference photograph.
+2. It matches the same framing used for every investigator.
+3. It uses the same wardrobe standard.
+4. It uses the same lighting setup.
+5. It uses the same background environment.
+6. It uses the same game color palette and photographic treatment.
+7. It looks like part of one cohesive investigator roster.
+8. It does not look like an independently generated cinematic character.
+
+The final image must feel like the original photograph was professionally reshot inside the visual universe of "Último Vestígio", not like the person was redesigned by AI.`;
 
 const generateWithOpenAI = async (mimeType: string, base64Data: string) => {
   const apiKey = process.env.OPENAI_API_KEY || process.env.OPEN_API_KEY;

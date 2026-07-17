@@ -22,6 +22,7 @@ const Home: React.FC = () => {
     <section className="home-hero">
       <div className="home-hero-image" />
       <div className="home-hero-copy">
+        <img className="home-hero-logo" src="/logo-sem-fundo.png" alt="Último Vestígio" />
         <span className="eyebrow">Dossiê aberto · Temporada 01</span>
         <h1>A verdade está nos detalhes.</h1>
         <p>Investigue em equipe. Conecte os fatos. Encontre o último vestígio.</p>

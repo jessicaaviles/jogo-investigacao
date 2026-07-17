@@ -1,4 +1,6 @@
 import { GoogleGenAI } from '@google/genai';
+import { selectBackground } from './portraitBackgrounds';
+import { selectOutfit } from './portraitOutfits';
 
 const allowedMimeTypes = new Set(['image/jpeg', 'image/png', 'image/webp']);
 
@@ -12,30 +14,43 @@ const imageModels = [
 
 const NEW_API_MODELS = new Set(['gemini-3.1-flash-lite-image', 'gemini-3.1-flash-image', 'gemini-3-pro-image']);
 
-const profilePortraitPrompt = `EDIT THIS PHOTO — do NOT generate a new person.
+function hashSeed(id: string): number {
+  let hash = 0
+  for (let i = 0; i < id.length; i++) {
+    const char = id.charCodeAt(i)
+    hash = ((hash << 5) - hash) + char
+    hash |= 0
+  }
+  return Math.abs(hash)
+}
 
-Take the supplied reference photograph and transform it according to the description below. The face, hair, body, age and all physical characteristics must remain exactly as in the reference photo. Do not recreate or reinterpret the person — edit the existing photo.
+function buildPrompt(userHash: number): string {
+  const bg = selectBackground(userHash)
+  const outfit = selectOutfit(userHash + 7)
 
-Now apply this transformation:
+  return `Edit the supplied photograph into a cinematic profile portrait.
 
-Instruction for the AI: Generate a high-quality, circular-framed profile image, strictly based on the input photograph.
+PRESERVE EXACTLY (do not change):
+- Face: all facial features, bone structure, skin, and expression must remain identical
+- Hair: exact style, color, length, and texture
+- Age: do not age or de-age
+- Body: proportions and build
 
-Subject: Accurately preserve the facial features, bone structure, hairstyle, and any distinctive accessories (such as glasses or piercings) of the person in the original image.
+CHANGE:
+- Clothing: ${outfit.description}
+- Background: replace the background with ${bg.description}
+- Lighting: dramatic chiaroscuro — deep navy-black shadows against warm gold highlights, melancholic mysterious mood, cinematographic lighting inspired by thriller films
+- Texture: visible film grain, high-caliber photographic film emulation, subtle
 
-Attire: The person must be wearing a dark, utilitarian trench coat. On the lapel or chest of the coat, there must be a circular, embossed gold metal badge, featuring the number "12" in a classic style.
+The person in the output must be IDENTICAL to the person in the input photo. This is an edit, not a new generation.`
+}
 
-Setting: The original background is replaced by a dark, rugged, and stormy coastal landscape. On a distant cliff, an ancient, gloomy manor house is visible, with a few faint, yellow lights in its windows.
-
-Lighting and Atmosphere: The lighting must be dramatic, chiaroscuro style, with a strong contrast between deep shadows (navy blue/black) and warm light highlights (gold). The mood is melancholic and mysterious.
-
-Style: The final image must have a tactile film texture, with visible grain, emulated from high-caliber photographic film.`;
-
-const generateViaInteractions = async (ai: GoogleGenAI, model: string, mimeType: string, base64Data: string) => {
+const generateViaInteractions = async (ai: GoogleGenAI, model: string, mimeType: string, base64Data: string, prompt: string) => {
   const interaction = await ai.interactions.create({
     model,
     input: [
       { type: 'image' as const, data: base64Data, mime_type: mimeType },
-      { type: 'text' as const, text: profilePortraitPrompt }
+      { type: 'text' as const, text: prompt }
     ],
     response_modalities: ['text', 'image'],
   });
@@ -46,10 +61,10 @@ const generateViaInteractions = async (ai: GoogleGenAI, model: string, mimeType:
   throw new Error(`${model} returned no portrait via Interactions API`);
 };
 
-const generateViaGenerateContent = async (ai: GoogleGenAI, model: string, mimeType: string, base64Data: string) => {
+const generateViaGenerateContent = async (ai: GoogleGenAI, model: string, mimeType: string, base64Data: string, prompt: string) => {
   const response: any = await ai.models.generateContent({
     model,
-    contents: [{ role: 'user', parts: [{ inlineData: { mimeType, data: base64Data } }, { text: profilePortraitPrompt }] }],
+    contents: [{ role: 'user', parts: [{ inlineData: { mimeType, data: base64Data } }, { text: prompt }] }],
     config: { responseModalities: ['TEXT', 'IMAGE'] }
   } as any);
   const imageParts = response.candidates?.[0]?.content?.parts?.filter((part: any) => part.inlineData?.data) || [];
@@ -61,12 +76,15 @@ const generateViaGenerateContent = async (ai: GoogleGenAI, model: string, mimeTy
   throw new Error(`${model} returned no portrait via generateContent`);
 };
 
-export const generateProfilePortrait = async (sourceDataUrl: string) => {
+export const generateProfilePortrait = async (sourceDataUrl: string, userId?: string) => {
   const match = sourceDataUrl.match(/^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/);
   if (!match || !allowedMimeTypes.has(match[1])) throw new Error('Unsupported profile image');
   if (Buffer.byteLength(match[2], 'base64') > 4 * 1024 * 1024) throw new Error('Profile image is too large');
 
   if (!process.env.GEMINI_API_KEY) throw new Error('Image generation is unavailable');
+
+  const userHash = userId ? hashSeed(userId) : Math.floor(Math.random() * 100000);
+  const prompt = buildPrompt(userHash);
 
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
   let lastError: unknown;
@@ -74,8 +92,8 @@ export const generateProfilePortrait = async (sourceDataUrl: string) => {
     try {
       const useNewApi = NEW_API_MODELS.has(model) || (model.startsWith('gemini-3.') && !model.includes('flash-lite'));
       const result = useNewApi
-        ? await generateViaInteractions(ai, model, match[1], match[2])
-        : await generateViaGenerateContent(ai, model, match[1], match[2]);
+        ? await generateViaInteractions(ai, model, match[1], match[2], prompt)
+        : await generateViaGenerateContent(ai, model, match[1], match[2], prompt);
       return result;
     } catch (error) {
       lastError = error;

@@ -11,7 +11,9 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
-    const newSocket = io(import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001', { reconnection: true, reconnectionAttempts: Infinity, timeout: 8000 });
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+    const baseUrl = apiUrl.endsWith('/api') ? apiUrl.slice(0, -4) : apiUrl.replace(/\/$/, '');
+    const newSocket = io(import.meta.env.VITE_SOCKET_URL || baseUrl, { reconnection: true, reconnectionAttempts: Infinity, timeout: 8000 });
     setSocket(newSocket);
 
     return () => {

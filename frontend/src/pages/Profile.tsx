@@ -68,7 +68,7 @@ const Profile: React.FC = () => {
           if (res.success) {
             currentUserId = res.data.userId;
             localStorage.setItem('deviceToken', res.data.deviceToken);
-            localStorage.setItem('userId', currentUserId);
+            localStorage.setItem('userId', currentUserId!);
           } else {
             setLoading(false);
             return;

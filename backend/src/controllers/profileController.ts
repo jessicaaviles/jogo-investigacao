@@ -70,7 +70,7 @@ export const updateProfile = async (req: Request, res: Response) => {
   // Generate portrait synchronously so it's ready in the response
   if (photoData && generatePortrait) {
     try {
-      generatedPortrait = await generateProfilePortrait(String(photoData));
+      generatedPortrait = await generateProfilePortrait(String(photoData), current.id);
       portraitStatus = 'READY';
       await prisma.anonymous_users.update({
         where: { id: current.id },

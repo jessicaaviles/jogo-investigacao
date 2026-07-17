@@ -169,7 +169,6 @@
 .timer-setting { display: flex; justify-content: space-between; align-items: center; gap: 12px; color: var(--muted); font-size: 12px; }.timer-setting select { color: var(--paper); background: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 8px; }
 .briefing-page { max-width: 760px; min-height: calc(100dvh - 180px); margin: 0 auto; padding: 52px clamp(20px, 6vw, 72px); border-radius: 16px; background: linear-gradient(90deg, rgba(31,42,48,.94), rgba(31,42,48,.55)), linear-gradient(0deg, rgba(31,42,48,.96), rgba(31,42,48,.2)), url('/backgrounds/cena-do-crime.png') center/cover; }.briefing-page h1 { font-size: clamp(40px, 7vw, 72px); line-height: .98; margin: 12px 0 20px; }.briefing-opening { color: var(--paper); font: 20px/1.5 var(--serif); max-width: 620px; }.briefing-facts { margin: 32px 0; padding: 20px; border-left: 2px solid var(--gold); background: rgba(184,153,83,.08); }.briefing-facts p { color: var(--muted); margin-top: 8px; }.turn-order { display: grid; margin-bottom: 28px; border-top: 1px solid var(--line); }.turn-order > span { padding: 16px 0 8px; }.turn-order div { display: grid; grid-template-columns: 36px 1fr auto; gap: 12px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--line); }.turn-order div > span { color: var(--gold-soft); font-family: var(--serif); }.turn-order small { color: var(--muted); }
 .messages-page input { min-width: 0; }
-.messages-page > div[style*="calc(100vh"] { height: calc(100dvh - 76px) !important; min-height: 0; }
 .cases-page [style*="maxHeight"] { max-height: 90dvh !important; }
 
 @media (max-width: 640px) {
@@ -180,8 +179,8 @@
   .game-page form { gap: 8px !important; }
   .game-page form input { flex: 1 1 100%; }
   .game-page form button { flex: 1; }
+  .game-page form button { flex: 1; }
   .game-actions > * { flex-basis: 100%; }
-  .messages-page > div[style*="calc(100vh"] { height: calc(100dvh - 68px) !important; }
   .cases-page [style*="gridTemplateColumns"] { grid-template-columns: 1fr !important; }
   .home-actions .btn-primary, .home-actions .btn-secondary { width: 100%; }.feedback-page, .tutorial-page { padding-top: 16px; }
   .profile-editor-page { padding-top: 16px !important; }.profile-hero { grid-template-columns: auto 1fr; gap: 24px; }.profile-avatar { width: 100px; height: 100px; }.profile-edit-trigger { grid-column: 1 / -1; width: 100%; }.profile-stats { gap: 8px; }.profile-stats > div { padding: 14px; }

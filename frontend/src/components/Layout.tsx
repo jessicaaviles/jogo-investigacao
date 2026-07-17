@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, FolderOpen, Users, MessageCircle, UserRound, Menu } from 'lucide-react';
+import { Home, FolderOpen, Users, MessageCircle, UserRound, Menu, X } from 'lucide-react';
 
 interface LayoutProps { children: React.ReactNode; }
 
@@ -32,9 +32,20 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       ) : (
         <div style={{ width: '72px' }} />
       )}
-      <button className="menu-button" aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'} aria-expanded={menuOpen} onClick={() => setMenuOpen((open) => !open)}><Menu size={19} strokeWidth={1.5} /><span className="notification-dot" /></button>
+      <button className="menu-button" aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'} aria-expanded={menuOpen} onClick={() => setMenuOpen((open) => !open)}>
+        <div className="menu-button-icon">
+          <Menu size={19} strokeWidth={1.5} className={`menu-icon ${menuOpen ? 'menu-icon--hidden' : ''}`} />
+          <X size={19} strokeWidth={1.5} className={`menu-icon menu-icon--x ${menuOpen ? 'menu-icon--visible' : ''}`} />
+        </div>
+        <span className="notification-dot" />
+      </button>
     </header>
-    {menuOpen && <div className="quick-menu" role="dialog" aria-label="Menu rápido"><div className="quick-menu-head"><span className="eyebrow">Arquivo do investigador</span><button onClick={() => setMenuOpen(false)} aria-label="Fechar menu">Fechar</button></div><button onClick={() => { setMenuOpen(false); navigate('/tutorial'); }}>Como funciona</button><button onClick={() => { setMenuOpen(false); navigate('/profile'); }}>Meu perfil</button><button onClick={() => { setMenuOpen(false); navigate('/messages'); }}>Mensagens da equipe</button></div>}
+    {menuOpen && <div className="menu-backdrop" onClick={() => setMenuOpen(false)} />}
+    <div className={`menu-drawer ${menuOpen ? 'menu-drawer--open' : ''}`}>
+      <button className="menu-drawer-item" onClick={() => { setMenuOpen(false); navigate('/profile'); }}>Meu perfil</button>
+      <button className="menu-drawer-item" onClick={() => { setMenuOpen(false); navigate('/messages'); }}>Mensagens</button>
+      <button className="menu-drawer-item" onClick={() => { setMenuOpen(false); navigate('/tutorial'); }}>Como funciona</button>
+    </div>
     <main className="app-content">{children}</main>
     <nav className="bottom-nav" aria-label="Navegação principal"><div className="bottom-nav-inner">
       {navItems.map(({ label, route, icon: Icon }) => <button className={`nav-item ${isActive(route) ? 'active' : ''}`} key={label} onClick={() => handleNav(route)}>

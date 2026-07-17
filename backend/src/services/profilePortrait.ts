@@ -1,12 +1,15 @@
 import { GoogleGenAI } from '@google/genai';
 
 const allowedMimeTypes = new Set(['image/jpeg', 'image/png', 'image/webp']);
+
 const imageModels = [
   process.env.GEMINI_IMAGE_MODEL,
   'gemini-3.1-flash-image',
   'gemini-2.5-flash-image',
   'gemini-3-pro-image'
 ].filter(Boolean) as string[];
+
+const NEW_API_MODELS = new Set(['gemini-3.1-flash-image', 'gemini-3-pro-image']);
 
 const profilePortraitPrompt = `EDIT THIS PHOTO — do NOT generate a new person.
 
@@ -26,6 +29,37 @@ Lighting and Atmosphere: The lighting must be dramatic, chiaroscuro style, with 
 
 Style: The final image must have a tactile film texture, with visible grain, emulated from high-caliber photographic film.`;
 
+const generateViaInteractions = async (ai: GoogleGenAI, model: string, mimeType: string, base64Data: string) => {
+  const interaction = await ai.interactions.create({
+    model,
+    input: [
+      { type: 'image' as const, data: base64Data, mime_type: mimeType },
+      { type: 'text' as const, text: profilePortraitPrompt }
+    ],
+    response_modalities: ['TEXT', 'IMAGE'],
+  });
+  if (interaction.output_image?.data) {
+    const outMime = interaction.output_image.mime_type || 'image/png';
+    return `data:${outMime};base64,${interaction.output_image.data}`;
+  }
+  throw new Error(`${model} returned no portrait via Interactions API`);
+};
+
+const generateViaGenerateContent = async (ai: GoogleGenAI, model: string, mimeType: string, base64Data: string) => {
+  const response: any = await ai.models.generateContent({
+    model,
+    contents: [{ role: 'user', parts: [{ inlineData: { mimeType, data: base64Data } }, { text: profilePortraitPrompt }] }],
+    config: { responseModalities: ['TEXT', 'IMAGE'] }
+  } as any);
+  const imageParts = response.candidates?.[0]?.content?.parts?.filter((part: any) => part.inlineData?.data) || [];
+  if (imageParts.length > 0) {
+    const imagePart = imageParts[imageParts.length - 1];
+    const outMime = imagePart.inlineData.mimeType || 'image/png';
+    return `data:${outMime};base64,${imagePart.inlineData.data}`;
+  }
+  throw new Error(`${model} returned no portrait via generateContent`);
+};
+
 export const generateProfilePortrait = async (sourceDataUrl: string) => {
   const match = sourceDataUrl.match(/^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/);
   if (!match || !allowedMimeTypes.has(match[1])) throw new Error('Unsupported profile image');
@@ -37,18 +71,15 @@ export const generateProfilePortrait = async (sourceDataUrl: string) => {
   let lastError: unknown;
   for (const model of imageModels) {
     try {
-      const response: any = await ai.models.generateContent({
-        model,
-        contents: [{ role: 'user', parts: [{ inlineData: { mimeType: match[1], data: match[2] } }, { text: profilePortraitPrompt }] }],
-        config: { responseModalities: ['TEXT', 'IMAGE'] }
-      } as any);
-      const imagePart = response.candidates?.[0]?.content?.parts?.find((part: any) => part.inlineData?.data);
-      if (imagePart?.inlineData?.data) {
-        const mimeType = imagePart.inlineData.mimeType || 'image/png';
-        return `data:${mimeType};base64,${imagePart.inlineData.data}`;
-      }
-      lastError = new Error(`${model} returned no portrait`);
-    } catch (error) { lastError = error; }
+      const useNewApi = NEW_API_MODELS.has(model) || (model.startsWith('gemini-3.') && !model.includes('flash-lite'));
+      const result = useNewApi
+        ? await generateViaInteractions(ai, model, match[1], match[2])
+        : await generateViaGenerateContent(ai, model, match[1], match[2]);
+      return result;
+    } catch (error) {
+      lastError = error;
+      console.error(`[profilePortrait] ${model} failed:`, error instanceof Error ? error.message : error);
+    }
   }
   throw lastError instanceof Error ? lastError : new Error('Image generation returned no portrait');
 };

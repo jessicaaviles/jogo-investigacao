@@ -206,7 +206,7 @@ const Messages: React.FC = () => {
         </div>
       ) : (
         /* Chat Ativo */
-        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, position: 'relative' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', height: 'auto', minHeight: '100%', paddingBottom: '96px', position: 'relative' }}>
           {/* Header do Chat */}
           <div style={{
             padding: '48px 24px 16px 24px',

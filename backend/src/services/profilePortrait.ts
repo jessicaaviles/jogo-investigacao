@@ -37,6 +37,8 @@ PRESERVE EXACTLY (do not change):
 - Body: proportions and build
 
 CHANGE:
+- Pose: 3/4 angle (three-quarter turn), person looking directly toward the camera
+- Framing: face centered in the frame, shoulders and torso visible, tight portrait crop
 - Clothing: ${outfit.description}
 - Background: replace the background with ${bg.description}
 - Lighting: dramatic chiaroscuro — deep navy-black shadows against warm gold highlights, melancholic mysterious mood, cinematographic lighting inspired by thriller films

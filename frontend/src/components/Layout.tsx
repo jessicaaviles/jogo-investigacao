@@ -12,7 +12,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const navItems = [
     { label: 'INVESTIGAÇÃO', route: '/', icon: Home },
     { label: 'CASOS', route: 'map', icon: FolderOpen },
-    { label: 'LOBBY', route: 'lobby', icon: Users },
+    { label: 'SALAS', route: 'lobby', icon: Users },
     { label: 'MENSAGENS', route: 'messages', icon: MessageCircle },
     { label: 'PERFIL', route: 'profile', icon: UserRound },
   ];

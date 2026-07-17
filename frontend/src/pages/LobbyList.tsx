@@ -13,14 +13,11 @@ const LobbyList: React.FC = () => {
       padding: '24px 24px 96px 24px',
       display: 'flex',
       flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      fontFamily: 'system-ui, -apple-system, sans-serif',
-      textAlign: 'center'
+      fontFamily: 'system-ui, -apple-system, sans-serif'
     }}>
       <div style={{
-        width: '64px',
-        height: '64px',
+        width: '48px',
+        height: '48px',
         borderRadius: '50%',
         backgroundColor: 'rgba(197, 168, 128, 0.08)',
         border: '1px solid rgba(197, 168, 128, 0.2)',
@@ -28,22 +25,22 @@ const LobbyList: React.FC = () => {
         alignItems: 'center',
         justifyContent: 'center',
         color: '#C5A880',
-        marginBottom: '24px'
+        marginBottom: '16px'
       }}>
-        <Users size={32} strokeWidth={1.5} />
+        <Users size={24} strokeWidth={1.5} />
       </div>
 
       <span style={{ color: '#C5A880', fontSize: '10px', letterSpacing: '2px', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>
-        LOBBY DE INVESTIGAÇÃO
+        Salas
       </span>
-      <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '28px', fontWeight: 400, margin: '0 0 12px 0', maxWidth: '80%' }}>
+      <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '28px', fontWeight: 400, margin: '0 0 12px 0' }}>
         Nenhuma sala ativa
       </h1>
-      <p style={{ color: '#8E989F', fontSize: '14px', lineHeight: 1.5, margin: '0 0 32px 0', maxWidth: '80%', fontWeight: 300 }}>
-        Para acessar o painel de lobby sincronizado em tempo real, você deve estar dentro de uma investigação ativa com a sua equipe.
+      <p style={{ color: '#8E989F', fontSize: '14px', lineHeight: 1.5, margin: '0 0 32px 0', fontWeight: 300 }}>
+        Você deve estar dentro de uma investigação ativa com a sua equipe para acessar a sala.
       </p>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', maxWidth: '280px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
          <button className="btn-primary"
           onClick={() => navigate('/cases')}
           style={{

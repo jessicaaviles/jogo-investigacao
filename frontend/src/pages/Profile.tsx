@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, Check, Edit3, LogOut, Mail, UserPlus } from 'lucide-react';
+import { Camera, Check, Download, Edit3, LogOut, Mail, UserPlus, X } from 'lucide-react';
 import { getProfile, updateProfile, registerAnonymousUser, authValidate, authLogout, authLink } from '../services/api';
 import Loading from '../components/Loading';
 
@@ -30,6 +30,7 @@ const Profile: React.FC = () => {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState('');
+  const [photoViewer, setPhotoViewer] = useState(false);
 
   const savingRef = useRef(false);
   const fetchSeqRef = useRef(0);
@@ -111,6 +112,17 @@ const Profile: React.FC = () => {
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleDownloadPhoto = () => {
+    const img = profile?.photo;
+    if (!img) return;
+    const link = document.createElement('a');
+    link.href = img;
+    link.download = `perfil-${profile.displayName.replace(/\s+/g, '-')}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const choosePhoto = (event: ChangeEvent<HTMLInputElement>) => {
@@ -214,7 +226,7 @@ const Profile: React.FC = () => {
     <div className="profile-page profile-editor-page" style={{ minHeight: '100vh', backgroundColor: '#0F1417', color: '#F8F9FA', padding: '24px 24px 96px 24px', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       <div className="profile-hero">
         <div className="profile-avatar-wrap">
-          <div className="profile-avatar">
+          <div className="profile-avatar" style={{ cursor: image ? 'pointer' : 'default' }} onClick={() => image && setPhotoViewer(true)}>
             {image ? <img src={image} alt={`Retrato de ${name}`} /> : <Camera size={28} strokeWidth={1.3} />}
           </div>
           {profile?.hasGeneratedPortrait && <span className="portrait-badge" title="Retrato gerado pela IA"><Check size={12} /></span>}
@@ -308,6 +320,25 @@ const Profile: React.FC = () => {
         <h2>Conquistas</h2>
         <p style={{ color: 'var(--muted)', fontSize: '13px', padding: '24px 0' }}>Nenhuma conquista desbloqueada ainda. Complete investigações para ganhar marcas de campo.</p>
       </section>
+
+      {photoViewer && profile?.photo && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          zIndex: 200, backgroundColor: 'rgba(0,0,0,0.92)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          padding: '24px', gap: '24px',
+        }} onClick={() => setPhotoViewer(false)}>
+          <div style={{ position: 'absolute', top: 24, right: 24, display: 'flex', gap: 12 }}>
+            <button onClick={(e) => { e.stopPropagation(); handleDownloadPhoto(); }} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', padding: '10px 16px', borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
+              <Download size={16} /> Baixar
+            </button>
+            <button onClick={() => setPhotoViewer(false)} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', padding: 10, borderRadius: 8, cursor: 'pointer', display: 'flex' }}>
+              <X size={20} />
+            </button>
+          </div>
+          <img src={profile.photo} alt={`Retrato de ${profile.displayName}`} style={{ maxWidth: '90%', maxHeight: '70vh', borderRadius: 12, objectFit: 'contain' }} onClick={(e) => e.stopPropagation()} />
+        </div>
+      )}
     </div>
   );
 };

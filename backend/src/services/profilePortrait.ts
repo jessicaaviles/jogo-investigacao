@@ -8,7 +8,138 @@ const imageModels = [
   'gemini-3-pro-image'
 ].filter(Boolean) as string[];
 
-const profilePortraitPrompt = `Transform the supplied person photo into a realistic cinematic investigative portrait for the game Último Vestígio, applying the game's art direction while preserving the person's exact face, age, skin texture, hair color/style, and bone structure. CRITICAL: Do NOT add wrinkles, aging, or skin texture that is not present in the original photo. The person must appear exactly the same age as in the supplied photo. Do NOT age or de-age. Do NOT alter eye shape, nose, mouth, or facial structure. Do NOT smooth wrinkles or skin texture. Do NOT change hairstyle, hair color, beard, or makeup. Apply the Último Vestígio visual style only to lighting, color grading, and background: 35mm or 50mm lens, moderate depth of field, subtle film grain, low saturation, cool ambient light mixed with warm tungsten, restrained contrast, natural expression, atmospheric Hotel Vesper / forensic archive setting. No text, no logos, no horror, no blood, no cyberpunk, no neon, no glamour retouching, no exaggerated beauty filter. Return only the generated portrait image.`;
+const profilePortraitPrompt = `Create an ultra-realistic cinematic investigator profile portrait using the reference photos.
+
+The portrait MUST preserve the exact identity of the person.
+
+Do not alter facial structure, bone proportions, eyes, nose, mouth, jawline, ears, skin tone, age, body type or any distinctive facial characteristics.
+
+Do not beautify, idealize or stylize the person.
+Maintain natural asymmetries, pores, skin texture, freckles, expression lines and all individual identity traits.
+
+The result should look exactly like the same real person photographed professionally.
+
+STYLE
+
+Premium contemporary investigative thriller.
+
+Inspired by high-end streaming crime dramas and cinematic photography.
+
+The image should feel sophisticated, realistic and mysterious without looking like horror, cyberpunk or fantasy.
+
+COLOR PALETTE
+
+Muted blue-gray
+
+Olive green
+
+Warm beige
+
+Dark burgundy
+
+Soft charcoal
+
+Avoid neon colors, saturated blues, glowing effects and pure black.
+
+WARDROBE
+
+Simple contemporary investigator clothing.
+
+Dark jacket or overshirt.
+
+Neutral t-shirt or shirt underneath.
+
+No visible logos.
+
+Minimal accessories.
+
+POSE
+
+Chest-up portrait.
+
+Body slightly turned (3/4 angle).
+
+Eyes looking directly at camera.
+
+Calm, intelligent and observant expression.
+
+Subtle confidence.
+
+No exaggerated smile.
+
+LIGHTING
+
+Soft cinematic lighting.
+
+Natural window-light feeling.
+
+Gentle shadows.
+
+High dynamic range.
+
+No dramatic rim light.
+
+BACKGROUND
+
+Softly blurred investigative environment.
+
+Hints of evidence boards, archived documents, maps, detective office, police files or research materials.
+
+Everything heavily out of focus.
+
+The person remains the visual focus.
+
+CAMERA
+
+Professional full-frame camera.
+
+85mm lens.
+
+Shallow depth of field.
+
+Extremely sharp eyes.
+
+Natural skin rendering.
+
+EDITORIAL DIRECTION
+
+Looks like an official investigator profile from a premium investigation game.
+
+Elegant.
+
+Minimal.
+
+Believable.
+
+Cinematic.
+
+Timeless.
+
+IMAGE QUALITY
+
+Ultra realistic.
+
+Photographic.
+
+8K.
+
+Natural colors.
+
+No AI artifacts.
+
+No cartoon style.
+
+No illustration.
+
+No fantasy armor.
+
+No exaggerated contrast.
+
+No beauty filter.
+
+No skin smoothing.
+
+Identity preservation is the highest priority.`;
 
 const generateWithOpenAI = async (mimeType: string, base64Data: string) => {
   const apiKey = process.env.OPENAI_API_KEY || process.env.OPEN_API_KEY;

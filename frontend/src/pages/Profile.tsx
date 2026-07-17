@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
-import { Camera, Check, Edit3, UserPlus } from 'lucide-react';
-import { getProfile, updateProfile, registerAnonymousUser } from '../services/api';
+import { useNavigate } from 'react-router-dom';
+import { Camera, Check, Edit3, LogOut, Mail, UserPlus } from 'lucide-react';
+import { getProfile, updateProfile, registerAnonymousUser, authValidate, authLogout, authLink } from '../services/api';
 import Loading from '../components/Loading';
 
 interface ProfileData {
@@ -15,7 +16,10 @@ interface ProfileData {
 }
 
 const Profile: React.FC = () => {
+  const navigate = useNavigate();
   const [userId, setUserId] = useState<string | null>(localStorage.getItem('userId'));
+  const [authToken, setAuthToken] = useState<string | null>(localStorage.getItem('authToken'));
+  const [authEmail, setAuthEmail] = useState<string | null>(null);
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState('Investigador');
@@ -31,6 +35,20 @@ const Profile: React.FC = () => {
   const fetchSeqRef = useRef(0);
 
   useEffect(() => {
+    if (authToken) {
+      ++fetchSeqRef.current;
+      authValidate(authToken).then((res) => {
+        if (res.success) {
+          localStorage.setItem('userId', res.data.userId);
+          setUserId(res.data.userId);
+          setAuthEmail(res.data.email || null);
+        } else {
+          localStorage.removeItem('authToken');
+          setAuthToken(null);
+        }
+      });
+      return;
+    }
     if (!userId) {
       registerAnonymousUser().then((res) => {
         if (res.success) {
@@ -61,7 +79,39 @@ const Profile: React.FC = () => {
       setProfile({ id: userId, displayName: 'Investigador', bio: '', active: true, photo: null, hasGeneratedPortrait: false, hasProfile: false });
       setLoading(false);
     });
-  }, [userId]);
+  }, [authToken, userId]);
+
+  const handleLogout = async () => {
+    if (authToken) await authLogout(authToken);
+    localStorage.removeItem('authToken');
+    setAuthToken(null);
+    setAuthEmail(null);
+    setStatus('Você saiu da sua conta.');
+  };
+
+  const handleLink = async () => {
+    if (!userId) return;
+    const email = window.prompt('Digite seu email para vincular este perfil:');
+    if (!email) return;
+    const password = window.prompt('Digite uma senha (mínimo 6 caracteres):');
+    if (!password || password.length < 6) return setStatus('A senha deve ter pelo menos 6 caracteres.');
+    setSaving(true);
+    try {
+      const res = await authLink(email, password, userId);
+      if (res.success) {
+        localStorage.setItem('authToken', res.data.authToken);
+        setAuthToken(res.data.authToken);
+        setAuthEmail(email);
+        setStatus('Perfil vinculado com sucesso! Agora você pode acessá-lo de qualquer dispositivo.');
+      } else {
+        setStatus(res.error || 'Erro ao vincular perfil.');
+      }
+    } catch {
+      setStatus('Erro de conexão.');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const choosePhoto = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -87,9 +137,7 @@ const Profile: React.FC = () => {
     try {
       let currentUserId = userId;
       let response = await updateProfile(currentUserId, {
-        displayName: name,
-        bio,
-        active,
+        displayName: name, bio, active,
         photoData: photoData || undefined,
         generatePortrait: Boolean(photoData),
       });
@@ -220,6 +268,39 @@ const Profile: React.FC = () => {
           <strong>—</strong>
           <small>das teorias</small>
         </div>
+      </div>
+
+      <div className="profile-section" style={{ marginTop: 32 }}>
+        <span className="eyebrow">Conta e sincronia</span>
+        {authToken ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '16px 0' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--olive-light)', fontSize: 13 }}>
+              <Mail size={16} /> {authEmail || 'Conta vinculada'}
+            </div>
+            <button className="btn-secondary" onClick={handleLogout} style={{ alignSelf: 'flex-start', minHeight: 40, fontSize: 12 }}>
+              <LogOut size={14} /> Sair da conta
+            </button>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '16px 0' }}>
+            <p style={{ color: 'var(--muted)', fontSize: 13, lineHeight: 1.5 }}>
+              Vincule seu perfil a um email para acessá-lo de qualquer dispositivo.
+            </p>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <button className="btn-primary" onClick={() => navigate('/login')} style={{ minHeight: 40, fontSize: 12 }}>
+                Entrar
+              </button>
+              <button className="btn-secondary" onClick={() => navigate('/register')} style={{ minHeight: 40, fontSize: 12 }}>
+                Criar conta
+              </button>
+              {userId && !authToken && (
+                <button className="btn-secondary" onClick={handleLink} disabled={saving} style={{ minHeight: 40, fontSize: 12 }}>
+                  <Mail size={14} /> Vincular este perfil
+                </button>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       <section className="profile-section">

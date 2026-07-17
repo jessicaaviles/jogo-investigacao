@@ -51,3 +51,28 @@ export const updateProfile = async (userId: string, payload: { displayName: stri
   const res = await fetch(`${API_URL}/profiles/${encodeURIComponent(userId)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
   return res.json();
 };
+
+export const authRegister = async (email: string, password: string, displayName?: string) => {
+  const res = await fetch(`${API_URL}/auth/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password, displayName }) });
+  return res.json();
+};
+
+export const authLogin = async (email: string, password: string) => {
+  const res = await fetch(`${API_URL}/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+  return res.json();
+};
+
+export const authLink = async (email: string, password: string, anonymousUserId: string) => {
+  const res = await fetch(`${API_URL}/auth/link`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password, anonymousUserId }) });
+  return res.json();
+};
+
+export const authValidate = async (token: string) => {
+  const res = await fetch(`${API_URL}/auth/validate`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` } });
+  return res.json();
+};
+
+export const authLogout = async (token: string) => {
+  const res = await fetch(`${API_URL}/auth/logout`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` } });
+  return res.json();
+};

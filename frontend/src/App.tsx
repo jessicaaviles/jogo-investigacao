@@ -8,6 +8,8 @@ import Game from './pages/Game';
 import Cases from './pages/Cases';
 import Messages from './pages/Messages';
 import Profile from './pages/Profile';
+import Login from './pages/Login';
+import Register from './pages/Register';
 import LobbyList from './pages/LobbyList';
 import Feedback from './pages/Feedback';
 import Tutorial from './pages/Tutorial';
@@ -30,6 +32,8 @@ function App() {
             <Route path="/cases" element={<Layout><Cases /></Layout>} />
             <Route path="/messages" element={<Layout><Messages /></Layout>} />
             <Route path="/profile" element={<Layout><Profile /></Layout>} />
+            <Route path="/login" element={<Layout><Login /></Layout>} />
+            <Route path="/register" element={<Layout><Register /></Layout>} />
             <Route path="/lobby" element={<Layout><LobbyList /></Layout>} />
             <Route path="/room/:roomId/lobby" element={<Layout><Lobby /></Layout>} />
             <Route path="/room/:roomCode" element={<Layout><RoomEntry /></Layout>} />

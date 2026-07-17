@@ -74,12 +74,14 @@ import userRoutes from './routes/userRoutes';
 import roomRoutes from './routes/roomRoutes';
 import feedbackRoutes from './routes/feedbackRoutes';
 import profileRoutes from './routes/profileRoutes';
+import authRoutes from './routes/authRoutes';
 
 // Routes
 app.use('/api', userRoutes);
 app.use('/api', roomRoutes);
 app.use('/api', feedbackRoutes);
 app.use('/api', profileRoutes);
+app.use('/api', authRoutes);
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });

@@ -5,7 +5,7 @@
 .home { margin: 0; }
 .home-hero { min-height: 590px; position: relative; display: flex; align-items: flex-end; padding: 72px 8%; overflow: hidden; background: var(--ink); margin-left: -24px !important; margin-right: -24px !important; width: calc(100% + 48px) !important; max-width: none !important; }
 .home-hero::after, .immersive-page::after { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .08; mix-blend-mode: screen; background-image: radial-gradient(rgba(242,238,229,.35) .6px, transparent .8px); background-size: 5px 5px; }
-.home-hero-logo { width: 90px; height: 90px; object-fit: contain; margin-bottom: 20px; display: block; filter: sepia(.15) saturate(.7); }
+.home-hero-logo { width: 150px; height: 150px; object-fit: contain; margin-bottom: 24px; display: block; filter: sepia(.15) saturate(.7); }
 .home-hero-image { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(24,33,38,.9) 0%, rgba(24,33,38,.4) 48%, rgba(24,33,38,.2)), linear-gradient(0deg, rgba(24,33,38,.98), transparent 58%), url('/capa_quarto_7.png') center/cover; filter: saturate(.72) contrast(1.05); }
 .home-hero-copy { position: relative; max-width: 590px; z-index: 1; }
 .home-hero h1 { font-size: clamp(42px, 6vw, 72px); line-height: .98; margin: 12px 0 18px; }
@@ -47,7 +47,7 @@
 .profile-page { background-image: linear-gradient(180deg, rgba(31,42,48,.7), rgba(31,42,48,.98) 62%), url('/backgrounds/equipe-investigadores.png') !important; }
 .messages-page { background-image: linear-gradient(180deg, rgba(31,42,48,.82), rgba(31,42,48,.98) 58%), url('/backgrounds/lobby.png') !important; }
 .lobby-list-page { background-image: linear-gradient(180deg, rgba(31,42,48,.7), rgba(31,42,48,.98) 64%), url('/backgrounds/lobby.png') !important; }
-.cases-page, .profile-page, .messages-page { min-height: auto !important; padding: 20px 24px 36px !important; }
+.cases-page, .profile-page, .messages-page { min-height: auto !important; padding: 108px 24px 36px !important; }
 .cases-page h1, .profile-page h2, .messages-page h1, .lobby-list-page h1 { color: var(--paper) !important; }
 .cases-page h3, .profile-page h3, .messages-page h3 { font-family: var(--serif) !important; }
 .cases-page > div:not(:first-child), .profile-page > div, .messages-page > div > div, .lobby-list-page > div { animation: scene-enter 300ms ease both; }
@@ -88,7 +88,7 @@
 .cases-page [style*="maxHeight"] { max-height: 90dvh !important; }
 
 @media (max-width: 640px) {
-  .cases-page, .profile-page, .messages-page { padding-top: 8px !important; }
+  .cases-page, .profile-page, .messages-page { padding-top: 84px !important; }
   .immersive-page, .lobby-list-page { margin: 0; border-radius: 12px; min-height: calc(100vh - 76px) !important; min-height: calc(100dvh - 76px) !important; }
   .immersive-page > div:last-child { min-height: calc(100vh - 76px); min-height: calc(100dvh - 76px); }
   .game-page form { gap: 8px !important; }

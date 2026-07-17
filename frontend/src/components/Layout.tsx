@@ -25,9 +25,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return <div className="app-shell">
     <header className="topbar">
-      <button aria-label="Ir para início" onClick={() => navigate('/')} style={{ background: 'none', border: 0 }}>
-        <img className="topbar-logo" src="/logo-sem-fundo.png" alt="Último Vestígio" />
-      </button>
+      {location.pathname !== '/' ? (
+        <button aria-label="Ir para início" onClick={() => navigate('/')} style={{ background: 'none', border: 0 }}>
+          <img className="topbar-logo" src="/logo-sem-fundo.png" alt="Último Vestígio" />
+        </button>
+      ) : (
+        <div style={{ width: '72px' }} />
+      )}
       <button className="menu-button" aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'} aria-expanded={menuOpen} onClick={() => setMenuOpen((open) => !open)}><Menu size={19} strokeWidth={1.5} /><span className="notification-dot" /></button>
     </header>
     {menuOpen && <div className="quick-menu" role="dialog" aria-label="Menu rápido"><div className="quick-menu-head"><span className="eyebrow">Arquivo do investigador</span><button onClick={() => setMenuOpen(false)} aria-label="Fechar menu">Fechar</button></div><button onClick={() => { setMenuOpen(false); navigate('/tutorial'); }}>Como funciona</button><button onClick={() => { setMenuOpen(false); navigate('/profile'); }}>Meu perfil</button><button onClick={() => { setMenuOpen(false); navigate('/messages'); }}>Mensagens da equipe</button></div>}

@@ -40,9 +40,11 @@ const Profile: React.FC = () => {
   const fetchSeqRef = useRef(0);
 
   useEffect(() => {
+    const seq = ++fetchSeqRef.current;
+
     if (authToken) {
-      ++fetchSeqRef.current;
       authValidate(authToken).then((res) => {
+        if (seq !== fetchSeqRef.current) return;
         if (res.success) {
           localStorage.setItem('userId', res.data.userId);
           setUserId(res.data.userId);
@@ -51,22 +53,30 @@ const Profile: React.FC = () => {
           localStorage.removeItem('authToken');
           setAuthToken(null);
         }
+        setLoading(false);
       });
       return;
     }
+
     if (!userId) {
       registerAnonymousUser().then((res) => {
+        if (seq !== fetchSeqRef.current) return;
         if (res.success) {
           localStorage.setItem('deviceToken', res.data.deviceToken);
           localStorage.setItem('userId', res.data.userId);
           setUserId(res.data.userId);
         }
-      }).catch(() => setStatus('Não foi possível registrar seu perfil temporário.'));
+        setLoading(false);
+      }).catch(() => {
+        if (seq !== fetchSeqRef.current) return;
+        setStatus('Não foi possível registrar seu perfil temporário.');
+        setLoading(false);
+      });
       return;
     }
+
     if (savingRef.current) return;
     setLoading(true);
-    const seq = ++fetchSeqRef.current;
     getProfile(userId).then((response) => {
       if (seq !== fetchSeqRef.current) return;
       if (response.success) {

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSocket } from '../contexts/SocketContext';
 import { QRCodeCanvas } from 'qrcode.react';
+import Loading from '../components/Loading';
 
 const Lobby: React.FC = () => {
   const { roomId } = useParams();
@@ -30,7 +31,7 @@ const Lobby: React.FC = () => {
     };
   }, [socket, roomId, navigate]);
 
-  if (!roomData) return <div style={{ padding: '24px' }}>Conectando à sala...</div>;
+  if (!roomData) return <Loading message="Conectando à sala..." />;
 
   const players = roomData.players || [];
   const isHost = players.some((p: any) => p.anonymous_user_id === localStorage.getItem('userId') && p.is_host);

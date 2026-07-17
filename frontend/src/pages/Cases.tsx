@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { listCases } from '../services/api';
 import { Clock3, Flame, UsersRound } from 'lucide-react';
+import Loading from '../components/Loading';
 
 interface CaseItem {
   slug: string;
@@ -57,7 +58,7 @@ const Cases: React.FC = () => {
       {/* Lista de Casos */}
       {error && <div role="alert" style={{ color: '#d79b8e', marginBottom: '16px' }}>{error}</div>}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        {loading ? <div className="card-surface" style={{ padding: '24px', color: 'var(--muted)' }}>Abrindo o arquivo de casos...</div> : cases.map((item) => (
+        {loading ? <Loading message="Abrindo o arquivo de casos..." fullPage={false} /> : cases.map((item) => (
           <div 
             key={item.slug}
             onClick={() => setSelectedCase(item)}

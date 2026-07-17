@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { Award, Camera, Check, Edit3, Shield, Trophy, UserPlus } from 'lucide-react';
 import { getProfile, updateProfile, registerAnonymousUser } from '../services/api';
+import Loading from '../components/Loading';
 
 interface ProfileData {
   id: string;
@@ -127,11 +128,7 @@ const Profile: React.FC = () => {
   const image = preview || profile?.photo;
 
   if (loading) {
-    return (
-      <div className="profile-page" style={{ minHeight: '100vh', backgroundColor: '#0F1417', color: '#F8F9FA', padding: '24px 24px 96px 24px', fontFamily: 'system-ui, -apple-system, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p>Carregando...</p>
-      </div>
-    );
+    return <Loading message="Carregando perfil..." />;
   }
 
   if (profile && !profile.hasProfile && !editing) {

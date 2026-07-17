@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSocket } from '../contexts/SocketContext';
+import Loading from '../components/Loading';
 
 const Game: React.FC = () => {
   const { roomId } = useParams();
@@ -141,7 +142,7 @@ const Game: React.FC = () => {
     update(); const interval = window.setInterval(update, 1000); return () => window.clearInterval(interval);
   }, [activeTurn?.id, activeTurn?.started_at, timerSeconds, isMyTurn, roomId, socket, userId]);
 
-   if (!roomData) return <div className="game-empty"><span className="eyebrow">Canal seguro</span><h1>Reconectando à investigação</h1><p>Recuperando o estado oficial da sala...</p></div>;
+   if (!roomData) return <Loading message="Recuperando o estado oficial da sala..." />;
 
    return (
     <div className="immersive-page game-page" style={{ 
@@ -252,7 +253,7 @@ const Game: React.FC = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', paddingBottom: '80px' }}>
             <div style={{ backgroundColor: 'rgba(132,147,107,0.2)', padding: '24px', borderRadius: '12px', border: '1px solid var(--accent-olive)' }}>
               <h3 style={{ color: 'var(--accent-gold)', fontFamily: 'var(--font-serif)', marginBottom: '16px' }}>A Verdade</h3>
-              <p style={{ fontSize: '16px', lineHeight: 1.6 }}>{trueSolution || 'Carregando solução...'}</p>
+              {trueSolution ? <p style={{ fontSize: '16px', lineHeight: 1.6 }}>{trueSolution}</p> : <Loading message="Carregando solução..." fullPage={false} />}
             </div>
             
             <h3 style={{ fontFamily: 'var(--font-serif)' }}>Teorias dos Investigadores</h3>

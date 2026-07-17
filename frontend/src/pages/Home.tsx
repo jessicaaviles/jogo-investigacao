@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowUpRight } from 'lucide-react';
 import { registerAnonymousUser } from '../services/api';
+import Loading from '../components/Loading';
 
 const featuredCases = [
   { title: 'O Quarto 7', subtitle: 'Hotel Vesper · Mistério clássico', level: 'Fácil', image: '/capa_quarto_7.png', description: 'Uma chave, uma câmera e a última noite de Helena Duarte.' },
@@ -10,10 +11,11 @@ const featuredCases = [
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
+  const [registering, setRegistering] = useState(false);
   const [, setUserData] = useState<{ userId: string; deviceToken: string } | null>(null);
   useEffect(() => {
     const token = localStorage.getItem('deviceToken'); const userId = localStorage.getItem('userId');
-    if (!token || !userId) registerAnonymousUser().then((res) => { if (res.success) { localStorage.setItem('deviceToken', res.data.deviceToken); localStorage.setItem('userId', res.data.userId); setUserData({ userId: res.data.userId, deviceToken: res.data.deviceToken }); } }).catch(() => undefined);
+    if (!token || !userId) { setRegistering(true); registerAnonymousUser().then((res) => { if (res.success) { localStorage.setItem('deviceToken', res.data.deviceToken); localStorage.setItem('userId', res.data.userId); setUserData({ userId: res.data.userId, deviceToken: res.data.deviceToken }); } }).catch(() => undefined).finally(() => setRegistering(false)); }
     else setUserData({ userId, deviceToken: token });
   }, []);
 
@@ -26,6 +28,7 @@ const Home: React.FC = () => {
         <h1>A verdade está nos detalhes.</h1>
         <p>Investigue em equipe. Conecte os fatos. Encontre o último vestígio.</p>
         <div className="home-actions"><button className="btn-primary" onClick={() => navigate('/cases')}>Explorar casos <ArrowUpRight size={17} /></button><button className="btn-secondary" onClick={() => navigate('/join')}>Entrar com código</button></div>
+        {registering && <p className="home-registering"><Loading small message="Preparando seu acesso..." /></p>}
         <button className="home-tutorial" onClick={() => navigate('/tutorial')}>Como funciona?</button>
       </div>
       <div className="home-hero-caption"><span>HOTEL VESPER</span><span>LAT. 41°23'N · 2026</span></div>

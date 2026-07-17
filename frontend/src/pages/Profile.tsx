@@ -31,6 +31,7 @@ const Profile: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState('');
   const [photoViewer, setPhotoViewer] = useState(false);
+  const [generatingPortrait, setGeneratingPortrait] = useState(false);
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState('');
@@ -195,7 +196,9 @@ const Profile: React.FC = () => {
     if (!userId) return;
     savingRef.current = true;
     setSaving(true);
-    setStatus('Salvando perfil...');
+    const hasPhoto = Boolean(photoData);
+    setStatus(hasPhoto ? 'Salvando perfil e gerando retrato investigador…' : 'Salvando perfil…');
+    if (hasPhoto) setGeneratingPortrait(true);
     try {
       let currentUserId = userId;
       let response = await updateProfile(currentUserId, {
@@ -229,12 +232,16 @@ const Profile: React.FC = () => {
       setPhotoData('');
       setPreview('');
       setEditing(false);
-      setStatus('Perfil salvo com sucesso!');
+      const genStatus = (response as any).portraitStatus;
+      if (hasPhoto && genStatus === 'READY') setStatus('Perfil salvo! Retrato gerado com sucesso.');
+      else if (hasPhoto && genStatus === 'UNAVAILABLE') setStatus('Perfil salvo, mas o retrato não pôde ser gerado no momento.');
+      else setStatus('Perfil salvo com sucesso!');
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Não foi possível atualizar o perfil.');
     } finally {
       savingRef.current = false;
       setSaving(false);
+      setGeneratingPortrait(false);
     }
   };
 
@@ -279,8 +286,8 @@ const Profile: React.FC = () => {
   return (
     <div className="profile-page profile-editor-page" style={{ minHeight: '100vh', backgroundColor: '#0F1417', color: '#F8F9FA', padding: '24px 24px 96px 24px', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       <div className="profile-hero">
-        <div className="profile-avatar-wrap">
-          <div className="profile-avatar" style={{ cursor: image ? 'pointer' : 'default' }} onClick={() => image && setPhotoViewer(true)}>
+          <div className="profile-avatar-wrap">
+            <div className={`profile-avatar${generatingPortrait ? ' profile-avatar--generating' : ''}`} style={{ cursor: image ? 'pointer' : 'default' }} onClick={() => image && setPhotoViewer(true)}>
             {image ? <img src={image} alt={`Retrato de ${name}`} /> : <Camera size={28} strokeWidth={1.3} />}
           </div>
           {profile?.hasGeneratedPortrait && <span className="portrait-badge" title="Retrato gerado pela IA"><Check size={12} /></span>}

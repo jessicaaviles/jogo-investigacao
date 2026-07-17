@@ -36,6 +36,15 @@ const Profile: React.FC = () => {
 
   const fetchSeqRef = useRef(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const bioInputRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (editing && bioInputRef.current) {
+      const el = bioInputRef.current;
+      el.style.height = 'auto';
+      el.style.height = el.scrollHeight + 'px';
+    }
+  }, [editing]);
 
   useEffect(() => {
     if (!authToken) { setLoading(false); return; }
@@ -230,7 +239,7 @@ const Profile: React.FC = () => {
             <h1 style={{ margin: '5px 0', lineHeight: 1.2, overflowWrap: 'break-word', wordBreak: 'break-word' }}>{profile?.displayName || name}</h1>
           )}
           {editing ? (
-            <textarea value={bio} onChange={(e) => setBio(e.target.value)} maxLength={280} rows={3} placeholder="Como você investiga?" style={{ color: 'var(--muted)', maxWidth: 440, fontSize: 14, margin: 0, padding: 0, border: 'none', borderBottom: '1px solid var(--gold)', background: 'transparent', resize: 'vertical', width: '100%', outline: 'none', lineHeight: 1.5, fontFamily: 'inherit', boxSizing: 'border-box' }} />
+            <textarea ref={bioInputRef} value={bio} onChange={(e) => { setBio(e.target.value); const el = e.target; el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; }} maxLength={280} rows={1} placeholder="Como você investiga?" style={{ color: 'var(--muted)', maxWidth: 440, fontSize: 14, margin: 0, padding: 0, border: 'none', borderBottom: '1px solid var(--gold)', background: 'transparent', resize: 'none', width: '100%', outline: 'none', lineHeight: 1.5, fontFamily: 'inherit', boxSizing: 'border-box', overflow: 'hidden' }} />
           ) : (
             <p style={{ margin: 0, lineHeight: 1.5, whiteSpace: 'pre-wrap', overflowWrap: 'break-word', wordBreak: 'break-word', color: 'var(--muted)', maxWidth: 440, fontSize: 14, fontFamily: 'inherit' }}>{profile?.bio || 'Ainda sem descrição.'}</p>
           )}

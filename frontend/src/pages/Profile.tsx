@@ -286,7 +286,7 @@ const Profile: React.FC = () => {
           zIndex: 200, backgroundColor: 'rgba(0,0,0,0.92)',
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
           padding: '24px', gap: '24px',
-        }}>
+        }} onClick={() => setPhotoViewer(false)}>
           <div style={{ position: 'absolute', top: 24, right: 24, display: 'flex', gap: 12 }}>
             <button onClick={(e) => { e.stopPropagation(); handleDownloadPhoto(); }} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', padding: '10px 16px', borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
               <Download size={16} /> Salvar imagem

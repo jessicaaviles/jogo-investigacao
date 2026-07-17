@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, Check, Download, Edit3, Image, LogOut, Mail, Upload, UserPlus, X } from 'lucide-react';
+import { ArrowLeft, Camera, Check, Download, Edit3, LogOut, Mail, Upload, UserPlus, X } from 'lucide-react';
 import { getProfile, updateProfile, authValidate, authLogout } from '../services/api';
 import Loading from '../components/Loading';
 
@@ -32,7 +32,6 @@ const Profile: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState('');
   const [photoViewer, setPhotoViewer] = useState(false);
-  const [showPhotoActions, setShowPhotoActions] = useState(false);
   const [generatingPortrait, setGeneratingPortrait] = useState(false);
 
   const fetchSeqRef = useRef(0);
@@ -186,8 +185,8 @@ const Profile: React.FC = () => {
   return (
     <div className="profile-page profile-editor-page" style={{ minHeight: '100vh', backgroundColor: '#0F1417', color: '#F8F9FA', padding: '24px 24px 96px 24px', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       <div className="profile-hero">
-        <div className="profile-avatar-wrap">
-          <div className={`profile-avatar${generatingPortrait ? ' profile-avatar--generating' : ''}`} style={{ cursor: image ? 'pointer' : 'default' }} onClick={() => image && setShowPhotoActions(true)}>
+        <div className="profile-avatar-wrap" style={{ position: 'relative' }}>
+          <div className={`profile-avatar${generatingPortrait ? ' profile-avatar--generating' : ''}`} style={{ cursor: image ? 'pointer' : 'default' }} onClick={() => image && setPhotoViewer(true)}>
             {image ? <img src={image} alt={`Retrato de ${name}`} /> : <Camera size={28} strokeWidth={1.3} />}
             {generatingPortrait && <div className="profile-avatar-spinner" />}
           </div>
@@ -216,20 +215,7 @@ const Profile: React.FC = () => {
         </button>
       </div>
 
-      {showPhotoActions && (
-        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 50, background: '#13191C', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: 8, display: 'flex', flexDirection: 'column', gap: 4, boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
-          <button onClick={() => { setShowPhotoActions(false); setPhotoViewer(true); }} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', background: 'transparent', border: 'none', color: '#F8F9FA', borderRadius: 8, cursor: 'pointer', fontSize: 13, textAlign: 'left' }}>
-            <Image size={16} /> Ver foto
-          </button>
-          <button onClick={() => { setShowPhotoActions(false); fileInputRef.current?.click(); }} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', background: 'transparent', border: 'none', color: '#F8F9FA', borderRadius: 8, cursor: 'pointer', fontSize: 13, textAlign: 'left' }}>
-            <Upload size={16} /> Alterar foto
-          </button>
-        </div>
-      )}
 
-      {showPhotoActions && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 49 }} onClick={() => setShowPhotoActions(false)} />
-      )}
 
       {status && <div className="profile-status" role="status">{status}</div>}
 
@@ -300,17 +286,25 @@ const Profile: React.FC = () => {
           zIndex: 200, backgroundColor: 'rgba(0,0,0,0.92)',
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
           padding: '24px', gap: '24px',
-        }} onClick={() => setPhotoViewer(false)}>
+        }}>
           <div style={{ position: 'absolute', top: 24, right: 24, display: 'flex', gap: 12 }}>
             <button onClick={(e) => { e.stopPropagation(); handleDownloadPhoto(); }} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', padding: '10px 16px', borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
-              <Download size={16} /> Baixar
+              <Download size={16} /> Salvar imagem
             </button>
             <button onClick={() => setPhotoViewer(false)} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', padding: 10, borderRadius: 8, cursor: 'pointer', display: 'flex' }}>
               <X size={20} />
             </button>
           </div>
           <div style={{ maxWidth: '90%', maxHeight: '70vh', aspectRatio: '1/1', borderRadius: 8, overflow: 'hidden' }}>
-            <img src={profile.photo} alt={`Retrato de ${profile.displayName}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onClick={(e) => e.stopPropagation()} />
+            <img src={profile.photo} alt={`Retrato de ${profile.displayName}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          </div>
+          <div style={{ display: 'flex', gap: 12 }}>
+            <button onClick={() => setPhotoViewer(false)} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', padding: '10px 20px', borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
+              <ArrowLeft size={16} /> Voltar
+            </button>
+            <button onClick={() => { setPhotoViewer(false); fileInputRef.current?.click(); }} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', padding: '10px 20px', borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
+              <Upload size={16} /> Alterar imagem
+            </button>
           </div>
         </div>
       )}

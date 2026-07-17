@@ -14,10 +14,10 @@ interface Chat {
 const INITIAL_CHATS: Chat[] = [
   {
     id: 'system-ia',
-    name: 'Mestre IA',
+    name: 'Mestre Investigador',
     role: 'Motor Forense',
-    avatar: 'IA',
-    lastMessage: 'Sistema de IA ativo. Pronto para receber e avaliar as teorias da sua equipe.',
+    avatar: 'MI',
+    lastMessage: 'Motor Forense ativo. Pronto para receber e avaliar as teorias da sua equipe.',
     time: 'Agora',
     unread: false,
     messages: [
@@ -63,12 +63,12 @@ const Messages: React.FC = () => {
     });
     setInputMessage('');
 
-    // Resposta automática se a mensagem for enviada para o Mestre IA fora de uma sala
+    // Resposta automática se a mensagem for enviada para o Mestre Investigador fora de uma sala
     if (activeChat.id === 'system-ia') {
       setTimeout(() => {
         const reply = {
           sender: 'them' as const,
-          text: 'Olá, investigador. O Motor Forense da IA opera exclusivamente dentro de salas de investigação ativas, pois necessito do contexto específico e das pistas de um caso para analisar e responder. Por favor, crie ou entre em uma sala na aba "Investigação" para iniciarmos a perícia.',
+          text: 'Olá, investigador. O Motor Forense do Mestre Investigador opera exclusivamente dentro de salas de investigação ativas, pois necessito do contexto específico e das pistas de um caso para analisar e responder. Por favor, crie ou entre em uma sala na aba "Investigação" para iniciarmos a perícia.',
           time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         };
         setChats(prevChats => prevChats.map(c => {
@@ -118,7 +118,7 @@ const Messages: React.FC = () => {
               Comunicações
             </h1>
             <p style={{ color: '#8E989F', fontSize: '14px', margin: 0, fontWeight: 300 }}>
-              Fale com outros membros da equipe ou com a IA do Mestre.
+              Fale com outros membros da equipe ou com o Mestre Investigador.
             </p>
           </header>
 

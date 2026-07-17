@@ -282,7 +282,7 @@ const Profile: React.FC = () => {
         </div>
       </div>
 
-      <div className="profile-section" style={{ marginTop: 32 }}>
+      <section className="profile-section" style={{ marginTop: 32 }}>
         <span className="eyebrow">Conta e sincronia</span>
         {authToken ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '16px 0' }}>
@@ -313,9 +313,9 @@ const Profile: React.FC = () => {
             </div>
           </div>
         )}
-      </div>
+      </section>
 
-      <section className="profile-section">
+      <section className="profile-section" style={{ marginTop: 32 }}>
         <span className="eyebrow">Marcas de campo</span>
         <h2>Conquistas</h2>
         <p style={{ color: 'var(--muted)', fontSize: '13px', padding: '24px 0' }}>Nenhuma conquista desbloqueada ainda. Complete investigações para ganhar marcas de campo.</p>

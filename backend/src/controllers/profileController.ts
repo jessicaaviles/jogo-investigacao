@@ -11,6 +11,7 @@ const publicProfile = (user: any) => ({
   active: user.profile_active,
   photo: user.generated_profile_photo_data || user.profile_photo_data || null,
   hasGeneratedPortrait: Boolean(user.generated_profile_photo_data),
+  hasProfile: Boolean(user.default_display_name) || Boolean(user.bio) || Boolean(user.profile_photo_data) || Boolean(user.generated_profile_photo_data),
   photoUpdatedAt: user.profile_photo_updated_at
 });
 

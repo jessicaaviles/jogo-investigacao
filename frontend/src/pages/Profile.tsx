@@ -142,7 +142,7 @@ const Profile: React.FC = () => {
       if (profile?.id && authToken) {
         try {
           const response = await updateProfile(profile.id, {
-            displayName, bio, active,
+            displayName: name, bio, active,
             photoData: value,
             generatePortrait: true,
           });

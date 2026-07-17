@@ -46,7 +46,7 @@
 .profile-page { background-image: linear-gradient(180deg, rgba(31,42,48,.7), rgba(31,42,48,.98) 62%), url('/backgrounds/equipe-investigadores.png') !important; }
 .messages-page { background-image: linear-gradient(180deg, rgba(31,42,48,.82), rgba(31,42,48,.98) 58%), url('/backgrounds/lobby.png') !important; }
 .lobby-list-page { background-image: linear-gradient(180deg, rgba(31,42,48,.7), rgba(31,42,48,.98) 64%), url('/backgrounds/lobby.png') !important; }
-.cases-page, .profile-page, .messages-page { min-height: auto !important; padding: 20px 0 36px !important; }
+.cases-page, .profile-page, .messages-page { min-height: auto !important; padding: 20px 24px 36px !important; }
 .cases-page h1, .profile-page h2, .messages-page h1, .lobby-list-page h1 { color: var(--paper) !important; }
 .cases-page h3, .profile-page h3, .messages-page h3 { font-family: var(--serif) !important; }
 .cases-page > div:not(:first-child), .profile-page > div, .messages-page > div > div, .lobby-list-page > div { animation: scene-enter 300ms ease both; }

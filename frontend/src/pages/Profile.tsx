@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Camera, Check, Download, Edit3, LogOut, Mail, UserPlus, X } from 'lucide-react';
-import { getProfile, updateProfile, registerAnonymousUser, authValidate, authLogout, authLink } from '../services/api';
+import { getProfile, updateProfile, registerAnonymousUser, authValidate, authLogin, authLogout, authLink } from '../services/api';
 import Loading from '../components/Loading';
 
 interface ProfileData {
@@ -31,6 +31,10 @@ const Profile: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState('');
   const [photoViewer, setPhotoViewer] = useState(false);
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
+  const [loginLoading, setLoginLoading] = useState(false);
 
   const savingRef = useRef(false);
   const fetchSeqRef = useRef(0);
@@ -111,6 +115,31 @@ const Profile: React.FC = () => {
       setStatus('Erro de conexão.');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleInlineLogin = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!loginEmail || !loginPassword) return;
+    setLoginError('');
+    setLoginLoading(true);
+    try {
+      const res = await authLogin(loginEmail, loginPassword);
+      if (res.success) {
+        localStorage.setItem('authToken', res.data.authToken);
+        localStorage.setItem('userId', res.data.userId);
+        setAuthToken(res.data.authToken);
+        setAuthEmail(loginEmail);
+        setUserId(res.data.userId);
+        setLoginEmail('');
+        setLoginPassword('');
+      } else {
+        setLoginError(res.error || 'Erro ao entrar.');
+      }
+    } catch {
+      setLoginError('Erro de conexão.');
+    } finally {
+      setLoginLoading(false);
     }
   };
 
@@ -293,6 +322,28 @@ const Profile: React.FC = () => {
               <LogOut size={14} /> Sair da conta
             </button>
           </div>
+        ) : profile?.hasProfile ? (
+          <form onSubmit={handleInlineLogin} style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '16px 0' }}>
+            <p style={{ color: 'var(--muted)', fontSize: 13, lineHeight: 1.5 }}>
+              Você já possui um perfil cadastrado. Faça login com email e senha para sincronizar seus dados.
+            </p>
+            <input
+              type="email" placeholder="Email" value={loginEmail}
+              onChange={(e) => setLoginEmail(e.target.value)}
+              required
+              style={{ padding: '10px 12px', borderRadius: 6, border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)', fontSize: 13 }}
+            />
+            <input
+              type="password" placeholder="Senha" value={loginPassword}
+              onChange={(e) => setLoginPassword(e.target.value)}
+              required minLength={6}
+              style={{ padding: '10px 12px', borderRadius: 6, border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)', fontSize: 13 }}
+            />
+            {loginError && <p style={{ color: 'var(--danger)', fontSize: 12 }}>{loginError}</p>}
+            <button className="btn-primary" type="submit" disabled={loginLoading} style={{ alignSelf: 'flex-start', minHeight: 40, fontSize: 12 }}>
+              {loginLoading ? 'Entrando…' : 'Entrar'}
+            </button>
+          </form>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '16px 0' }}>
             <p style={{ color: 'var(--muted)', fontSize: 13, lineHeight: 1.5 }}>

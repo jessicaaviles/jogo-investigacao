@@ -197,7 +197,7 @@ const Profile: React.FC = () => {
     savingRef.current = true;
     setSaving(true);
     const hasPhoto = Boolean(photoData);
-    setStatus(hasPhoto ? 'Salvando perfil e gerando retrato investigador…' : 'Salvando perfil…');
+    setStatus(hasPhoto ? 'Gerando retrato investigador…' : 'Salvando perfil…');
     if (hasPhoto) setGeneratingPortrait(true);
     try {
       let currentUserId = userId;
@@ -290,6 +290,7 @@ const Profile: React.FC = () => {
           <div className="profile-avatar-wrap">
             <div className={`profile-avatar${generatingPortrait ? ' profile-avatar--generating' : ''}`} style={{ cursor: image ? 'pointer' : 'default' }} onClick={() => image && setPhotoViewer(true)}>
             {image ? <img src={image} alt={`Retrato de ${name}`} /> : <Camera size={28} strokeWidth={1.3} />}
+            {generatingPortrait && <div className="profile-avatar-spinner" />}
           </div>
           {profile?.hasGeneratedPortrait && <span className="portrait-badge" title="Retrato gerado pela IA"><Check size={12} /></span>}
         </div>
@@ -326,7 +327,7 @@ const Profile: React.FC = () => {
             <input type="checkbox" checked={active} onChange={(event) => setActive(event.target.checked)} /> Perfil ativo para a equipe
           </label>
           <button className="btn-primary" type="submit" disabled={saving}>
-            {saving ? 'Processando...' : 'Salvar perfil'}
+            {saving ? (photoData ? 'Gerando retrato…' : 'Salvando…') : 'Salvar perfil'}
           </button>
         </form>
       )}

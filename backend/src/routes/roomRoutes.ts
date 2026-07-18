@@ -1,8 +1,9 @@
 import express from 'express';
-import { createRoom, joinRoom, recoverRoom, listCases } from '../controllers/roomController';
+import { createRoom, joinRoom, recoverRoom, listCases, handleGenerateCaseImage } from '../controllers/roomController';
 
 const router = express.Router();
 router.get('/cases', listCases);
+router.post('/cases/:slug/generate-image', handleGenerateCaseImage);
 
 router.post('/rooms', createRoom);
 router.post('/rooms/join', joinRoom);

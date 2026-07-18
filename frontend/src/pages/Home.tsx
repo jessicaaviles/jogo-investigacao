@@ -1,23 +1,69 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowUpRight } from 'lucide-react';
-import { registerAnonymousUser } from '../services/api';
+import { registerAnonymousUser, listCases, generateCaseImage } from '../services/api';
 import Loading from '../components/Loading';
 
-const featuredCases = [
-  { title: 'O Quarto 7', subtitle: 'Hotel Vesper · Mistério clássico', level: 'Fácil', image: '/capa_quarto_7.png', description: 'Uma chave, uma câmera e a última noite de Helena Duarte.' },
-  { title: 'O Presente Desaparecido', subtitle: 'Arquivo · Linha do tempo', level: 'Fácil', image: '/backgrounds/cena-do-crime.png', description: 'Durante uma comemoração em família, um presente desaparece de uma mesa diante de todos.' }
-];
+const fallbackImages: Record<string, string> = {
+  'o-quarto-7': '/capa_quarto_7.png',
+  'o-presente-desaparecido': '/backgrounds/cena-do-crime.png',
+};
+
+interface FeaturedCase { title: string; subtitle: string; level: string; image: string; description: string; slug: string }
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const [registering, setRegistering] = useState(false);
   const [, setUserData] = useState<{ userId: string; deviceToken: string } | null>(null);
+  const [featuredCases, setFeaturedCases] = useState<FeaturedCase[]>([]);
+
   useEffect(() => {
     const token = localStorage.getItem('deviceToken'); const userId = localStorage.getItem('userId');
     if (!token || !userId) { setRegistering(true); registerAnonymousUser().then((res) => { if (res.success) { localStorage.setItem('deviceToken', res.data.deviceToken); localStorage.setItem('userId', res.data.userId); setUserData({ userId: res.data.userId, deviceToken: res.data.deviceToken }); } }).catch(() => undefined).finally(() => setRegistering(false)); }
     else setUserData({ userId, deviceToken: token });
   }, []);
+
+  useEffect(() => {
+    listCases().then((res: any) => {
+      if (!res.success || !res.data?.length) {
+        setFeaturedCases([
+          { title: 'O Quarto 7', subtitle: 'Hotel Vesper · Mistério clássico', level: 'Fácil', image: '/capa_quarto_7.png', description: 'Uma chave, uma câmera e a última noite de Helena Duarte.', slug: 'o-quarto-7' },
+          { title: 'O Presente Desaparecido', subtitle: 'Arquivo · Linha do tempo', level: 'Fácil', image: '/backgrounds/cena-do-crime.png', description: 'Durante uma comemoração em família, um presente desaparece de uma mesa diante de todos.', slug: 'o-presente-desaparecido' },
+        ]);
+        return;
+      }
+      const firstTwo = res.data.slice(0, 2);
+      const mapped: FeaturedCase[] = firstTwo.map((item: any, i: number) => {
+        const img = item.cover_image_data || fallbackImages[item.slug] || '/backgrounds/mapa-da-investigacao.png';
+        return {
+          title: item.title,
+          subtitle: i === 0 ? 'Hotel Vesper · Mistério clássico' : 'Arquivo · Linha do tempo',
+          level: item.difficulty,
+          image: img,
+          description: item.short_synopsis,
+          slug: item.slug,
+        };
+      });
+      setFeaturedCases(mapped);
+      // Gera imagens para casos sem cover
+      firstTwo.forEach((item: any) => {
+        if (!item.cover_image_data) {
+          generateCaseImage(item.slug).then((genRes: any) => {
+            if (genRes.success) {
+              setFeaturedCases(prev => prev.map(fc => fc.slug === item.slug ? { ...fc, image: genRes.data.cover_image_data } : fc));
+            }
+          }).catch(() => {});
+        }
+      });
+    }).catch(() => {
+      setFeaturedCases([
+        { title: 'O Quarto 7', subtitle: 'Hotel Vesper · Mistério clássico', level: 'Fácil', image: '/capa_quarto_7.png', description: 'Uma chave, uma câmera e a última noite de Helena Duarte.', slug: 'o-quarto-7' },
+        { title: 'O Presente Desaparecido', subtitle: 'Arquivo · Linha do tempo', level: 'Fácil', image: '/backgrounds/cena-do-crime.png', description: 'Durante uma comemoração em família, um presente desaparece de uma mesa diante de todos.', slug: 'o-presente-desaparecido' },
+      ]);
+    });
+  }, []);
+
+  if (featuredCases.length === 0) return null;
 
   return <div className="home route-page">
     <section className="home-hero">

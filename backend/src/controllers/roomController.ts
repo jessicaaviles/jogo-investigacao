@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import crypto from 'crypto';
 import { hashToken } from '../security/secrets';
+import { generateCaseImage } from '../services/caseImageGenerator';
 
 const prisma = new PrismaClient();
 
@@ -21,6 +22,28 @@ export const listCases = async (_req: Request, res: Response) => {
     cases.sort((a, b) => Number(b.slug === 'o-quarto-7') - Number(a.slug === 'o-quarto-7'));
     res.json({ success: true, data: cases });
   } catch { res.status(500).json({ success: false, error: 'Could not load cases' }); }
+};
+
+export const handleGenerateCaseImage = async (req: Request, res: Response) => {
+  try {
+    const slug = String(req.params.slug);
+    if (!slug) return res.status(400).json({ success: false, error: 'Case slug is required' });
+
+    const c = await prisma.cases.findUnique({ where: { slug } });
+    if (!c) return res.status(404).json({ success: false, error: 'Case not found' });
+
+    if (c.cover_image_data) {
+      return res.json({ success: true, data: { cover_image_data: c.cover_image_data } });
+    }
+
+    const imageData = await generateCaseImage(c.title, c.short_synopsis);
+    await prisma.cases.update({ where: { slug }, data: { cover_image_data: imageData } });
+
+    res.json({ success: true, data: { cover_image_data: imageData } });
+  } catch (error) {
+    console.error('[handleGenerateCaseImage]', error);
+    res.status(500).json({ success: false, error: 'Failed to generate case image' });
+  }
 };
 
 export const createRoom = async (req: Request, res: Response) => {

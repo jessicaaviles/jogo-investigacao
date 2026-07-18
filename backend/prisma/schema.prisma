@@ -44,6 +44,7 @@ model cases {
   max_players               Int
   tension_level             Int
   status                    String
+  cover_image_data          String?
   created_at                DateTime  @default(now())
   updated_at                DateTime  @updatedAt
   deleted_at                DateTime?

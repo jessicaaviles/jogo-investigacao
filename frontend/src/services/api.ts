@@ -6,6 +6,11 @@ export const listCases = async () => {
   return res.json();
 };
 
+export const generateCaseImage = async (slug: string) => {
+  const res = await fetch(`${API_URL}/cases/${encodeURIComponent(slug)}/generate-image`, { method: 'POST' });
+  return res.json();
+};
+
 export const registerAnonymousUser = async (displayName?: string) => {
   const res = await fetch(`${API_URL}/anonymous-users`, {
     method: 'POST',

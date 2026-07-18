@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import * as apiService from '../services/api';
 import { Clock3, UsersRound } from 'lucide-react';
@@ -57,8 +57,15 @@ const CreateRoom: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [timer, setTimer] = useState<number | null>(null);
+  const [coverImage, setCoverImage] = useState<string | null>(null);
 
   const caseInfo = CASES_MAP[selectedCaseId] || CASES_MAP['o-quarto-7'];
+
+  useEffect(() => {
+    apiService.generateCaseImage(selectedCaseId).then((res: any) => {
+      if (res.success) setCoverImage(res.data.cover_image_data);
+    }).catch(() => {});
+  }, [selectedCaseId]);
 
   const handleCreate = async () => {
     try {
@@ -90,7 +97,7 @@ const CreateRoom: React.FC = () => {
       flexDirection: 'column', 
       height: '100vh', 
       backgroundColor: '#0F1417',
-      backgroundImage: `url(${caseInfo.image})`,
+      backgroundImage: `url(${coverImage || caseInfo.image})`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       position: 'relative'

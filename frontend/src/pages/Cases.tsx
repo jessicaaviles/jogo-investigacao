@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { listCases } from '../services/api';
+import { listCases, generateCaseImage } from '../services/api';
 import { Clock3, Flame, UsersRound } from 'lucide-react';
 import Loading from '../components/Loading';
 
@@ -14,6 +14,7 @@ interface CaseItem {
   players: string;
   tension: number;
   image: string;
+  cover_image_data: string | null;
 }
 
 const Cases: React.FC = () => {
@@ -25,8 +26,32 @@ const Cases: React.FC = () => {
 
   React.useEffect(() => {
     listCases().then((response) => {
-      if (response.success && response.data?.length) setCases(response.data.map((item: any) => ({ slug: item.slug, title: item.title, synopsis: item.short_synopsis, type: item.case_type, duration: `${item.estimated_duration_minutes} min`, difficulty: item.difficulty, players: `${item.min_players}-${item.max_players} Jogadores`, tension: item.tension_level, image: item.slug === 'o-quarto-7' ? '/capa_quarto_7.png' : item.slug === 'o-presente-desaparecido' ? '/backgrounds/cena-do-crime.png' : '/backgrounds/mapa-da-investigacao.png' })));
-      else if (!response.success) setError('Não foi possível carregar os casos.');
+      if (response.success && response.data?.length) {
+        const mapped = response.data.map((item: any) => {
+          const image = item.cover_image_data
+            ? item.cover_image_data
+            : item.slug === 'o-quarto-7'
+              ? '/capa_quarto_7.png'
+              : '/backgrounds/mapa-da-investigacao.png';
+          return {
+            slug: item.slug, title: item.title, synopsis: item.short_synopsis,
+            type: item.case_type, duration: `${item.estimated_duration_minutes} min`,
+            difficulty: item.difficulty, players: `${item.min_players}-${item.max_players} Jogadores`,
+            tension: item.tension_level, image, cover_image_data: item.cover_image_data
+          };
+        });
+        setCases(mapped);
+        // Gera imagem para casos sem imagem no banco
+        mapped.forEach((c: any) => {
+          if (!c.cover_image_data) {
+            generateCaseImage(c.slug).then((res: any) => {
+              if (res.success) {
+                setCases(prev => prev.map(p => p.slug === c.slug ? { ...p, image: res.data.cover_image_data, cover_image_data: res.data.cover_image_data } : p));
+              }
+            }).catch(() => {});
+          }
+        });
+      } else if (!response.success) setError('Não foi possível carregar os casos.');
     }).catch(() => setError('Não foi possível carregar os casos.')).finally(() => setLoading(false));
   }, []);
 

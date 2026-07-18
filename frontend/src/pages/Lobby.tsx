@@ -32,11 +32,12 @@ const Lobby: React.FC = () => {
   }, [socket, roomId, navigate]);
 
   useEffect(() => {
-    const style = document.createElement('style');
-    style.id = '__scroll-lock';
-    style.textContent = 'html, body, #root, .app-shell, .app-content { overflow: hidden !important; height: 100% !important; }';
-    document.head.appendChild(style);
-    return () => { const el = document.getElementById('__scroll-lock'); if (el) el.remove(); };
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    };
   }, []);
 
   if (!roomData) return <Loading message="Conectando à sala..." />;

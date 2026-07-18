@@ -169,7 +169,8 @@
 .profile-achievements > div { display: flex; align-items: center; gap: 14px; padding: 15px 0; border-bottom: 1px solid var(--line); color: var(--gold-soft); }
 .profile-achievements span { display: grid; gap: 3px; color: var(--paper); }
 .profile-achievements small { color: var(--muted); font-size: 12px; }
-.immersive-page { min-height: 100vh !important; min-height: 100dvh !important; height: auto !important; border-radius: 0; padding-left: 0 !important; padding-right: 0 !important; }
+.immersive-page.is-fixed-height { min-height: 0 !important; height: 100vh !important; overflow: hidden !important; }
+.immersive-page { min-height: 100vh; min-height: 100dvh; height: auto; border-radius: 0; padding-left: 0 !important; padding-right: 0 !important; }
 .immersive-page > div:last-child { min-height: calc(100vh - 88px); min-height: calc(100dvh - 88px); }
 .lobby-list-page { min-height: calc(100vh - 88px) !important; min-height: calc(100dvh - 88px) !important; }
 

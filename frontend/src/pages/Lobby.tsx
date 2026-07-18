@@ -54,10 +54,9 @@ const Lobby: React.FC = () => {
   };
 
   return (
-    <div className="immersive-page" style={{ 
+    <div className="immersive-page is-fixed-height" style={{ 
       display: 'flex', 
       flexDirection: 'column', 
-      height: '100vh', 
       overflow: 'hidden',
       backgroundColor: 'var(--bg-primary)',
       backgroundImage: `url(/backgrounds/lobby.png)`,

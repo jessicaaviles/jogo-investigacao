@@ -44,7 +44,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <header className="topbar">
       {location.pathname !== '/' ? (
         <button aria-label="Ir para início" onClick={() => navigate('/')} style={{ background: 'none', border: 0 }}>
-          <img className="topbar-logo" src="/logo-sem-fundo.png" alt="Último Vestígio" />
+          <img className="topbar-logo" src="/monograma-ultimo-vestigio.png" alt="Último Vestígio" />
         </button>
       ) : (
         <div style={{ width: '72px' }} />

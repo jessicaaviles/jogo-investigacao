@@ -47,7 +47,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <img className="topbar-logo" src="/monograma-ultimo-vestigio.png" alt="Último Vestígio" />
         </button>
       ) : (
-        <div style={{ width: '72px' }} />
+        <div style={{ width: '68px' }} />
       )}
       <div className="menu-wrapper" ref={menuRef}>
         <button

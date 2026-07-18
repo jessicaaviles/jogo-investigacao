@@ -69,6 +69,15 @@ const CreateRoom: React.FC = () => {
     }).catch(() => {});
   }, [selectedCaseId, coverImage]);
 
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    };
+  }, []);
+
   const handleCreate = async () => {
     try {
       setLoading(true);

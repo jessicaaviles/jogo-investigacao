@@ -28,7 +28,7 @@ function buildPrompt(userHash: number): string {
   const bg = selectBackground(userHash)
   const outfit = selectOutfit(userHash + 7)
 
-  return `Edit this photo into a moody detective portrait.
+  return `Edit this photo into a mysterious detective portrait.
 
 CRITICAL — keep identical:
 - Face: every detail, skin, expression unchanged
@@ -38,11 +38,11 @@ CRITICAL — keep identical:
 What to change:
 - Replace the background: ${bg.description}
 - Replace the clothing: ${outfit.description}
-- Lighting: dramatic but natural — warm golden light from one side, deep cool shadows on the other, cinematic thriller mood
+- Lighting: low-light nocturnal scene — soft, diffused illumination falling gently on the face, background darker and receding into shadow, mysterious and melancholic mood, focus on the face with the surroundings dim
 
 Composition:
 - Tight portrait crop, head and shoulders visible
-- Face centered in frame
+- Face centered and in sharp focus
 - Person looking toward the camera
 
 Do NOT add film grain, noise, or texture overlay. The person must look exactly like the original photo — this is a realistic photo edit, not an illustration.`

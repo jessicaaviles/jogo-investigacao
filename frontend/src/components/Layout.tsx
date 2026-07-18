@@ -42,13 +42,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return <div className="app-shell">
     <header className="topbar">
-      {location.pathname !== '/' ? (
-        <button aria-label="Ir para início" onClick={() => navigate('/')} style={{ background: 'none', border: 0 }}>
-          <img className="topbar-logo" src="/monograma-ultimo-vestigio.png" alt="Último Vestígio" />
-        </button>
-      ) : (
-        <div style={{ width: '68px' }} />
-      )}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        {location.pathname !== '/' && (
+          <button aria-label="Voltar" onClick={() => navigate(-1)} style={{ color: '#8E989F', background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', fontSize: '18px' }}>←</button>
+        )}
+        {location.pathname !== '/' ? (
+          <button aria-label="Ir para início" onClick={() => navigate('/')} style={{ background: 'none', border: 0 }}>
+            <img className="topbar-logo" src="/monograma-ultimo-vestigio.png" alt="Último Vestígio" />
+          </button>
+        ) : (
+          <div style={{ width: '68px' }} />
+        )}
+      </div>
       <div className="menu-wrapper" ref={menuRef}>
         <button
           className={`menu-button${menuOpen ? ' menu-button--active' : ''}`}

@@ -103,13 +103,6 @@ const CreateRoom: React.FC = () => {
         zIndex: 0
       }}></div>
 
-      {/* Top Bar / Voltar */}
-      <div style={{ position: 'relative', zIndex: 1, padding: '88px 24px 24px' }}>
-        <button onClick={() => navigate(-1)} style={{ color: '#8E989F', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px', background: 'transparent', border: 'none', cursor: 'pointer' }}>
-          <span style={{ fontSize: '14px' }}>←</span> Voltar
-        </button>
-      </div>
-
       {/* Bottom Sheet UI */}
       <div style={{ position: 'relative', zIndex: 1, padding: '0 24px 32px', display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'flex-end' }}>
         <h2 style={{ fontSize: '32px', marginBottom: '8px', fontFamily: 'var(--font-serif)', lineHeight: 1.1, fontWeight: 400 }}>Configurar Partida</h2>

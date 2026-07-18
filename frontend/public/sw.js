@@ -1,4 +1,4 @@
-const CACHE = 'ultimo-vestigio-static-v2';
+const CACHE = 'ultimo-vestigio-static-v3';
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(['/','/manifest.webmanifest'])));
   self.skipWaiting();

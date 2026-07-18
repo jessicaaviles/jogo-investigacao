@@ -99,15 +99,21 @@ const CreateRoom: React.FC = () => {
       flexDirection: 'column', 
       minHeight: '100vh', 
       backgroundColor: '#0F1417',
-      backgroundImage: `url(${coverImage || caseInfo.image})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
       position: 'relative'
     }}>
+      {/* Background fixo que cobre a tela inteira inclusive o padding do app-content */}
+      <div style={{
+        position: 'fixed',
+        top: 0, left: 0, width: '100vw', height: '100vh',
+        backgroundImage: `url(${coverImage || caseInfo.image})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        zIndex: 0
+      }}></div>
       {/* Overlay gradiente forte na parte inferior para a interface flutuar */}
       <div style={{
-        position: 'absolute',
-        top: 0, left: 0, right: 0, bottom: 0,
+        position: 'fixed',
+        top: 0, left: 0, width: '100vw', height: '100vh',
         background: 'linear-gradient(to bottom, rgba(15, 20, 23, 0.3) 0%, rgba(15, 20, 23, 0.95) 60%, #0F1417 100%)',
         zIndex: 0
       }}></div>

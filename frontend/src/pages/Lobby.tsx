@@ -63,34 +63,34 @@ const Lobby: React.FC = () => {
         zIndex: 0
       }}></div>
 
-      <div style={{ position: 'relative', zIndex: 1, padding: '24px 24px 16px', display: 'flex', flexDirection: 'column', flex: 1 }}>
-        <div style={{ paddingBottom: '16px' }}>
-          <h2 style={{ fontSize: '24px', marginBottom: '4px', fontFamily: 'var(--font-serif)', lineHeight: 1.2 }}>
+      <div style={{ position: 'relative', zIndex: 1, padding: '96px 24px calc(80px + env(safe-area-inset-bottom))', display: 'flex', flexDirection: 'column', height: '100%', gap: '12px', overflowY: 'auto' }}>
+        <div>
+          <h2 style={{ fontSize: '22px', marginBottom: '2px', fontFamily: 'var(--font-serif)', lineHeight: 1.2 }}>
             Sala de Briefing · {roomData.case_version?.case_ref?.title || 'O Quarto 7'}
           </h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '13px', marginBottom: '12px' }}>Aguardando os investigadores da equipe.</p>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '12px', marginBottom: '10px' }}>Aguardando os investigadores da equipe.</p>
           
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', backgroundColor: 'rgba(255,255,255,0.03)', padding: '10px 14px', borderRadius: '8px', width: 'fit-content', border: '1px solid rgba(255,255,255,0.05)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', backgroundColor: 'rgba(255,255,255,0.03)', padding: '8px 12px', borderRadius: '8px', width: 'fit-content', border: '1px solid rgba(255,255,255,0.05)' }}>
             <div style={{ fontSize: '10px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '2px' }}>Código:</div>
-            <div style={{ fontSize: '18px', color: 'var(--accent-gold)', letterSpacing: '4px', fontWeight: 600, fontFamily: 'var(--font-serif)' }}>
+            <div style={{ fontSize: '16px', color: 'var(--accent-gold)', letterSpacing: '4px', fontWeight: 600, fontFamily: 'var(--font-serif)' }}>
               {roomData.public_code}
             </div>
           </div>
         </div>
 
-        <div className="lobby-invite" style={{ marginBottom: '12px' }}><QRCodeCanvas value={`${window.location.origin}/join?room=${roomData.public_code}`} size={64} bgColor="#f2eee5" fgColor="#182126" /><div><span className="eyebrow">Convite</span><p style={{ fontSize: '11px' }}>Compartilhe o código ou o QR Code.</p><button className="btn-secondary" onClick={() => navigator.clipboard?.writeText(`${window.location.origin}/join?room=${roomData.public_code}`)}>Copiar link</button></div></div>
+        <div className="lobby-invite" style={{ marginBottom: 0 }}><QRCodeCanvas value={`${window.location.origin}/join?room=${roomData.public_code}`} size={56} bgColor="#f2eee5" fgColor="#182126" /><div><span className="eyebrow">Convite</span><p style={{ fontSize: '11px' }}>Compartilhe o código ou o QR Code.</p><button className="btn-secondary" onClick={() => navigator.clipboard?.writeText(`${window.location.origin}/join?room=${roomData.public_code}`)}>Copiar link</button></div></div>
 
-        <div style={{ flex: 1, overflowY: 'auto' }}>
-          <h3 style={{ marginBottom: '12px', fontSize: '11px', color: 'var(--accent-olive)', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 600 }}>
+        <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
+          <h3 style={{ marginBottom: '8px', fontSize: '10px', color: 'var(--accent-olive)', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 600 }}>
             Equipe ({players.length}/{roomData.max_players})
           </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {players.map((p: any) => (
-              <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 14px', backgroundColor: 'rgba(31,42,48,0.4)', borderRadius: '10px', border: `1px solid ${p.connection_status === 'CONNECTED' ? 'rgba(132,147,107,0.3)' : 'rgba(138,51,36,0.3)'}`, backdropFilter: 'blur(8px)' }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '8px', backgroundColor: 'rgba(0,0,0,0.2)', border: `1px solid ${p.connection_status === 'CONNECTED' ? 'var(--accent-olive)' : 'var(--error-color)'}` }}></div>
+              <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '8px 12px', backgroundColor: 'rgba(31,42,48,0.4)', borderRadius: '10px', border: `1px solid ${p.connection_status === 'CONNECTED' ? 'rgba(132,147,107,0.3)' : 'rgba(138,51,36,0.3)'}`, backdropFilter: 'blur(8px)' }}>
+                <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: 'rgba(0,0,0,0.2)', border: `1px solid ${p.connection_status === 'CONNECTED' ? 'var(--accent-olive)' : 'var(--error-color)'}` }}></div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text-primary)', fontFamily: 'var(--font-serif)' }}>{p.display_name}</div>
-                  <div style={{ fontSize: '10px', color: p.connection_status === 'CONNECTED' ? 'var(--accent-olive)' : 'var(--text-secondary)', marginTop: '2px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                  <div style={{ fontWeight: 600, fontSize: '13px', color: 'var(--text-primary)', fontFamily: 'var(--font-serif)' }}>{p.display_name}</div>
+                  <div style={{ fontSize: '10px', color: p.connection_status === 'CONNECTED' ? 'var(--accent-olive)' : 'var(--text-secondary)', marginTop: '1px', textTransform: 'uppercase', letterSpacing: '1px' }}>
                     {p.connection_status === 'CONNECTED' ? 'Online' : 'Offline'}
                     {p.is_host && <span style={{ color: 'var(--accent-gold)', marginLeft: '8px' }}>• Anfitrião</span>}
                   </div>
@@ -100,7 +100,7 @@ const Lobby: React.FC = () => {
           </div>
         </div>
 
-        <div style={{ paddingTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <button className="btn-secondary lobby-ready" onClick={handleReady} style={{ marginBottom: 0 }}>{isReady ? 'Estou pronto' : 'Marcar como pronto'}</button>
           {isHost ? (
             <button className="btn-primary" onClick={handleStart} disabled={players.length < 2} style={{ padding: '14px 24px', fontSize: '14px' }}>

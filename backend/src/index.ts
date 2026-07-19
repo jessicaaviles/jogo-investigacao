@@ -605,13 +605,14 @@ io.on('connection', (socket) => {
     if (roomId && userId) {
       prisma.room_players.updateMany({ where: { room_id: roomId, anonymous_user_id: userId }, data: { connection_status: 'DISCONNECTED', last_seen_at: new Date() } })
         .then(async () => {
-          const room = await prisma.rooms.findUnique({ where: { id: roomId }, include: { players: true } });
-          if (room?.host_user_id === userId && !['GAME_OVER', 'COMPLETED'].includes(room.status)) {
-            const successor = room.players.find((player) => player.anonymous_user_id !== userId && player.connection_status === 'CONNECTED');
-            if (successor) {
-              await prisma.$transaction([prisma.rooms.update({ where: { id: roomId }, data: { host_user_id: successor.anonymous_user_id } }), prisma.room_players.updateMany({ where: { room_id: roomId, is_host: true }, data: { is_host: false } }), prisma.room_players.update({ where: { id: successor.id }, data: { is_host: true } })]);
-              io.to(roomId).emit('host_transferred', { playerId: successor.id });
-            }
+          // Aguarda 5s antes de transferir host para evitar transferências acidentais em reconexões rápidas
+          await new Promise(r => setTimeout(r, 5000));
+          const current = await prisma.rooms.findUnique({ where: { id: roomId }, include: { players: true } });
+          if (!current || current.host_user_id !== userId || ['GAME_OVER', 'COMPLETED'].includes(current.status)) return;
+          const successor = current.players.find((player) => player.anonymous_user_id !== userId && player.connection_status === 'CONNECTED');
+          if (successor) {
+            await prisma.$transaction([prisma.rooms.update({ where: { id: roomId }, data: { host_user_id: successor.anonymous_user_id } }), prisma.room_players.updateMany({ where: { room_id: roomId, is_host: true }, data: { is_host: false } }), prisma.room_players.update({ where: { id: successor.id }, data: { is_host: true } })]);
+            io.to(roomId).emit('host_transferred', { playerId: successor.id });
           }
           return emitRoomState(roomId);
         }).catch(() => undefined);

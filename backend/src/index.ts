@@ -342,7 +342,7 @@ io.on('connection', (socket) => {
             factual_payload: '{}',
             rendered_text: aiResponse.rendered_text,
             validation_status: 'VALID',
-            model_name: 'gemini-2.5-flash'
+            model_name: 'gemini-3.5-flash'
           }
         });
 

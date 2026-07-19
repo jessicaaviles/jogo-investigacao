@@ -23,7 +23,7 @@ Regras obrigatórias:
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
       const res = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.5-flash',
         contents: narrativePrompt,
         config: { temperature: 0.4 }
       });
@@ -87,7 +87,7 @@ Pergunta do Jogador: "${questionText}"
 Analise a pergunta, extraia as premissas, compare com os Fatos Absolutos e gere a saída JSON.`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3.5-flash',
       contents: prompt,
       config: { responseMimeType: 'application/json', responseSchema, temperature: 0.1 }
     });

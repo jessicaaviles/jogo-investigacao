@@ -55,7 +55,7 @@ const JoinRoom: React.FC = () => {
         zIndex: 0
       }}></div>
 
-      <div style={{ position: 'relative', zIndex: 1, padding: '88px 24px calc(76px + env(safe-area-inset-bottom) + 24px)', display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'flex-end', gap: '20px' }}>
+      <div style={{ position: 'fixed', inset: 0, zIndex: 1, padding: '88px 24px calc(76px + env(safe-area-inset-bottom) + 24px)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', gap: '20px' }}>
         <div>
           <h2 style={{ fontSize: '30px', marginBottom: '6px', fontFamily: 'var(--font-serif)', lineHeight: 1.1, fontWeight: 400, color: '#F8F9FA' }}>Junte-se à Equipe</h2>
           <p style={{ color: '#8E989F', fontSize: '13px', maxWidth: '85%', fontWeight: 300 }}>A investigação já começou. Insira suas credenciais para entrar.</p>

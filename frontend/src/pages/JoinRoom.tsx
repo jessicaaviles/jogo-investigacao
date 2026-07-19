@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { joinRoom } from '../services/api';
+import { joinRoom, registerAnonymousUser } from '../services/api';
 
 const JoinRoom: React.FC = () => {
   const navigate = useNavigate();
@@ -14,14 +14,31 @@ const JoinRoom: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     
-    const userId = localStorage.getItem('userId');
-    if (!userId || !name || !code) {
-      setError('Preencha o código e seu nome para entrar.');
+    if (!code) {
+      setError('Informe o código de acesso.');
+      setLoading(false);
+      return;
+    }
+    if (!name) {
+      setError('Informe seu nome para entrar.');
       setLoading(false);
       return;
     }
 
     try {
+      let userId = localStorage.getItem('userId');
+      if (!userId) {
+        const reg = await registerAnonymousUser(name);
+        if (!reg.success) {
+          setError('Não foi possível identificar o jogador.');
+          setLoading(false);
+          return;
+        }
+        userId = reg.data.userId;
+        localStorage.setItem('userId', userId);
+        localStorage.setItem('deviceToken', reg.data.deviceToken);
+      }
+
       const res = await joinRoom(code.toUpperCase(), userId, name);
       if (res.success) {
         localStorage.setItem('userName', name.trim());

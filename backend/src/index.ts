@@ -296,8 +296,19 @@ io.on('connection', (socket) => {
 
       // 1. Processar Pergunta no Mestre IA (Gemini)
       const aiResponse = await processQuestion(roomId, cleanQuestion, room.case_version_id);
+
+      // Classificações que pedem reformulação semântica
       if (['AMBIGUOUS', 'MULTI_PREMISE', 'BLOCKED'].includes(aiResponse.classification)) {
         socket.emit('question_needs_reformulation', { classification: aiResponse.classification, message: aiResponse.rendered_text });
+        return;
+      }
+
+      // Falha técnica do Mestre IA — não salvar no banco, pedir tentativa novamente
+      if (aiResponse.fallback_used === true && aiResponse.classification === 'UNKNOWN') {
+        socket.emit('question_needs_reformulation', {
+          classification: 'TECHNICAL_ERROR',
+          message: aiResponse.rendered_text
+        });
         return;
       }
 

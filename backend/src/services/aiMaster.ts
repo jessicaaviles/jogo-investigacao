@@ -4,45 +4,71 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-// Mestre IA - Fase 2 do MVP
+const BLOCKED_PATTERNS = /(ignore|esqueça|revele|mostre|prompt|instruções|system message|segredo|solução completa|ignore previous|forget|reveal the)/i;
+
+const generateNarrative = async (classification: string, factualExplanation: string): Promise<string> => {
+  const narrativePrompt = `Você é o Mestre IA de um jogo de mistério e investigação brasileiro.
+Sua tarefa é redigir a resposta final ao jogador, baseada na análise lógica abaixo.
+
+Classificação lógica: ${classification}
+Justificativa factual: ${factualExplanation}
+
+Regras obrigatórias:
+1. Responda SEMPRE em português do Brasil (pt-BR). Nunca use outro idioma.
+2. Responda em no máximo 2 frases curtas e diretas.
+3. Não invente nada que não esteja na justificativa factual.
+4. Prefixos obrigatórios: YES → "Sim." | NO → "Não." | PARTIAL → "Parcialmente." | IRRELEVANT → "Isso é irrelevante para o caso." | UNKNOWN → "Os registros não revelam isso."
+5. Use um tom levemente misterioso e narrativo, como um narrador de noir.`;
+
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const res = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: narrativePrompt,
+        config: { temperature: 0.4, thinkingConfig: { thinkingBudget: 0 } }
+      });
+      const text = res.text?.trim();
+      if (text && text.length > 5) return text.slice(0, 360);
+    } catch (_err) {
+      if (attempt === 0) await new Promise(r => setTimeout(r, 800));
+    }
+  }
+  return '';
+};
+
 export const processQuestion = async (roomId: string, questionText: string, caseVersionId: string) => {
   try {
     const cleanQuestion = String(questionText || '').trim().slice(0, 500);
     if (!cleanQuestion) throw new Error('Empty question');
-    if (/(ignore|esqueça|revele|mostre|prompt|instruções|system message|segredo|solução completa)/i.test(cleanQuestion)) {
-      return { classification: 'BLOCKED', rendered_text: 'Essa pergunta não pode alterar as regras da investigação. Reformule usando os fatos do caso.' };
+
+    if (BLOCKED_PATTERNS.test(cleanQuestion)) {
+      return { classification: 'BLOCKED', rendered_text: 'Essa pergunta tenta alterar as regras da investigação. Reformule usando apenas os fatos do caso.', fallback_used: false };
     }
-    // 1. Obter todos os fatos do caso do banco de dados (A Verdade Absoluta)
+
     const facts = await prisma.case_facts.findMany({
       where: { case_version_id: caseVersionId, visibility: { not: 'SECRET' } }
     });
 
-    const factListText = facts.map(f => `- ${f.statement}`).join('\n');
+    if (!facts || facts.length === 0) {
+      return { classification: 'UNKNOWN', rendered_text: 'O arquivo do caso não pôde ser acessado agora. Tente novamente em instantes.', fallback_used: true };
+    }
 
-    // 2. Definir o Schema de Resposta (Interpretação Semântica + Classificação Factual)
+    const factListText = facts.map((f: any) => `- ${f.statement}`).join('\n');
+
     const responseSchema: Schema = {
       type: Type.OBJECT,
       properties: {
-        classification: {
-          type: Type.STRING,
-          description: "Deve ser exatamente um destes: YES, NO, PARTIAL, IRRELEVANT, UNKNOWN, AMBIGUOUS, MULTI_PREMISE",
-        },
-        premises: {
-          type: Type.ARRAY,
-          items: { type: Type.STRING },
-          description: "As premissas extraídas da pergunta."
-        },
-        factualExplanation: {
-          type: Type.STRING,
-          description: "O contexto permitido que justifica a classificação, baseado APENAS nos fatos fornecidos."
-        }
+        classification: { type: Type.STRING, description: "Deve ser exatamente um destes: YES, NO, PARTIAL, IRRELEVANT, UNKNOWN, AMBIGUOUS, MULTI_PREMISE" },
+        premises: { type: Type.ARRAY, items: { type: Type.STRING }, description: "As premissas extraídas da pergunta." },
+        factualExplanation: { type: Type.STRING, description: "Contexto que justifica a classificação, baseado APENAS nos fatos. Sempre em português do Brasil." }
       },
       required: ["classification", "premises", "factualExplanation"]
     };
 
-    const prompt = `Você atua como o motor lógico (Mestre IA) de um jogo de investigação.
+    const prompt = `Você atua como o motor lógico (Mestre IA) de um jogo de investigação brasileiro.
 Sua função é interpretar a pergunta do jogador e classificá-la ESTRITAMENTE baseada nos fatos fornecidos abaixo.
 Você NÃO pode inventar fatos, usar conhecimento externo ou tentar adivinhar o que não está escrito.
+Responda SEMPRE em português do Brasil (pt-BR).
 
 Fatos Absolutos do Caso:
 ${factListText}
@@ -54,67 +80,46 @@ Regras de Classificação:
 - IRRELEVANT: não tem relação nenhuma com os fatos ou com a solução.
 - UNKNOWN: os fatos não dizem nada sobre isso (não invente!).
 - AMBIGUOUS: a pergunta usa pronomes soltos ou não faz sentido direto.
+- MULTI_PREMISE: a pergunta contém múltiplas afirmações que precisam ser separadas.
 
 Pergunta do Jogador: "${questionText}"
 
-Analise a pergunta, extraia as premissas, compare com os Fatos Absolutos e gere a saída.`;
+Analise a pergunta, extraia as premissas, compare com os Fatos Absolutos e gere a saída JSON.`;
 
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: prompt,
-      config: {
-        responseMimeType: 'application/json',
-        responseSchema: responseSchema,
-        temperature: 0.1 // Baixa temperatura para ser estrito e determinístico
-      }
+      config: { responseMimeType: 'application/json', responseSchema, temperature: 0.1, thinkingConfig: { thinkingBudget: 0 } }
     });
 
-    if (!response.text) {
-      throw new Error("Erro na geração do motor lógico");
-    }
+    if (!response.text) throw new Error("Resposta vazia do motor lógico");
 
     const logicResult = JSON.parse(response.text);
     const allowedClassifications = new Set(['YES', 'NO', 'PARTIAL', 'IRRELEVANT', 'UNKNOWN', 'BLOCKED', 'AMBIGUOUS', 'MULTI_PREMISE']);
     if (!allowedClassifications.has(logicResult.classification) || !Array.isArray(logicResult.premises) || typeof logicResult.factualExplanation !== 'string') {
-      throw new Error('Invalid interpretation');
+      throw new Error('Invalid interpretation from AI');
     }
 
-    // 3. Camada 3 - Redação Narrativa (Geração de Texto Final)
-    const narrativePrompt = `Você é o narrador do Mestre IA em um jogo de mistério familiar.
-Sua resposta final ao jogador deve refletir a seguinte decisão factual:
-Classificação: ${logicResult.classification}
-Justificativa factual: ${logicResult.factualExplanation}
+    if (['AMBIGUOUS', 'MULTI_PREMISE', 'BLOCKED'].includes(logicResult.classification)) {
+      const msgMap: Record<string, string> = {
+        AMBIGUOUS: 'A pergunta está ambígua — use termos mais específicos. Por exemplo: em vez de "alguém fez isso?", pergunte com nome e contexto.',
+        MULTI_PREMISE: 'A pergunta contém múltiplas afirmações. Separe em perguntas menores, uma por vez.',
+        BLOCKED: 'Essa pergunta não pode ser processada. Reformule focando nos eventos do caso.'
+      };
+      return { classification: logicResult.classification, rendered_text: msgMap[logicResult.classification] || 'Reformule a pergunta.', fallback_used: false };
+    }
 
-Regras:
-1. Responda em no máximo 2 frases curtas.
-2. Não invente nada fora da justificativa factual.
-3. Se a classificação for YES, comece com "Sim.". Se NO, comece com "Não.". Se PARTIAL, comece com "Parcialmente.". Se IRRELEVANT, comece com "Isso é irrelevante.".
-4. Use um tom intrigante e levemente misterioso.`;
+    const finalAnswerText = await generateNarrative(logicResult.classification, logicResult.factualExplanation);
 
-    const narrativeResponse = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: narrativePrompt,
-      config: {
-        temperature: 0.5
-      }
-    });
+    if (!finalAnswerText) {
+      return { classification: 'UNKNOWN', rendered_text: 'O Mestre não conseguiu formular a resposta agora. Tente novamente.', fallback_used: true };
+    }
 
-    const finalAnswerText = (narrativeResponse.text?.trim() || "Não foi possível analisar sua pergunta com segurança. Reformule.").slice(0, 360);
-
-    return {
-      classification: logicResult.classification,
-      rendered_text: finalAnswerText,
-      fallback_used: false
-    };
+    return { classification: logicResult.classification, rendered_text: finalAnswerText, fallback_used: false };
 
   } catch (error) {
     console.error("Erro no Mestre IA:", error);
-    // 4. Camada 4 - Fallback Seguro
-    return {
-      classification: "UNKNOWN",
-      rendered_text: "Não foi possível analisar sua pergunta com segurança. Reformule.",
-      fallback_used: true
-    };
+    return { classification: "UNKNOWN", rendered_text: "O Mestre está consultando os arquivos. Tente reformular a pergunta.", fallback_used: true };
   }
 };
 
@@ -130,5 +135,13 @@ export const evaluateTheory = async (theoryAnswers: any, trueSolutionText: strin
     return result;
   }, {});
   const score = Math.max(0, Math.min(100, Math.round(Object.values(dimensionResults).reduce((sum, value) => sum + value, 0) / fields.length)));
-  return { score, feedback: score >= 75 ? 'A teoria acompanha os fatos essenciais do caso.' : score >= 40 ? 'Há conexões corretas, mas alguns detalhes ainda não fecham a linha do tempo.' : 'A hipótese se afasta dos fatos disponíveis. Volte ao histórico e observe as pequenas inconsistências.', dimensionResults };
+  return {
+    score,
+    feedback: score >= 75
+      ? 'A teoria acompanha os fatos essenciais do caso.'
+      : score >= 40
+        ? 'Há conexões corretas, mas alguns detalhes ainda não fecham a linha do tempo.'
+        : 'A hipótese se afasta dos fatos disponíveis. Volte ao histórico e observe as pequenas inconsistências.',
+    dimensionResults
+  };
 };

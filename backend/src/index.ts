@@ -609,6 +609,9 @@ io.on('connection', (socket) => {
           await new Promise(r => setTimeout(r, 5000));
           const current = await prisma.rooms.findUnique({ where: { id: roomId }, include: { players: true } });
           if (!current || current.host_user_id !== userId || ['GAME_OVER', 'COMPLETED'].includes(current.status)) return;
+          // Se o host já reconectou nesse intervalo, não transfere
+          const hostPlayer = current.players.find((p) => p.anonymous_user_id === userId);
+          if (hostPlayer?.connection_status === 'CONNECTED') return;
           const successor = current.players.find((player) => player.anonymous_user_id !== userId && player.connection_status === 'CONNECTED');
           if (successor) {
             await prisma.$transaction([prisma.rooms.update({ where: { id: roomId }, data: { host_user_id: successor.anonymous_user_id } }), prisma.room_players.updateMany({ where: { room_id: roomId, is_host: true }, data: { is_host: false } }), prisma.room_players.update({ where: { id: successor.id }, data: { is_host: true } })]);

@@ -38,10 +38,9 @@ const JoinRoom: React.FC = () => {
   };
 
   return (
-    <div className="immersive-page" style={{ 
+    <div className="immersive-page is-fixed-height" style={{ 
       display: 'flex', 
-      flexDirection: 'column', 
-      height: '100%', 
+      flexDirection: 'column',
       backgroundColor: '#0F1417',
       backgroundImage: `url(/backgrounds/equipe-investigadores.png)`,
       backgroundSize: 'cover',
@@ -50,26 +49,22 @@ const JoinRoom: React.FC = () => {
     }}>
       {/* Overlay gradiente */}
       <div style={{
-        position: 'absolute',
+        position: 'fixed',
         top: 0, left: 0, right: 0, bottom: 0,
-        background: 'linear-gradient(to bottom, rgba(15, 20, 23, 0.3) 0%, rgba(15, 20, 23, 0.95) 60%, #0F1417 100%)',
+        background: 'linear-gradient(to bottom, rgba(15, 20, 23, 0.2) 0%, rgba(15, 20, 23, 0.92) 55%, #0F1417 100%)',
         zIndex: 0
       }}></div>
 
-      <div style={{ position: 'relative', zIndex: 1, padding: '24px', marginTop: '24px' }}>
-        <button onClick={() => navigate(-1)} style={{ color: '#8E989F', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px', background: 'transparent', border: 'none', cursor: 'pointer' }}>
-          <span style={{ fontSize: '18px', lineHeight: 1 }}>←</span> Voltar
-        </button>
-      </div>
+      <div style={{ position: 'relative', zIndex: 1, padding: '88px 24px calc(76px + env(safe-area-inset-bottom) + 24px)', display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'flex-end', gap: '20px' }}>
+        <div>
+          <h2 style={{ fontSize: '30px', marginBottom: '6px', fontFamily: 'var(--font-serif)', lineHeight: 1.1, fontWeight: 400, color: '#F8F9FA' }}>Junte-se à Equipe</h2>
+          <p style={{ color: '#8E989F', fontSize: '13px', maxWidth: '85%', fontWeight: 300 }}>A investigação já começou. Insira suas credenciais para entrar.</p>
+        </div>
 
-      <div style={{ position: 'relative', zIndex: 1, padding: '0 24px 32px 24px', display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'flex-end' }}>
-        <h2 style={{ fontSize: '32px', marginBottom: '8px', fontFamily: 'var(--font-serif)', lineHeight: 1.1, fontWeight: 400, color: '#F8F9FA' }}>Junte-se à Equipe</h2>
-        <p style={{ color: '#8E989F', fontSize: '14px', marginBottom: '32px', maxWidth: '85%', fontWeight: 300 }}>A investigação já começou. Insira suas credenciais para entrar.</p>
-
-        <form onSubmit={handleJoin} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <form onSubmit={handleJoin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {error && <div role="alert" style={{ color: '#d79b8e', border: '1px solid rgba(215,155,142,.4)', padding: '12px', borderRadius: '8px' }}>{error}</div>}
           <div>
-            <label style={{ display: 'block', marginBottom: '12px', color: '#C5A880', textTransform: 'uppercase', letterSpacing: '2px', fontSize: '10px', fontWeight: 600 }}>
+            <label style={{ display: 'block', marginBottom: '10px', color: '#C5A880', textTransform: 'uppercase', letterSpacing: '2px', fontSize: '10px', fontWeight: 600 }}>
               Código de Acesso
             </label>
             <input 
@@ -80,24 +75,24 @@ const JoinRoom: React.FC = () => {
               required
               style={{ 
                 width: '100%',
-                padding: '16px',
+                padding: '14px',
                 borderRadius: '8px',
-                fontSize: '24px', 
-                letterSpacing: '6px', 
+                fontSize: '22px', 
+                letterSpacing: '8px', 
                 textAlign: 'center', 
-                fontFamily: 'var(--font-serif)', 
-                fontWeight: 600, 
+                fontFamily: 'var(--font-sans)',
+                fontWeight: 700, 
                 backgroundColor: 'rgba(15, 20, 23, 0.7)', 
-                color: '#F8F9FA',
+                color: 'var(--gold-soft)',
                 backdropFilter: 'blur(10px)', 
-                border: '1px solid rgba(255,255,255,0.08)',
+                border: '1px solid rgba(184,153,83,.3)',
                 outline: 'none'
               }}
             />
           </div>
 
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', marginBottom: '12px', color: '#C5A880', textTransform: 'uppercase', letterSpacing: '2px', fontSize: '10px', fontWeight: 600 }}>
+          <div>
+            <label style={{ display: 'block', marginBottom: '10px', color: '#C5A880', textTransform: 'uppercase', letterSpacing: '2px', fontSize: '10px', fontWeight: 600 }}>
               Identificação (Nome)
             </label>
             <input 
@@ -107,7 +102,7 @@ const JoinRoom: React.FC = () => {
               required
               style={{ 
                 width: '100%',
-                padding: '16px',
+                padding: '14px',
                 borderRadius: '8px',
                 fontSize: '14px',
                 backgroundColor: 'rgba(15, 20, 23, 0.7)', 
@@ -124,8 +119,7 @@ const JoinRoom: React.FC = () => {
             disabled={loading || !code || !name}
             style={{ 
               padding: '16px 24px', 
-              fontSize: '14px', 
-              marginTop: '8px',
+              fontSize: '14px',
               backgroundColor: 'var(--olive)',
               color: 'var(--paper)',
               border: 'none',

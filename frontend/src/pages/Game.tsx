@@ -221,10 +221,10 @@ const Game: React.FC = () => {
                 style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 0, color: 'inherit' }}
               >
                 <span style={{ ...labelStyle, marginBottom: 0 }}>📋 Resumo do Caso</span>
-                <span style={{ color: 'var(--accent-gold)', fontSize: '18px', lineHeight: 1 }}>{showCaseSummary ? '−' : '+'}</span>
+                <span style={{ color: 'var(--accent-gold)', fontSize: '14px', lineHeight: 1 }}>{showCaseSummary ? '▲' : '▼'}</span>
               </button>
               {showCaseSummary && (
-                <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '160px', overflowY: 'auto' }}>
                   {caseSynopsis && <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: '14px', lineHeight: 1.6, margin: 0, fontFamily: 'var(--font-serif)', fontStyle: 'italic' }}>{caseSynopsis}</p>}
                   {caseOpening && caseSynopsis !== caseOpening && (
                     <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '13px', lineHeight: 1.6, margin: 0 }}>{caseOpening}</p>

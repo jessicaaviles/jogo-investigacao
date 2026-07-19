@@ -35,8 +35,8 @@ const JoinRoom: React.FC = () => {
           return;
         }
         userId = reg.data.userId;
-        localStorage.setItem('userId', userId);
-        localStorage.setItem('deviceToken', reg.data.deviceToken);
+        if (userId) localStorage.setItem('userId', userId);
+        if (reg.data.deviceToken) localStorage.setItem('deviceToken', reg.data.deviceToken);
       }
 
       const res = await joinRoom(code.toUpperCase(), userId, name);

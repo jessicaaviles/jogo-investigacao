@@ -4,7 +4,7 @@ import { QRCodeCanvas } from 'qrcode.react';
 
 const RecoveryCode: React.FC = () => {
   const { roomId } = useParams(); const navigate = useNavigate(); const query = new URLSearchParams(useLocation().search);
-  const code = query.get('code') || 'indisponível'; const publicCode = query.get('publicCode') || ''; const invite = query.get('invite') || `${window.location.origin}/join?room=${publicCode}`;
+  const code = query.get('code') || 'indisponível'; const publicCode = query.get('publicCode') || ''; const invite = `${window.location.origin}/join?room=${publicCode}`;
   const copy = () => navigator.clipboard?.writeText(code);
 
   return (

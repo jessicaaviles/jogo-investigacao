@@ -33,7 +33,6 @@ const Game: React.FC = () => {
       setLoading(false);
       setHistory(prev => [...prev, data]);
       setQuestion('');
-      setShowCaseSummary(false); // Oculta o resumo depois da 1ª pergunta
     });
 
     socket.on('vote_started', (data) => setActiveVote(data));

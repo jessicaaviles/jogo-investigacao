@@ -433,7 +433,6 @@ const Game: React.FC = () => {
                   )}
                 </div>
               </div>
-            </div>
             )}
 
           {/* Status: SOLVING */}

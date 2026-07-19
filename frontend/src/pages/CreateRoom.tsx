@@ -75,12 +75,21 @@ const CreateRoom: React.FC = () => {
     try {
       setLoading(true);
       
-      const hostName = localStorage.getItem('userName') || 'Investigador';
       const userId = localStorage.getItem('userId');
-      
       if (!userId) {
         setError("Sua identidade local não está disponível. Retorne à Home.");
         return;
+      }
+
+      let hostName = localStorage.getItem('userName') || '';
+      if (!hostName) {
+        const profileRes = await apiService.getProfile(userId);
+        if (profileRes.success) {
+          hostName = profileRes.data.displayName;
+          localStorage.setItem('userName', hostName);
+        } else {
+          hostName = 'Investigador';
+        }
       }
 
       const response = await apiService.createRoom(selectedCaseId, userId, hostName, { turn_timer_seconds: timer });

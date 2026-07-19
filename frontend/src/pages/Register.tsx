@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authRegister, authGoogle } from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 import Loading from '../components/Loading';
 
 declare global {
@@ -15,15 +16,19 @@ const Register: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const { refresh } = useAuth();
+
   const handleGoogleResponse = useCallback(async (response: any) => {
     setLoading(true);
     setError('');
     try {
+      const anonId = localStorage.getItem('userId');
       const res = await authGoogle(response.credential, displayName || undefined);
       if (res.success) {
         localStorage.setItem('authToken', res.data.authToken);
         localStorage.setItem('userId', res.data.userId);
-        navigate('/profile');
+        await refresh();
+        navigate(anonId ? '/cases' : '/profile');
       } else {
         setError(res.error || 'Erro ao autenticar com Google.');
       }
@@ -32,7 +37,7 @@ const Register: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [navigate, displayName]);
+  }, [navigate, displayName, refresh]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,11 +46,13 @@ const Register: React.FC = () => {
     setLoading(true);
     setError('');
     try {
+      const anonId = localStorage.getItem('userId');
       const res = await authRegister(email, password, displayName || undefined);
       if (res.success) {
         localStorage.setItem('authToken', res.data.authToken);
         localStorage.setItem('userId', res.data.userId);
-        navigate('/profile');
+        await refresh();
+        navigate(anonId ? '/cases' : '/profile');
       } else {
         setError(res.error || 'Erro ao criar conta.');
       }

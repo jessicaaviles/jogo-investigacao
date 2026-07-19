@@ -34,7 +34,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const resolveUser = useCallback(async () => {
     setLoading(true);
     try {
-      const authToken = localStorage.getItem('auth_token');
+      const authToken = localStorage.getItem('authToken');
       if (authToken) {
         const validateRes = await authValidate(authToken);
         if (validateRes.success && validateRes.data?.userId) {
@@ -78,7 +78,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = useCallback(async () => {
     const token = localStorage.getItem('auth_token');
     if (token) await authLogout(token).catch(() => {});
-    localStorage.removeItem('auth_token');
+    localStorage.removeItem('authToken');
     setUser(null);
   }, []);
 

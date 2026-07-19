@@ -35,12 +35,18 @@ const Lobby: React.FC = () => {
   useEffect(() => {
     if (!roomData?.players) return;
     roomData.players.forEach((p: any) => {
-      if (p.user || profileCache[p.anonymous_user_id]) return;
-      getProfile(p.anonymous_user_id).then((res: any) => {
-        if (res.success) setProfileCache(prev => ({ ...prev, [p.anonymous_user_id]: res.data }));
+      const uid = p.anonymous_user_id;
+      if (p.user || profileCache[uid]) return;
+      getProfile(uid).then((res: any) => {
+        if (res.success) {
+          setProfileCache(prev => {
+            if (prev[uid]) return prev;
+            return { ...prev, [uid]: res.data };
+          });
+        }
       }).catch(() => {});
     });
-  }, [roomData, profileCache]);
+  }, [roomData?.players]);
 
   const getPlayerDisplayName = (p: any) => {
     const profile = p.user || profileCache[p.anonymous_user_id];

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSocket } from '../contexts/useSocket';
 import Loading from '../components/Loading';
@@ -21,6 +21,37 @@ const Game: React.FC = () => {
   const [evaluationNotice, setEvaluationNotice] = useState<any>(null);
   const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
   const [showCaseSummary, setShowCaseSummary] = useState(true);
+  const [listening, setListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
+
+  const toggleVoice = useCallback(() => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+
+    if (listening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      setListening(false);
+      return;
+    }
+
+    const rec = new SpeechRecognition();
+    rec.lang = 'pt-BR';
+    rec.continuous = false;
+    rec.interimResults = false;
+
+    rec.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      setQuestion(prev => prev + (prev ? ' ' : '') + transcript);
+      setListening(false);
+    };
+
+    rec.onerror = () => setListening(false);
+    rec.onend = () => setListening(false);
+
+    recognitionRef.current = rec;
+    rec.start();
+    setListening(true);
+  }, [listening]);
 
   useEffect(() => {
     if (!socket || !roomId) return;
@@ -327,14 +358,32 @@ const Game: React.FC = () => {
               {/* Área de ação: formulário + botões */}
               <div style={{ marginTop: 'auto', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '10px' }}>
-                  <input
-                    type="text"
-                    value={question}
-                    onChange={(e) => setQuestion(e.target.value)}
-                    placeholder={isMyTurn ? 'Faça uma pergunta de sim ou não...' : 'Aguarde sua vez...'}
-                    disabled={!isMyTurn || loading}
-                    style={inputStyle}
-                  />
+                  <div style={{ flex: 1, display: 'flex', gap: '8px', alignItems: 'stretch' }}>
+                    <input
+                      type="text"
+                      value={question}
+                      onChange={(e) => setQuestion(e.target.value)}
+                      placeholder={isMyTurn ? 'Faça uma pergunta de sim ou não...' : 'Aguarde sua vez...'}
+                      disabled={!isMyTurn || loading}
+                      style={{ ...inputStyle, flex: 1 }}
+                    />
+                    {isMyTurn && !loading && (
+                      <button
+                        type="button"
+                        onClick={toggleVoice}
+                        disabled={!isMyTurn || loading}
+                        style={{
+                          padding: '0 14px', borderRadius: '10px', border: 'none',
+                          backgroundColor: listening ? '#d79b8e' : 'rgba(255,255,255,0.08)',
+                          color: listening ? '#000' : 'rgba(255,255,255,0.5)',
+                          cursor: 'pointer', fontSize: '18px', transition: 'all 0.2s'
+                        }}
+                        title={listening ? 'Gravando... clique para parar' : 'Perguntar por voz'}
+                      >
+                        {listening ? '■' : '🎤'}
+                      </button>
+                    )}
+                  </div>
                   <button
                     type="submit"
                     disabled={!isMyTurn || !question.trim() || loading}

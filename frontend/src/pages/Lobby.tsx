@@ -55,6 +55,11 @@ const Lobby: React.FC = () => {
   }, [roomData?.players]);
 
   const getPlayerDisplayName = (p: any) => {
+    const isMe = p.anonymous_user_id === localStorage.getItem('userId');
+    if (isMe) {
+      const localName = localStorage.getItem('userName');
+      if (localName) return localName;
+    }
     const profile = p.user || profileCache[p.anonymous_user_id];
     return profile?.displayName || profile?.default_display_name || p.display_name;
   };

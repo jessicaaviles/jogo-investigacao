@@ -42,7 +42,7 @@ const Lobby: React.FC = () => {
     if (!roomData?.players) return;
     roomData.players.forEach((p: any) => {
       const uid = p.anonymous_user_id;
-      if (p.user || profileCache[uid]) return;
+      if (profileCache[uid]) return; // já buscou, não busca de novo
       getProfile(uid).then((res: any) => {
         if (res.success) {
           setProfileCache(prev => {
@@ -55,18 +55,24 @@ const Lobby: React.FC = () => {
   }, [roomData?.players]);
 
   const getPlayerDisplayName = (p: any) => {
-    const isMe = p.anonymous_user_id === localStorage.getItem('userId');
-    if (isMe) {
+    // Primeiro: cache fresco da API /profiles/:id
+    const cached = profileCache[p.anonymous_user_id];
+    if (cached?.displayName) return cached.displayName;
+    // Segundo: se é o próprio usuário, pega nome do localStorage
+    if (p.anonymous_user_id === localStorage.getItem('userId')) {
       const localName = localStorage.getItem('userName');
       if (localName) return localName;
     }
-    const profile = p.user || profileCache[p.anonymous_user_id];
-    return profile?.displayName || profile?.default_display_name || p.display_name;
+    // Terceiro: dados incluídos via socket
+    return p.user?.default_display_name || p.display_name || 'Investigador';
   };
 
   const getPlayerPhoto = (p: any) => {
-    const profile = p.user || profileCache[p.anonymous_user_id];
-    return profile?.photo || profile?.generated_profile_photo_data || profile?.profile_photo_data || null;
+    // Primeiro: cache fresco da API (tem o campo 'photo' já normalizado)
+    const cached = profileCache[p.anonymous_user_id];
+    if (cached?.photo) return cached.photo;
+    // Segundo: dados incluídos via socket
+    return p.user?.generated_profile_photo_data || p.user?.profile_photo_data || null;
   };
 
   if (!roomData) return <Loading message="Conectando à sala..." />;

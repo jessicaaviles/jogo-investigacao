@@ -332,7 +332,7 @@ const Game: React.FC = () => {
         </div>
 
         {/* Área scrollável: jogadores, turno, perguntas e respostas */}
-        <div ref={historyRef} style={{ flexGrow: 1, flexShrink: 1, flexBasis: 0, overflowY: 'auto', padding: '0 20px', minHeight: 0 }}>
+        <div ref={historyRef} style={{ flexGrow: 1, flexShrink: 1, flexBasis: 0, overflowY: 'auto', padding: '0 20px', paddingTop: '16px', minHeight: 0 }}>
           {status === 'IN_PROGRESS' && (
             <>
               {/* Jogadores */}

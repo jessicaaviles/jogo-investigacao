@@ -28,22 +28,24 @@ const Feedback: React.FC = () => {
     borderRadius: '12px',
     padding: '24px',
     width: '100%',
-    maxWidth: '400px',
-    height: 'auto',
-    margin: '100px auto 40px auto'
+    height: 'max-content',
+    margin: '0'
   };
 
   const labelStyle = { display: 'block', color: 'var(--gold-soft)', fontSize: '10px', fontWeight: 600, letterSpacing: '.22em', textTransform: 'uppercase', marginBottom: '12px' } as any;
 
   return (
     <div className="immersive-page" style={{
+      display: 'flex',
+      flexDirection: 'column',
       backgroundColor: '#0F1417',
       backgroundImage: `url(/backgrounds/equipe-investigadores.png)`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundBlendMode: 'overlay',
-      padding: '1px 24px',
-      minHeight: '100vh'
+      padding: '112px 24px 24px 24px', // 88px (header) + 24px (margem)
+      minHeight: '100vh',
+      boxSizing: 'border-box'
     }}>
       {sent ? (
         <div style={{ ...cardStyle, textAlign: 'center' }}>

@@ -132,6 +132,10 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('typing', ({ roomId, userId, typing }) => {
+    socket.to(roomId).emit('player_typing', { userId, typing });
+  });
+
   socket.on('start_game', async ({ roomId, userId }) => {
     try {
       const room = await prisma.rooms.findUnique({ where: { id: roomId }, include: { players: true } });

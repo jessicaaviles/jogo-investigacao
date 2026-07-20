@@ -35,16 +35,20 @@ const Feedback: React.FC = () => {
   const labelStyle = { display: 'block', color: 'var(--gold-soft)', fontSize: '10px', fontWeight: 600, letterSpacing: '.22em', textTransform: 'uppercase', marginBottom: '12px' } as any;
 
   return (
-    <div className="immersive-page is-fixed-height" style={{
+    <div style={{
       display: 'flex',
       flexDirection: 'column',
-      backgroundColor: '#0F1417',
+      backgroundColor: 'var(--petrol)',
       backgroundImage: `url(/backgrounds/equipe-investigadores.png)`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       position: 'fixed',
       top: 0, left: 0, right: 0, bottom: 0,
-      zIndex: 0
+      zIndex: 0,
+      color: 'var(--paper)',
+      fontFamily: 'var(--sans)',
+      margin: 0,
+      padding: 0
     }}>
       {/* Overlay gradiente para escurecer o fundo igual nas outras páginas */}
       <div style={{

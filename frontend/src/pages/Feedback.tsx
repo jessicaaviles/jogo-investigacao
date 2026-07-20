@@ -75,10 +75,10 @@ const Feedback: React.FC = () => {
             <h2 style={{ fontSize: '24px', marginBottom: '12px', fontFamily: 'var(--font-serif)', fontWeight: 400, color: '#F8F9FA' }}>Obrigado por investigar.</h2>
             <p style={{ color: '#8E989F', fontSize: '13px', lineHeight: 1.5, marginBottom: '24px' }}>Seu feedback ajuda a calibrar os próximos casos.</p>
             <button 
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/cases')}
               style={{ width: '100%', padding: '14px', borderRadius: '8px', border: 'none', backgroundColor: 'var(--accent-gold)', color: '#000', fontWeight: 700, fontSize: '14px', cursor: 'pointer' }}
             >
-              Voltar ao Arquivo
+              Desvendar mais casos
             </button>
           </div>
         ) : (

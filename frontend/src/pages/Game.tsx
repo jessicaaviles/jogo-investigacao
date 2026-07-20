@@ -23,6 +23,7 @@ const Game: React.FC = () => {
   const [showCaseSummary, setShowCaseSummary] = useState(true);
   const [listening, setListening] = useState(false);
   const [typingPlayer, setTypingPlayer] = useState<string | null>(null);
+  const [showHintsPanel, setShowHintsPanel] = useState(false);
   const typingTimeoutRef = useRef<any>(null);
   const recognitionRef = useRef<any>(null);
   const historyRef = useRef<HTMLDivElement>(null);
@@ -408,18 +409,6 @@ const Game: React.FC = () => {
                   </span>
                   <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px', fontStyle: 'italic' }}>consultando os arquivos...</span>
                 </div>
-              )}
-              {hints.length > 0 && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
-                  {hints.map((hint) => (
-                    <div key={hint.hintIndex} style={{ ...cardStyle, borderColor: 'rgba(132,147,107,0.4)', background: 'rgba(132,147,107,0.08)' }}>
-                      <div style={labelStyle}>Pista {hint.hintIndex}</div>
-                      <p style={{ margin: 0, fontSize: '14px', color: 'rgba(255,255,255,0.8)' }}>{hint.content}</p>
-                      <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginTop: '4px' }}>−{hint.penalty} pontos</div>
-                    </div>
-                  ))}
-                </div>
-              )}
             </>
           )}
 
@@ -567,7 +556,14 @@ const Game: React.FC = () => {
                     disabled={loading || hints.length >= 3}
                     style={{ flex: 1, padding: '12px', background: 'rgba(132,147,107,0.15)', border: '1px solid rgba(132,147,107,0.3)', borderRadius: '10px', color: hints.length >= 3 ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.8)', cursor: hints.length >= 3 ? 'default' : 'pointer', fontWeight: 600, fontSize: '13px' }}
                   >
-                    Usar Pista ({Math.max(0, 3 - hints.length)})
+                    Pedir pistas ({Math.max(0, 3 - hints.length)})
+                  </button>
+                  <button
+                    onClick={() => setShowHintsPanel(v => !v)}
+                    disabled={hints.length === 0}
+                    style={{ flex: 1, padding: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: hints.length === 0 ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.7)', cursor: hints.length === 0 ? 'default' : 'pointer', fontWeight: 600, fontSize: '13px' }}
+                  >
+                    {showHintsPanel ? '▲ Ocultar pistas' : `▼ Ver pistas (${hints.length})`}
                   </button>
                   {isMyTurn && (
                     <button
@@ -579,6 +575,17 @@ const Game: React.FC = () => {
                     </button>
                   )}
                 </div>
+                {showHintsPanel && hints.length > 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
+                    {hints.map((hint) => (
+                      <div key={hint.hintIndex} style={{ ...cardStyle, borderColor: 'rgba(132,147,107,0.4)', background: 'rgba(132,147,107,0.08)' }}>
+                        <div style={labelStyle}>Pista {hint.hintIndex}</div>
+                        <p style={{ margin: 0, fontSize: '14px', color: 'rgba(255,255,255,0.8)' }}>{hint.content}</p>
+                        <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginTop: '4px' }}>−{hint.penalty} pontos</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
             )}

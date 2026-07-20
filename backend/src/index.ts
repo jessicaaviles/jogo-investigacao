@@ -38,10 +38,12 @@ const roomState = async (roomId: string) => {
     }
   });
   if (!room) return null;
+  const activeVote = await prisma.votes.findFirst({ where: { room_id: roomId, status: 'OPEN' } });
   return {
     ...room,
     case_version_id: room.case_version_id,
-    theories: room.status === 'SOLVING' ? room.theories.map(({ answers: _answers, ...theory }) => theory) : room.theories
+    theories: room.status === 'SOLVING' ? room.theories.map(({ answers: _answers, ...theory }) => theory) : room.theories,
+    activeVote
   };
 };
 
@@ -572,10 +574,13 @@ io.on('connection', (socket) => {
       // Restringir que só o host pode encerrar
       if (room.host_user_id !== userId) return;
 
+      const openVote = await prisma.votes.findFirst({ where: { room_id: roomId, type: 'THEORY_SELECTION', status: 'OPEN' } });
+      if (openVote) return socket.emit('room_error', 'A votação da equipe ainda está em andamento. Aguarde todos votarem.');
+
       const selectionVote = await prisma.votes.findFirst({ where: { room_id: roomId, type: 'THEORY_SELECTION', status: 'CLOSED' }, orderBy: { closed_at: 'desc' }, include: { responses: true } });
       const selectedTheoryId = selectionVote?.responses.reduce<Record<string, number>>((all, response) => ({ ...all, [response.option_id]: (all[response.option_id] || 0) + 1 }), {});
       const selectedId = selectedTheoryId ? Object.entries(selectedTheoryId).sort((a, b) => b[1] - a[1])[0]?.[0] : undefined;
-      if (!selectedId) return socket.emit('room_error', 'A votação da teoria ainda não foi encerrada.');
+      if (!selectedId) return socket.emit('room_error', 'Erro ao determinar a teoria vencedora.');
       const trueSolution = revealSecret(room.case_version.full_solution_encrypted);
       
       const evaluations = await Promise.all(

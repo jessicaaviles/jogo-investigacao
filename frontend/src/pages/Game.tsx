@@ -79,6 +79,7 @@ const Game: React.FC = () => {
 
     socket.on('room_state_updated', (data) => {
       setRoomData(data);
+      if (data.activeVote !== undefined) setActiveVote(data.activeVote);
       if (data.questions?.length) {
         setHistory(data.questions.map((q: any) => ({
           question: { original_text: q.original_text, id: q.id },

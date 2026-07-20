@@ -545,7 +545,11 @@ io.on('connection', (socket) => {
           where: { id: roomId },
           data: { status: 'REVEAL' }
         });
-        const selectionVote = await prisma.votes.create({ data: { room_id: roomId, type: 'THEORY_SELECTION', options: JSON.stringify(allTheories.map((theory) => ({ id: theory.id, label: `Teoria ${theory.player_id.slice(0, 6)}` }))), status: 'OPEN' } });
+        const selectionVote = await prisma.votes.create({ data: { room_id: roomId, type: 'THEORY_SELECTION', options: JSON.stringify(allTheories.map((theory) => {
+          const p = room.players.find(pl => pl.id === theory.player_id);
+          const name = p ? p.display_name : 'Desconhecido';
+          return { id: theory.id, label: `Teoria de ${name}` };
+        })), status: 'OPEN' } });
         io.to(roomId).emit('theories_revealed', { ready: true });
         io.to(roomId).emit('vote_started', selectionVote);
       }

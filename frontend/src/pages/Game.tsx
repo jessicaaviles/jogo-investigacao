@@ -410,7 +410,7 @@ const Game: React.FC = () => {
                   </div>
                   <div className="answer-row" style={{ color: 'rgba(255,255,255,0.75)', fontSize: '14px', lineHeight: 1.6, display: 'flex', alignItems: 'flex-start' }}>
                     <span style={{ color: 'var(--accent-gold)', fontWeight: 700, marginRight: '6px', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px', flexShrink: 0 }}>Mestre:</span>
-                    {item.answer?.rendered_text || item.responseText}
+                    <span className="answer-text">{item.answer?.rendered_text || item.responseText}</span>
                     <button onClick={() => speakAnswer(item.answer?.rendered_text || item.responseText)} style={{ flexShrink: 0, width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '6px', cursor: 'pointer', color: 'rgba(255,255,255,0.4)', fontSize: '14px' }} title="Ouvir resposta"><Volume2 size={14} /></button>
                   </div>
                   <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>

@@ -604,6 +604,7 @@ const Game: React.FC = () => {
                     </button>
                   )}
                 </div>
+              </div>
             </div>
             )}
 

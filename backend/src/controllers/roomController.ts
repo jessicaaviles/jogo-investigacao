@@ -16,12 +16,26 @@ const generateRoomCode = () => {
   return result;
 };
 
-export const listCases = async (_req: Request, res: Response) => {
+export const listCases = async (req: Request, res: Response) => {
   try {
+    const userId = req.query.userId as string;
     const cases = await prisma.cases.findMany({ where: { status: { in: ['PUBLISHED', 'published'] }, deleted_at: null }, orderBy: { created_at: 'asc' } });
     cases.sort((a, b) => Number(b.slug === 'o-guarda-chuva-molhado') - Number(a.slug === 'o-guarda-chuva-molhado'));
-    res.json({ success: true, data: cases });
-  } catch { res.status(500).json({ success: false, error: 'Could not load cases' }); }
+    
+    let solvedSlugs: string[] = [];
+    if (userId) {
+      const solvedRooms = await prisma.room_players.findMany({
+        where: { user_id: userId, room: { status: 'COMPLETED' } },
+        include: { room: { include: { case_version: { include: { case_ref: true } } } } }
+      });
+      solvedSlugs = Array.from(new Set(solvedRooms.map(rp => rp.room.case_version.case_ref.slug)));
+    }
+
+    res.json({ success: true, data: cases, solvedSlugs });
+  } catch (err) { 
+    console.error(err);
+    res.status(500).json({ success: false, error: 'Could not load cases' }); 
+  }
 };
 
 export const handleGenerateCaseImage = async (req: Request, res: Response) => {

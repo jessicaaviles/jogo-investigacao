@@ -1,8 +1,9 @@
 const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 export const API_URL = rawApiUrl.endsWith('/api') ? rawApiUrl : `${rawApiUrl.replace(/\/$/, '')}/api`;
 
-export const listCases = async () => {
-  const res = await fetch(`${API_URL}/cases`);
+export const listCases = async (userId?: string | null) => {
+  const query = userId ? `?userId=${encodeURIComponent(userId)}` : '';
+  const res = await fetch(`${API_URL}/cases${query}`);
   return res.json();
 };
 

@@ -26,9 +26,19 @@ const Cases: React.FC = () => {
   const [solvedCases, setSolvedCases] = useState<string[]>([]);
 
   React.useEffect(() => {
-    setSolvedCases(JSON.parse(localStorage.getItem('solvedCases') || '[]'));
-    listCases().then((response) => {
+    const localSolved = JSON.parse(localStorage.getItem('solvedCases') || '[]');
+    const userId = localStorage.getItem('userId');
+    
+    listCases(userId).then((response) => {
       if (response.success && response.data?.length) {
+        // Merge localStorage with DB solved cases
+        const dbSolved = response.solvedSlugs || [];
+        const mergedSolved = Array.from(new Set([...localSolved, ...dbSolved]));
+        setSolvedCases(mergedSolved);
+        
+        // Update local storage just to be safe
+        localStorage.setItem('solvedCases', JSON.stringify(mergedSolved));
+
         const mapped = response.data.map((item: any) => {
           const image = item.cover_image_data
             ? item.cover_image_data

@@ -668,22 +668,21 @@ const Game: React.FC = () => {
                       ))}
                     </div>
                   </div>
-                  <button
-                    onClick={() => setAutoSpeak(v => !v)}
-                    style={{ padding: '12px', background: 'transparent', border: `1px solid ${autoSpeak ? 'var(--accent-gold)' : 'rgba(255,255,255,0.15)'}`, borderRadius: '10px', color: autoSpeak ? 'var(--accent-gold)' : 'rgba(255,255,255,0.4)', cursor: 'pointer', fontWeight: 600, fontSize: '13px', flexShrink: 0 }}
-                    title={autoSpeak ? 'Auto-fala ligada' : 'Auto-fala desligada'}
-                  >
-                    <Volume2 size={16} />
-                  </button>
-                  {isMyTurn && (
+                  
+                  {(isMyTurn || isHost) && (
                     <button
                       onClick={handlePassTurn}
                       disabled={loading}
                       style={{ flex: 1, padding: '12px', background: 'transparent', border: '1px dashed rgba(255,255,255,0.2)', borderRadius: '10px', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', fontWeight: 600, fontSize: '13px' }}
                     >
-                      Passar a vez
+                      {isHost && !isMyTurn ? 'Forçar pular vez' : 'Passar a vez'}
                     </button>
                   )}
+                </div>
+                
+                <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }} onClick={() => setAutoSpeak(v => !v)}>
+                  <input type="checkbox" checked={autoSpeak} onChange={(e) => setAutoSpeak(e.target.checked)} style={{ width: '16px', height: '16px', accentColor: 'var(--accent-gold)', cursor: 'pointer' }} />
+                  <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '13px', fontWeight: 500 }}>Ativar leitura automática de respostas</span>
                 </div>
               </div>
             )}

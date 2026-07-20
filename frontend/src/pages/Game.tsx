@@ -224,7 +224,7 @@ const Game: React.FC = () => {
         flexDirection: 'column',
       }}>
         {/* TOPO FIXO: título, resumo, jogadores e turno */}
-        <div style={{ flexShrink: 0, padding: '0 20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ flexShrink: 0, padding: '0 20px', display: 'flex', flexDirection: 'column', gap: '12px', overflow: 'hidden' }}>
 
           {/* Header do caso */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>

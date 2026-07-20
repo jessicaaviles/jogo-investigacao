@@ -34,7 +34,7 @@ const Feedback: React.FC = () => {
   const labelStyle = { display: 'block', color: 'var(--gold-soft)', fontSize: '10px', fontWeight: 600, letterSpacing: '.22em', textTransform: 'uppercase', marginBottom: '12px' } as any;
 
   return (
-    <div className="immersive-page is-fixed-height" style={{
+    <div className="immersive-page" style={{
       display: 'flex',
       flexDirection: 'column',
       backgroundColor: '#0F1417',
@@ -44,7 +44,9 @@ const Feedback: React.FC = () => {
       backgroundBlendMode: 'overlay',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '24px'
+      padding: '88px 24px 24px', // Adicionado padding-top para não sobrepor o header
+      minHeight: '100vh',
+      overflowY: 'auto'
     }}>
       {sent ? (
         <div style={{ ...cardStyle, textAlign: 'center' }}>

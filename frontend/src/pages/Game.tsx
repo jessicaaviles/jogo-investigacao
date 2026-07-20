@@ -68,7 +68,7 @@ const Game: React.FC = () => {
 
     socket.on('vote_started', (data) => setActiveVote(data));
     socket.on('vote_closed', () => setActiveVote(null));
-    socket.on('hint_used', (data) => setHints(prev => [...prev, data]));
+    socket.on('hint_used', (data) => { setHints(prev => [...prev, data]); setLoading(false); });
     socket.on('question_repeated', (data) => { setLoading(false); setQuestionWarning({ kind: 'repeat', text: `Uma pergunta parecida já foi feita: "${data.previous}"`, answer: data.answer }); });
     socket.on('question_needs_reformulation', (data) => { setLoading(false); setQuestionWarning({ kind: 'reformulate', text: data.message }); });
     socket.on('clarification_added', (data) => setHistory(prev => prev.map(item => item.question?.id === data.questionId ? { ...item, clarification: data.text } : item)));

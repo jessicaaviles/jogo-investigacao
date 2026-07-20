@@ -408,10 +408,12 @@ const Game: React.FC = () => {
                   <div style={{ fontWeight: 600, marginBottom: '6px', color: '#fff', fontSize: '14px', fontStyle: 'italic' }}>
                     "{item.question?.original_text || item.questionText}"
                   </div>
-                  <div style={{ color: 'rgba(255,255,255,0.75)', fontSize: '14px', lineHeight: 1.6 }}>
-                    <span style={{ color: 'var(--accent-gold)', fontWeight: 700, marginRight: '6px', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px' }}>Mestre:</span>
-                    {item.answer?.rendered_text || item.responseText}
-                    <button onClick={() => speakAnswer(item.answer?.rendered_text || item.responseText)} style={{ marginLeft: '8px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', opacity: 0.5, verticalAlign: 'middle', lineHeight: 1 }} title="Ouvir resposta"><Volume2 size={14} /></button>
+                  <div style={{ color: 'rgba(255,255,255,0.75)', fontSize: '14px', lineHeight: 1.6, display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                    <div style={{ flex: 1 }}>
+                      <span style={{ color: 'var(--accent-gold)', fontWeight: 700, marginRight: '6px', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px' }}>Mestre:</span>
+                      {item.answer?.rendered_text || item.responseText}
+                    </div>
+                    <button onClick={() => speakAnswer(item.answer?.rendered_text || item.responseText)} style={{ flexShrink: 0, width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '6px', cursor: 'pointer', color: 'rgba(255,255,255,0.4)', fontSize: '14px' }} title="Ouvir resposta"><Volume2 size={14} /></button>
                   </div>
                   <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
                     <button onClick={() => requestClarification(item.question?.id)} disabled={!item.question?.id || item.clarification} style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', padding: '4px 8px', cursor: 'pointer' }}>Esclarecer</button>

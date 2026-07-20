@@ -222,6 +222,7 @@ const Game: React.FC = () => {
         paddingBottom: 'calc(76px + env(safe-area-inset-bottom) + 24px)',
         display: 'flex',
         flexDirection: 'column',
+        overflow: 'hidden',
       }}>
         {/* TOPO FIXO: título, resumo, jogadores e turno */}
         <div style={{ flexShrink: 0, padding: '0 20px', display: 'flex', flexDirection: 'column', gap: '12px', overflow: 'hidden' }}>

@@ -41,7 +41,7 @@
 .menu-dropup {
   position: absolute;
   bottom: calc(100% + 8px);
-  left: 0;
+  right: 0;
   z-index: 200;
   min-width: 250px;
   background: #1e2c32;
@@ -52,7 +52,7 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  transform-origin: bottom left;
+  transform-origin: bottom right;
   transform: scale(0.88) translateY(6px);
   opacity: 0;
   pointer-events: none;

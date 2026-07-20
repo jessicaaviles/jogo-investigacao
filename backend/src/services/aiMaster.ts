@@ -6,8 +6,11 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 const BLOCKED_PATTERNS = /(ignore|esqueça|revele|mostre|prompt|instruções|system message|segredo|solução completa|ignore previous|forget|reveal the)/i;
 
-const generateNarrative = async (classification: string, factualExplanation: string): Promise<string> => {
-  const narrativePrompt = `Você é o Mestre IA de um jogo de mistério e investigação. Responda APENAS à pergunta feita pelo jogador.
+const generateNarrative = async (classification: string, factualExplanation: string, questionText: string): Promise<string> => {
+  const narrativePrompt = `Você é o Mestre IA de um jogo de mistério e investigação.
+O jogador fez a seguinte pergunta: "${questionText}"
+
+Responda APENAS à pergunta feita pelo jogador baseando-se no contexto abaixo.
 
 Classificação: ${classification}
 Contexto interno (use APENAS como base, não revele detalhes): ${factualExplanation}
@@ -49,10 +52,17 @@ export const processQuestion = async (roomId: string, questionText: string, case
       where: { case_version_id: caseVersionId, visibility: { not: 'SECRET' } }
     });
 
-    if (!facts || facts.length === 0) {
+    const caseVersion = await prisma.case_versions.findUnique({
+      where: { id: caseVersionId },
+      include: { case_ref: true }
+    });
+
+    if (!facts || facts.length === 0 || !caseVersion) {
       return { classification: 'UNKNOWN', rendered_text: 'O arquivo do caso não pôde ser acessado agora. Tente novamente em instantes.', fallback_used: true };
     }
 
+    const { revealSecret } = await import('../security/secrets');
+    const solutionSummary = revealSecret(caseVersion.solution_summary_encrypted);
     const factListText = facts.map((f: any) => `- ${f.statement}`).join('\n');
 
     const responseSchema: Schema = {
@@ -66,11 +76,14 @@ export const processQuestion = async (roomId: string, questionText: string, case
     };
 
     const prompt = `Você atua como o motor lógico (Mestre IA) de um jogo de investigação brasileiro.
-Sua função é interpretar a pergunta do jogador e classificá-la ESTRITAMENTE baseada nos fatos fornecidos abaixo.
+Sua função é interpretar a pergunta do jogador e classificá-la ESTRITAMENTE baseada nas informações abaixo.
 Você NÃO pode inventar fatos, usar conhecimento externo ou tentar adivinhar o que não está escrito.
 Responda SEMPRE em português do Brasil (pt-BR).
 
-Fatos Absolutos do Caso:
+Resumo da Solução (Contexto Geral):
+${solutionSummary}
+
+Fatos Absolutos do Caso (Detalhes Específicos):
 ${factListText}
 
 Regras de Classificação:
@@ -109,7 +122,7 @@ Analise a pergunta, extraia as premissas, compare com os Fatos Absolutos e gere 
       return { classification: logicResult.classification, rendered_text: msgMap[logicResult.classification] || 'Reformule a pergunta.', fallback_used: false };
     }
 
-    const finalAnswerText = await generateNarrative(logicResult.classification, logicResult.factualExplanation);
+    const finalAnswerText = await generateNarrative(logicResult.classification, logicResult.factualExplanation, questionText);
 
     if (!finalAnswerText) {
       return { classification: 'UNKNOWN', rendered_text: 'O Mestre não conseguiu formular a resposta agora. Tente novamente.', fallback_used: true };

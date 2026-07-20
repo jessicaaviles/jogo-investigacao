@@ -127,6 +127,7 @@ const Game: React.FC = () => {
       socket.off('game_over');
       socket.off('theory_evaluation');
       socket.off('room_error');
+      socket.off('player_typing');
     };
   }, [socket, roomId]);
 

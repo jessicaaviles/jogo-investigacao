@@ -23,6 +23,7 @@ const Game: React.FC = () => {
   const [showCaseSummary, setShowCaseSummary] = useState(true);
   const [listening, setListening] = useState(false);
   const [typingPlayer, setTypingPlayer] = useState<string | null>(null);
+  const [processingUser, setProcessingUser] = useState<string | null>(null);
   const [showHintsPanel, setShowHintsPanel] = useState(false);
   const [myVote, setMyVote] = useState<string | null>(null);
   const [voteTiedMessage, setVoteTiedMessage] = useState(false);
@@ -107,6 +108,7 @@ const Game: React.FC = () => {
 
     socket.on('question_processed', (data) => {
       setLoading(false);
+      setProcessingUser(null);
       setHistory(prev => [...prev, data]);
       setQuestion('');
     });
@@ -115,8 +117,8 @@ const Game: React.FC = () => {
     socket.on('vote_closed', () => { setActiveVote(null); setMyVote(null); setVoteTiedMessage(false); });
     socket.on('vote_tied', () => { setVoteTiedMessage(true); });
     socket.on('hint_used', (data) => { setHints(prev => [...prev, data]); setLoading(false); });
-    socket.on('question_repeated', (data) => { setLoading(false); setQuestionWarning({ kind: 'repeat', text: `Uma pergunta parecida já foi feita: "${data.previous}"`, answer: data.answer }); });
-    socket.on('question_needs_reformulation', (data) => { setLoading(false); setQuestionWarning({ kind: 'reformulate', text: data.message }); });
+    socket.on('question_repeated', (data) => { setLoading(false); setProcessingUser(null); setQuestionWarning({ kind: 'repeat', text: `Uma pergunta parecida já foi feita: "${data.previous}"`, answer: data.answer }); });
+    socket.on('question_needs_reformulation', (data) => { setLoading(false); setProcessingUser(null); setQuestionWarning({ kind: 'reformulate', text: data.message }); });
     socket.on('clarification_added', (data) => setHistory(prev => prev.map(item => item.question?.id === data.questionId ? { ...item, clarification: data.text } : item)));
     socket.on('contestation_resolved', (data) => setHistory(prev => prev.map(item => item.question?.id === data.questionId ? { ...item, contestation: data.text } : item)));
 
@@ -129,6 +131,10 @@ const Game: React.FC = () => {
     socket.on('room_error', (err) => { setLoading(false); setErrorMessage(String(err)); });
     socket.on('player_typing', ({ userId: typerId, typing }) => {
       if (typerId !== userId) setTypingPlayer(typing ? typerId : null);
+    });
+    socket.on('question_processing', ({ userId: processorId }) => {
+      setProcessingUser(processorId);
+      setTypingPlayer(null); // Limpa o "está digitando..." quando começa a processar
     });
 
     return () => {
@@ -145,6 +151,7 @@ const Game: React.FC = () => {
       socket.off('theory_evaluation');
       socket.off('room_error');
       socket.off('player_typing');
+      socket.off('question_processing');
     };
   }, [socket, roomId]);
 
@@ -401,10 +408,10 @@ const Game: React.FC = () => {
                 </div>
               )}
 
-              {!history.length && !loading && (
+              {!history.length && !loading && !processingUser && (
                 <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '14px', textAlign: 'center', fontStyle: 'italic', marginTop: '60px' }}>Faça sua primeira pergunta para iniciar a investigação.</p>
               )}
-              {loading && (
+              {(loading || processingUser) && (
                 <div style={{ paddingLeft: '14px', borderLeft: '2px solid rgba(184,153,83,0.5)', display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
                   <span style={{ color: 'var(--accent-gold)', fontWeight: 700, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px' }}>Mestre:</span>
                   <span style={{ display: 'inline-flex', gap: '4px', alignItems: 'center' }}>
@@ -417,7 +424,11 @@ const Game: React.FC = () => {
                       }} />
                     ))}
                   </span>
-                  <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px', fontStyle: 'italic' }}>consultando os arquivos...</span>
+                  <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px', fontStyle: 'italic' }}>
+                    {processingUser && processingUser !== userId 
+                      ? `${players.find((p: any) => p.anonymous_user_id === processingUser)?.display_name || 'Alguém'} fez uma pergunta e o mestre está processando...` 
+                      : 'consultando os arquivos...'}
+                  </span>
                 </div>
               )}
             </>

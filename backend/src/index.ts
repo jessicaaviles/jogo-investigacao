@@ -314,6 +314,8 @@ io.on('connection', (socket) => {
         return;
       }
 
+      io.to(roomId).emit('question_processing', { userId });
+
       // 1. Processar Pergunta no Mestre IA (Gemini)
       const aiResponse = await processQuestion(roomId, cleanQuestion, room.case_version_id);
 

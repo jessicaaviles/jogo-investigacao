@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Mic, Square, Volume2 } from 'lucide-react';
 import { useSocket } from '../contexts/useSocket';
 import Loading from '../components/Loading';
 
@@ -410,7 +411,7 @@ const Game: React.FC = () => {
                   <div style={{ color: 'rgba(255,255,255,0.75)', fontSize: '14px', lineHeight: 1.6 }}>
                     <span style={{ color: 'var(--accent-gold)', fontWeight: 700, marginRight: '6px', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px' }}>Mestre:</span>
                     {item.answer?.rendered_text || item.responseText}
-                    <button onClick={() => speakAnswer(item.answer?.rendered_text || item.responseText)} style={{ marginLeft: '8px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', opacity: 0.5, verticalAlign: 'middle', lineHeight: 1 }} title="Ouvir resposta">🔊</button>
+                    <button onClick={() => speakAnswer(item.answer?.rendered_text || item.responseText)} style={{ marginLeft: '8px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', opacity: 0.5, verticalAlign: 'middle', lineHeight: 1 }} title="Ouvir resposta"><Volume2 size={14} /></button>
                   </div>
                   <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
                     <button onClick={() => requestClarification(item.question?.id)} disabled={!item.question?.id || item.clarification} style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', padding: '4px 8px', cursor: 'pointer' }}>Esclarecer</button>
@@ -621,7 +622,7 @@ const Game: React.FC = () => {
                         }}
                         title={listening ? 'Gravando... clique para parar' : 'Perguntar por voz'}
                       >
-                        {listening ? '■' : '🎤'}
+                        {listening ? <Square size={16} /> : <Mic size={16} />}
                       </button>
                     )}
                   </div>
@@ -671,7 +672,7 @@ const Game: React.FC = () => {
                     style={{ padding: '12px', background: 'transparent', border: `1px solid ${autoSpeak ? 'var(--accent-gold)' : 'rgba(255,255,255,0.15)'}`, borderRadius: '10px', color: autoSpeak ? 'var(--accent-gold)' : 'rgba(255,255,255,0.4)', cursor: 'pointer', fontWeight: 600, fontSize: '13px', flexShrink: 0 }}
                     title={autoSpeak ? 'Auto-fala ligada' : 'Auto-fala desligada'}
                   >
-                    🔊
+                    <Volume2 size={16} />
                   </button>
                   {isMyTurn && (
                     <button

@@ -206,13 +206,28 @@ const Game: React.FC = () => {
   }, [socket, roomId, autoSpeak, speakAnswer]);
 
   const loadingTimeoutRef = useRef<number | null>(null);
+  const syncIntervalRef = useRef<number | null>(null);
   
   useEffect(() => {
-    if (!loading && loadingTimeoutRef.current) {
-      window.clearTimeout(loadingTimeoutRef.current);
-      loadingTimeoutRef.current = null;
+    if (!loading) {
+      if (loadingTimeoutRef.current) {
+        window.clearTimeout(loadingTimeoutRef.current);
+        loadingTimeoutRef.current = null;
+      }
+      if (syncIntervalRef.current) {
+        window.clearInterval(syncIntervalRef.current);
+        syncIntervalRef.current = null;
+      }
+    } else {
+      // Se estiver carregando, forçar sincronização a cada 6 segundos para dispositivos móveis
+      if (!syncIntervalRef.current && socket && socket.connected) {
+        syncIntervalRef.current = window.setInterval(() => {
+          const userId = localStorage.getItem('userId');
+          if (roomId && userId) socket.emit('join_room', { roomId, userId });
+        }, 6000);
+      }
     }
-  }, [loading]);
+  }, [loading, socket, roomId]);
 
   const startLoadingTimeout = () => {
     setLoading(true);

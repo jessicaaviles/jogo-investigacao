@@ -336,7 +336,7 @@ const Game: React.FC = () => {
 
               {/* Histórico de perguntas */}
               {history.length > 0 && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   {history.map((item, idx) => (
                     <div key={idx} style={{ paddingLeft: '14px', borderLeft: '2px solid rgba(184,153,83,0.35)' }}>
                       <div style={{ fontWeight: 600, marginBottom: '6px', color: '#fff', fontSize: '14px', fontStyle: 'italic' }}>

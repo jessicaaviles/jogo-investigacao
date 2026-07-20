@@ -359,19 +359,7 @@ const Game: React.FC = () => {
                   );
                 })}
               </div>
-              {/* Indicador de digitação */}
-              {typingPlayer && typingPlayer !== userId && (
-                <div style={{ paddingLeft: '14px', borderLeft: '2px solid rgba(184,153,83,0.5)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ display: 'inline-flex', gap: '3px', alignItems: 'center' }}>
-                    {[0, 1, 2].map(i => (
-                      <span key={i} style={{ width: '5px', height: '5px', borderRadius: '50%', background: 'var(--accent-gold)', display: 'inline-block', animation: `pulse-dot 1.2s ease-in-out ${i * 0.2}s infinite` }} />
-                    ))}
-                  </span>
-                  <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px', fontStyle: 'italic' }}>
-                    {players.find((p: any) => p.anonymous_user_id === typingPlayer)?.display_name || 'Alguém'} está digitando...
-                  </span>
-                </div>
-              )}
+
               {/* Histórico de perguntas + turnos */}
               {history.map((item, idx) => (
                 item.type === 'turn' ? (
@@ -398,6 +386,21 @@ const Game: React.FC = () => {
                 </div>
                 )
               ))}
+              
+              {/* Indicador de digitação */}
+              {typingPlayer && typingPlayer !== userId && (
+                <div style={{ paddingLeft: '14px', borderLeft: '2px solid rgba(184,153,83,0.5)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ display: 'inline-flex', gap: '3px', alignItems: 'center' }}>
+                    {[0, 1, 2].map(i => (
+                      <span key={i} style={{ width: '5px', height: '5px', borderRadius: '50%', background: 'var(--accent-gold)', display: 'inline-block', animation: `pulse-dot 1.2s ease-in-out ${i * 0.2}s infinite` }} />
+                    ))}
+                  </span>
+                  <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px', fontStyle: 'italic' }}>
+                    {players.find((p: any) => p.anonymous_user_id === typingPlayer)?.display_name || 'Alguém'} está digitando...
+                  </span>
+                </div>
+              )}
+
               {!history.length && !loading && (
                 <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '14px', textAlign: 'center', fontStyle: 'italic', marginTop: '60px' }}>Faça sua primeira pergunta para iniciar a investigação.</p>
               )}

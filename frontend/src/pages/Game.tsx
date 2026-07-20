@@ -58,7 +58,19 @@ const Game: React.FC = () => {
     const userId = localStorage.getItem('userId');
     socket.emit('join_room', { roomId, userId });
 
-    socket.on('room_state_updated', (data) => setRoomData(data));
+    socket.on('room_state_updated', (data) => {
+      setRoomData(data);
+      if (data.questions?.length) {
+        setHistory(data.questions.map((q: any) => ({
+          question: { original_text: q.original_text, id: q.id },
+          questionText: q.original_text,
+          answer: q.master_answers?.[0] ? { rendered_text: q.master_answers[0].rendered_text } : null,
+          responseText: q.master_answers?.[0]?.rendered_text || '',
+          clarification: null,
+          contestation: null,
+        })));
+      }
+    });
 
     socket.on('question_processed', (data) => {
       setLoading(false);

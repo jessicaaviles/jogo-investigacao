@@ -211,7 +211,7 @@ io.on('connection', (socket) => {
     await recordRoomEvent(roomId, 'player_ready', { ready: Boolean(ready) });
   });
 
-  socket.on('pass_turn', async ({ roomId, userId }) => {
+  socket.on('pass_turn', async ({ roomId, userId, turnId }) => {
     try {
       const room = await prisma.rooms.findUnique({
         where: { id: roomId },
@@ -219,11 +219,21 @@ io.on('connection', (socket) => {
       });
       if (!room || room.status !== 'IN_PROGRESS' || !room.current_turn_id) return;
 
+      // Se foi fornecido um turnId, garante que só passa se for o turno atual
+      if (turnId && room.current_turn_id !== turnId) return;
+
       const currentTurn = await prisma.turns.findUnique({ where: { id: room.current_turn_id } });
       if (!currentTurn) return;
 
       const currentPlayer = room.players.find(p => p.id === currentTurn.player_id);
-      if (!currentPlayer || currentPlayer.anonymous_user_id !== userId) {
+      
+      const settings = typeof room.settings === 'string' ? JSON.parse(room.settings) : (room.settings as any);
+      const turnTimer = settings?.turn_timer_seconds || 120;
+      const startedAt = currentTurn.started_at ? currentTurn.started_at.getTime() : Date.now();
+      const timeElapsed = (Date.now() - startedAt) / 1000;
+      const isTimeUp = timeElapsed >= turnTimer;
+
+      if (!currentPlayer || (currentPlayer.anonymous_user_id !== userId && !isTimeUp && room.host_user_id !== userId)) {
         socket.emit('room_error', 'Não é a sua vez. Aguarde o jogador atual concluir.');
         return;
       }

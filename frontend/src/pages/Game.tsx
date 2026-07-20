@@ -185,7 +185,7 @@ const Game: React.FC = () => {
     });
   };
 
-  const handlePassTurn = () => socket?.emit('pass_turn', { roomId, userId: localStorage.getItem('userId') });
+  const handlePassTurn = () => socket?.emit('pass_turn', { roomId, userId: localStorage.getItem('userId'), turnId: activeTurn?.id });
   const handleStartSolving = () => socket?.emit('start_solving', { roomId, userId: localStorage.getItem('userId') });
   const handleVote = (optionId: string) => { if (!activeVote) return; socket?.emit('cast_vote', { roomId, voteId: activeVote.id, userId, optionId }); };
   const handleHint = () => { const hintIndex = hints.length + 1; socket?.emit('use_hint', { roomId, userId, hintIndex, idempotencyKey: `${roomId}:${userId}:hint:${hintIndex}` }); };
@@ -199,7 +199,7 @@ const Game: React.FC = () => {
   const activeTurn = roomData?.turns?.find((t: any) => t.status === 'ACTIVE');
   const activePlayer = players.find((p: any) => p.id === activeTurn?.player_id);
   const isMyTurn = activePlayer?.anonymous_user_id === userId;
-  console.log('[Game] userId:', userId, 'activeTurn:', activeTurn, 'activePlayer:', activePlayer, 'isMyTurn:', isMyTurn);
+  console.log('[Game] userId:', userId, 'activePlayer.anonymous_user_id:', activePlayer?.anonymous_user_id, 'all players:', players.map((p: any) => ({ id: p.id, anonId: p.anonymous_user_id, name: p.display_name })), 'isMyTurn:', isMyTurn);
   const isHost = roomData?.host_user_id === userId;
   const status = roomData?.status;
   const theories = roomData?.theories || [];
@@ -211,7 +211,7 @@ const Game: React.FC = () => {
 
   useEffect(() => {
     if (!timerSeconds || !activeTurn?.started_at) { setRemainingSeconds(null); return; }
-    const update = () => { const elapsed = Math.floor((Date.now() - new Date(activeTurn.started_at).getTime()) / 1000); const remaining = Math.max(0, timerSeconds - elapsed); setRemainingSeconds(remaining); if (remaining === 0 && isMyTurn) socket?.emit('pass_turn', { roomId, userId }); };
+    const update = () => { const elapsed = Math.floor((Date.now() - new Date(activeTurn.started_at).getTime()) / 1000); const remaining = Math.max(0, timerSeconds - elapsed); setRemainingSeconds(remaining); if (remaining === 0) socket?.emit('pass_turn', { roomId, userId, turnId: activeTurn.id }); };
     update(); const interval = window.setInterval(update, 1000); return () => window.clearInterval(interval);
   }, [activeTurn?.id, activeTurn?.started_at, timerSeconds, isMyTurn, roomId, socket, userId]);
 

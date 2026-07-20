@@ -137,24 +137,64 @@ Analise a pergunta, extraia as premissas, compare com os Fatos Absolutos e gere 
 };
 
 export const evaluateTheory = async (theoryAnswers: any, trueSolutionText: string) => {
-  const stopWords = new Set(['para', 'como', 'uma', 'que', 'foi', 'com', 'dos', 'das', 'por', 'antes', 'durante', 'the', 'and']);
-  const tokens = (value: string) => new Set(String(value || '').toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\u0300-\u036f]/g, '').match(/[a-z0-9]{4,}/g)?.filter((word) => !stopWords.has(word)) || []);
-  const solutionTokens = tokens(trueSolutionText);
-  const fields = ['what_happened', 'who', 'how', 'why'];
-  const dimensionResults = fields.reduce<Record<string, number>>((result, field) => {
-    const answerTokens = tokens(theoryAnswers?.[field]);
-    const overlap = [...answerTokens].filter((token) => solutionTokens.has(token)).length;
-    result[field] = answerTokens.size ? Math.min(100, Math.round((overlap / Math.min(answerTokens.size, 6)) * 100)) : 0;
-    return result;
-  }, {});
-  const score = Math.max(0, Math.min(100, Math.round(Object.values(dimensionResults).reduce((sum, value) => sum + value, 0) / fields.length)));
-  return {
-    score,
-    feedback: score >= 75
-      ? 'A teoria acompanha os fatos essenciais do caso.'
-      : score >= 40
-        ? 'Há conexões corretas, mas alguns detalhes ainda não fecham a linha do tempo.'
-        : 'A hipótese se afasta dos fatos disponíveis. Volte ao histórico e observe as pequenas inconsistências.',
-    dimensionResults
-  };
+  try {
+    const responseSchema: Schema = {
+      type: Type.OBJECT,
+      properties: {
+        score: { type: Type.INTEGER, description: "Nota geral da teoria (0 a 100)." },
+        feedback: { type: Type.STRING, description: "Feedback em português do Brasil sobre o que acertaram e o que erraram." },
+        dimensionResults: {
+          type: Type.OBJECT,
+          properties: {
+            what_happened: { type: Type.INTEGER, description: "Nota (0 a 100)." },
+            who: { type: Type.INTEGER, description: "Nota (0 a 100)." },
+            how: { type: Type.INTEGER, description: "Nota (0 a 100)." },
+            why: { type: Type.INTEGER, description: "Nota (0 a 100)." }
+          },
+          required: ["what_happened", "who", "how", "why"]
+        }
+      },
+      required: ["score", "feedback", "dimensionResults"]
+    };
+
+    const prompt = `Você é o avaliador de um jogo de investigação policial.
+Avalie a teoria dos jogadores comparando-a com a solução real do caso.
+
+Solução Real do Caso (Fatos absolutos):
+"${trueSolutionText}"
+
+Teoria submetida pelos jogadores:
+- O que aconteceu: "${theoryAnswers.what_happened || ''}"
+- Quem: "${theoryAnswers.who || ''}"
+- Como: "${theoryAnswers.how || ''}"
+- Por que: "${theoryAnswers.why || ''}"
+
+Instruções ESTRITAS:
+1. Avalie cada uma das 4 dimensões de 0 a 100.
+2. Seja MUITO tolerante a sinônimos, palavras diferentes ou explicações mais curtas. Se o cerne da resposta bater com a solução real, dê 100. Não penalize por falta de nomes específicos se a intenção e o papel da pessoa na trama estiverem corretos.
+3. O 'score' geral deve ser a média exata das 4 dimensões.
+4. Gere um 'feedback' curto (max 2 frases) em português do Brasil, num tom de detetive sênior. Se a nota for >= 75, confirme o sucesso. Se for menor, aponte de forma misteriosa onde eles erraram.`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-3.5-flash',
+      contents: prompt,
+      config: { responseMimeType: 'application/json', responseSchema, temperature: 0.1 }
+    });
+
+    if (!response.text) throw new Error("Resposta vazia da avaliação");
+    const result = JSON.parse(response.text);
+    return {
+      score: result.score || 0,
+      feedback: result.feedback || "Avaliação concluída.",
+      dimensionResults: result.dimensionResults || { what_happened: 0, who: 0, how: 0, why: 0 }
+    };
+  } catch (error) {
+    console.error("Erro na avaliação IA da teoria:", error);
+    // Fallback básico caso a IA falhe
+    return {
+      score: 50,
+      feedback: "A avaliação detalhada falhou, mas há inconsistências na teoria.",
+      dimensionResults: { what_happened: 50, who: 50, how: 50, why: 50 }
+    };
+  }
 };

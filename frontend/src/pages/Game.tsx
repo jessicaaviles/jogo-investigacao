@@ -98,7 +98,14 @@ const Game: React.FC = () => {
   useEffect(() => {
     if (!socket || !roomId) return;
     const userId = localStorage.getItem('userId');
-    socket.emit('join_room', { roomId, userId });
+    const handleConnect = () => {
+      socket.emit('join_room', { roomId, userId });
+    };
+
+    if (socket.connected) {
+      handleConnect();
+    }
+    socket.on('connect', handleConnect);
 
     socket.on('room_state_updated', (data) => {
       setRoomData(data);
@@ -184,6 +191,7 @@ const Game: React.FC = () => {
       socket.off('player_typing');
       socket.off('question_processing');
       socket.off('question_processing_cancelled');
+      socket.off('connect', handleConnect);
     };
   }, [socket, roomId, autoSpeak, speakAnswer]);
 

@@ -28,7 +28,7 @@ const Game: React.FC = () => {
   const recognitionRef = useRef<any>(null);
   const historyRef = useRef<HTMLDivElement>(null);
   const prevTurnRef = useRef<string | null>(null);
-
+  const hintsMenuRef = useRef<HTMLDivElement>(null);
   const toggleVoice = useCallback(() => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) return;
@@ -57,6 +57,18 @@ const Game: React.FC = () => {
     rec.start();
     setListening(true);
   }, [listening]);
+
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (showHintsPanel && hintsMenuRef.current && !hintsMenuRef.current.contains(e.target as Node)) {
+        setShowHintsPanel(false);
+      }
+    };
+    if (showHintsPanel) {
+      document.addEventListener('mousedown', handleOutsideClick);
+    }
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, [showHintsPanel]);
 
   useEffect(() => {
     if (!socket || !roomId) return;
@@ -559,13 +571,29 @@ const Game: React.FC = () => {
                   >
                     Pedir pistas ({Math.max(0, 3 - hints.length)})
                   </button>
-                  <button
-                    onClick={() => setShowHintsPanel(true)}
-                    disabled={hints.length === 0}
-                    style={{ flex: 1, padding: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: hints.length === 0 ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.7)', cursor: hints.length === 0 ? 'default' : 'pointer', fontWeight: 600, fontSize: '13px' }}
-                  >
-                    Ver pistas ({hints.length})
-                  </button>
+                  <div className="menu-wrapper" style={{ flex: 1, position: 'relative' }} ref={hintsMenuRef}>
+                    <button
+                      onClick={() => setShowHintsPanel(v => !v)}
+                      disabled={hints.length === 0}
+                      style={{ width: '100%', padding: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: hints.length === 0 ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.7)', cursor: hints.length === 0 ? 'default' : 'pointer', fontWeight: 600, fontSize: '13px' }}
+                    >
+                      {showHintsPanel ? '▲ Ocultar pistas' : `▼ Ver pistas (${hints.length})`}
+                    </button>
+                    <div 
+                      className={`menu-dropup${showHintsPanel && hints.length > 0 ? ' menu-dropup--open' : ''}`}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(184,153,83,0.3)', paddingBottom: '12px', marginBottom: '8px' }}>
+                        <h3 style={{ fontFamily: 'var(--font-serif)', color: 'var(--accent-gold)', margin: 0, fontSize: '18px' }}>Pistas Reveladas</h3>
+                      </div>
+                      {hints.map((hint) => (
+                        <div key={hint.hintIndex} style={{ ...cardStyle, borderColor: 'rgba(132,147,107,0.4)', background: 'rgba(132,147,107,0.08)', padding: '12px' }}>
+                          <div style={{ ...labelStyle, color: '#84936b', marginBottom: '8px', fontSize: '11px' }}>Pista {hint.hintIndex}</div>
+                          <p style={{ margin: 0, fontSize: '13px', color: 'rgba(255,255,255,0.9)', lineHeight: 1.5 }}>{hint.content}</p>
+                          <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', marginTop: '8px', textAlign: 'right', fontStyle: 'italic' }}>−{hint.penalty} pontos</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                   {isMyTurn && (
                     <button
                       onClick={handlePassTurn}
@@ -576,24 +604,6 @@ const Game: React.FC = () => {
                     </button>
                   )}
                 </div>
-                {showHintsPanel && hints.length > 0 && (
-                  <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => setShowHintsPanel(false)}>
-                    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--accent-gold)', borderRadius: '12px', padding: '24px', width: '100%', maxWidth: '400px', maxHeight: '80vh', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }} onClick={e => e.stopPropagation()}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(184,153,83,0.3)', paddingBottom: '12px', marginBottom: '8px' }}>
-                        <h3 style={{ fontFamily: 'var(--font-serif)', color: 'var(--accent-gold)', margin: 0, fontSize: '20px' }}>Pistas Reveladas</h3>
-                        <button onClick={() => setShowHintsPanel(false)} style={{ background: 'none', border: 'none', color: '#fff', fontSize: '24px', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.1)' }}>×</button>
-                      </div>
-                      {hints.map((hint) => (
-                        <div key={hint.hintIndex} style={{ ...cardStyle, borderColor: 'rgba(132,147,107,0.4)', background: 'rgba(132,147,107,0.08)', padding: '16px' }}>
-                          <div style={{ ...labelStyle, color: '#84936b', marginBottom: '8px', fontSize: '12px' }}>Pista {hint.hintIndex}</div>
-                          <p style={{ margin: 0, fontSize: '15px', color: 'rgba(255,255,255,0.9)', lineHeight: 1.5 }}>{hint.content}</p>
-                          <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginTop: '12px', textAlign: 'right', fontStyle: 'italic' }}>−{hint.penalty} pontos</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
             </div>
             )}
 

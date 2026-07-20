@@ -222,10 +222,10 @@ const Game: React.FC = () => {
     update(); const interval = window.setInterval(update, 1000); return () => window.clearInterval(interval);
   }, [activeTurn?.id, activeTurn?.started_at, timerSeconds, isMyTurn, roomId, socket, userId]);
 
-  // Auto-scroll ao enviar pergunta ou receber resposta
+  // Auto-scroll ao enviar pergunta, receber resposta, ao processar ou quando alguém digita
   useEffect(() => {
     historyRef.current?.scrollTo({ top: historyRef.current.scrollHeight, behavior: 'smooth' });
-  }, [history, loading]);
+  }, [history, loading, processingUser, typingPlayer]);
 
   useEffect(() => {
     if (status === 'GAME_OVER' || status === 'COMPLETED') {

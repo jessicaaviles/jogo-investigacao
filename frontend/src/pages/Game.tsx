@@ -339,6 +339,24 @@ const Game: React.FC = () => {
                 </div>
               )}
 
+              {/* Loading: IA processando */}
+              {loading && (
+                <div style={{ paddingLeft: '14px', borderLeft: '2px solid rgba(184,153,83,0.5)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span style={{ color: 'var(--accent-gold)', fontWeight: 700, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px' }}>Mestre:</span>
+                  <span style={{ display: 'inline-flex', gap: '4px', alignItems: 'center' }}>
+                    {[0, 1, 2].map(i => (
+                      <span key={i} style={{
+                        width: '6px', height: '6px', borderRadius: '50%',
+                        background: 'var(--accent-gold)',
+                        display: 'inline-block',
+                        animation: `pulse-dot 1.2s ease-in-out ${i * 0.2}s infinite`
+                      }} />
+                    ))}
+                  </span>
+                  <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px', fontStyle: 'italic' }}>consultando os arquivos...</span>
+                </div>
+              )}
+
               {/* Pistas usadas */}
               {hints.length > 0 && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>

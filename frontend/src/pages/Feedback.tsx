@@ -28,7 +28,9 @@ const Feedback: React.FC = () => {
     borderRadius: '12px',
     padding: '24px',
     width: '100%',
-    maxWidth: '400px'
+    maxWidth: '400px',
+    height: 'max-content',
+    margin: 'auto'
   };
 
   const labelStyle = { display: 'block', color: 'var(--gold-soft)', fontSize: '10px', fontWeight: 600, letterSpacing: '.22em', textTransform: 'uppercase', marginBottom: '12px' } as any;
@@ -43,8 +45,7 @@ const Feedback: React.FC = () => {
       backgroundPosition: 'center',
       backgroundBlendMode: 'overlay',
       alignItems: 'center',
-      justifyContent: 'center',
-      padding: '88px 24px 24px', // Adicionado padding-top para não sobrepor o header
+      padding: '88px 24px 24px',
       minHeight: '100vh',
       overflowY: 'auto'
     }}>

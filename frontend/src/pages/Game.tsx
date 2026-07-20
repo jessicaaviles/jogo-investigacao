@@ -391,11 +391,104 @@ const Game: React.FC = () => {
               )}
             </>
           )}
+
+          {/* Outros status (SOLVING, REVEAL, GAME_OVER) */}
+          {status === 'SOLVING' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '24px', margin: 0 }}>Formular Teoria</h3>
+              {myTheory ? (
+                <div style={{ ...cardStyle, textAlign: 'center', padding: '40px 20px' }}>
+                  <div style={{ fontSize: '40px', marginBottom: '12px' }}>✓</div>
+                  <h3 style={{ fontFamily: 'var(--font-serif)', color: 'var(--accent-gold)', margin: '0 0 8px' }}>Teoria Enviada!</h3>
+                  <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px', margin: 0 }}>Aguardando os outros investigadores...</p>
+                  <div style={{ marginTop: '12px', color: 'var(--accent-gold)', fontSize: '13px' }}>{theories.length} de {players.length} teorias submetidas.</div>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmitTheory} style={{ display: 'flex', flexDirection: 'column', gap: '12px', ...cardStyle } as any}>
+                  <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '13px', margin: 0 }}>Preencha os campos abaixo com o que você descobriu.</p>
+                  {['what_happened', 'who', 'how', 'why'].map((key) => (
+                    <label key={key} style={{ fontSize: '11px', color: 'var(--accent-gold)', textTransform: 'uppercase', letterSpacing: '1px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      {key === 'what_happened' ? 'O que aconteceu?' : key === 'who' ? 'Quem foi o responsável?' : key === 'how' ? 'Como foi feito?' : 'Qual foi o motivo?'}
+                      <input required type="text" value={(theoryAnswers as any)[key]} onChange={e => setTheoryAnswers({...theoryAnswers, [key]: e.target.value})} style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(0,0,0,0.3)', color: '#fff', fontSize: '14px' }} />
+                    </label>
+                  ))}
+                  <button type="submit" style={{ padding: '14px', background: 'var(--accent-gold)', color: '#000', fontWeight: 700, border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px' }}>Enviar Minha Teoria</button>
+                </form>
+              )}
+            </div>
+          )}
+
+          {status === 'REVEAL' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ ...cardStyle, borderColor: 'rgba(132,147,107,0.5)', background: 'rgba(132,147,107,0.12)' }}>
+                <div style={labelStyle}>A Verdade</div>
+                {trueSolution ? <p style={{ fontSize: '15px', lineHeight: 1.6, color: 'rgba(255,255,255,0.85)', fontFamily: 'var(--font-serif)', fontStyle: 'italic', margin: 0 }}>{trueSolution}</p> : <Loading message="Carregando solução..." fullPage={false} />}
+              </div>
+              <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '20px', margin: 0, color: 'var(--accent-gold)' }}>Teorias dos Investigadores</h3>
+              {theories.map((t: any, idx: number) => {
+                const author = players.find((p: any) => p.id === t.player_id);
+                const answers = JSON.parse(t.answers);
+                return (
+                  <div key={idx} style={{ ...cardStyle }}>
+                    <div style={{ fontWeight: 700, color: 'var(--accent-gold)', marginBottom: '8px', fontSize: '13px' }}>Investigador: {author?.display_name}</div>
+                    <div style={{ fontSize: '13px', lineHeight: 1.5, color: 'rgba(255,255,255,0.8)', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <div><strong>O que:</strong> {answers.what_happened}</div>
+                      <div><strong>Quem:</strong> {answers.who}</div>
+                      <div><strong>Como:</strong> {answers.how}</div>
+                      <div><strong>Motivo:</strong> {answers.why}</div>
+                    </div>
+                  </div>
+                );
+              })}
+              {isHost ? (
+                <button onClick={handleFinishGame} disabled={loading || Boolean(activeVote)} style={{ padding: '14px', background: 'var(--accent-gold)', color: '#000', border: 'none', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', fontSize: '14px' }}>
+                  {activeVote ? 'Aguardando votação...' : loading ? 'Calculando...' : 'Obter Avaliação do Mestre'}
+                </button>
+              ) : (
+                <p style={{ textAlign: 'center', fontStyle: 'italic', color: 'rgba(255,255,255,0.5)', fontSize: '13px' }}>Aguardando o anfitrião pedir a avaliação final...</p>
+              )}
+            </div>
+          )}
+
+          {status === 'GAME_OVER' && gameResult && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', textAlign: 'center', paddingTop: '40px' }}>
+              <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '36px', color: 'var(--accent-gold)', margin: 0 }}>Caso Encerrado</h2>
+              <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '15px' }}>O Mestre avaliou as teorias.</p>
+              <div style={{ ...cardStyle, padding: '32px', borderColor: 'rgba(184,153,83,0.3)' }}>
+                <div style={labelStyle}>Precisão Geral da Equipe</div>
+                <div style={{ fontSize: '64px', fontFamily: 'var(--font-serif)', color: '#fff', lineHeight: 1, marginTop: '8px' }}>
+                  {Math.round(gameResult.groupScore)}<span style={{ fontSize: '28px', color: 'rgba(255,255,255,0.5)' }}>%</span>
+                </div>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', textAlign: 'left' }}>
+                {gameResult.evaluations.map((ev: any, idx: number) => {
+                  const author = players.find((p: any) => p.id === ev.playerId);
+                  return (
+                    <div key={idx} style={{ ...cardStyle, borderLeft: '3px solid rgba(132,147,107,0.5)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                        <div style={{ fontWeight: 700, fontSize: '16px' }}>{author?.display_name}</div>
+                        <div style={{ color: 'var(--accent-gold)', fontWeight: 700, fontSize: '18px' }}>{ev.score}%</div>
+                      </div>
+                      <div style={{ fontStyle: 'italic', color: 'rgba(255,255,255,0.6)', fontSize: '13px', lineHeight: 1.5 }}>"{ev.feedback}"</div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <button style={{ padding: '16px', background: 'var(--accent-gold)', color: '#000', border: 'none', borderRadius: '10px', fontWeight: 700, cursor: 'pointer', fontSize: '15px' }} onClick={() => navigate(`/room/${roomId}/feedback`)}>
+                  Responder feedback
+                </button>
+                <button onClick={() => window.location.href = '/'} style={{ padding: '14px', background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.7)', borderRadius: '10px', fontWeight: 600, cursor: 'pointer', fontSize: '14px' }}>
+                  Voltar ao Início
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* FUNDO FIXO: input + botões */}
+        {/* FUNDO FIXO: input + botões (apenas IN_PROGRESS) */}
         {status === 'IN_PROGRESS' && (
-            <div style={{ padding: '10px 20px', paddingBottom: 'calc(76px + env(safe-area-inset-bottom) + 24px)', display: 'flex', flexDirection: 'column', gap: '10px', background: 'linear-gradient(0deg, rgba(15,20,23,0.98) 0%, rgba(15,20,23,0.85) 100%)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ padding: '10px 20px', paddingBottom: 'calc(76px + env(safe-area-inset-bottom) + 24px)', display: 'flex', flexDirection: 'column', gap: '10px', background: 'linear-gradient(0deg, rgba(15,20,23,0.98) 0%, rgba(15,20,23,0.85) 100%)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '10px' }}>
                   <div style={{ flex: 1, display: 'flex', gap: '8px', alignItems: 'stretch' }}>
@@ -453,121 +546,6 @@ const Game: React.FC = () => {
               </div>
             </div>
             )}
-
-          {/* Status: SOLVING */}
-          {status === 'SOLVING' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '24px', margin: 0 }}>Formular Teoria</h3>
-              {myTheory ? (
-                <div style={{ ...cardStyle, textAlign: 'center', padding: '40px 20px' }}>
-                  <div style={{ fontSize: '40px', marginBottom: '12px' }}>✓</div>
-                  <h3 style={{ fontFamily: 'var(--font-serif)', color: 'var(--accent-gold)', margin: '0 0 8px' }}>Teoria Enviada!</h3>
-                  <p style={{ color: 'rgba(255,255,255,0.6)', margin: '0 0 16px' }}>Aguardando os outros investigadores...</p>
-                  <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.4)' }}>{theories.length} de {players.length} teorias submetidas.</div>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmitTheory} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                  <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px', margin: 0, lineHeight: 1.5 }}>Com base na investigação, preencha o que você descobriu.</p>
-                  {[
-                    { key: 'what_happened', label: 'O que aconteceu?' },
-                    { key: 'who', label: 'Quem foi o responsável?' },
-                    { key: 'how', label: 'Como foi feito?' },
-                    { key: 'why', label: 'Qual foi o motivo?' }
-                  ].map(({ key, label }) => (
-                    <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                      <label style={labelStyle}>{label}</label>
-                      <input
-                        required
-                        type="text"
-                        value={theoryAnswers[key]}
-                        onChange={e => setTheoryAnswers({ ...theoryAnswers, [key]: e.target.value })}
-                        style={inputStyle}
-                      />
-                    </div>
-                  ))}
-                  <button type="submit" style={{ padding: '16px', background: 'var(--accent-gold)', color: '#000', fontWeight: 700, border: 'none', borderRadius: '10px', marginTop: '8px', cursor: 'pointer', fontSize: '15px' }}>
-                    Enviar Minha Teoria
-                  </button>
-                </form>
-              )}
-            </div>
-          )}
-
-          {/* Status: REVEAL */}
-          {status === 'REVEAL' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <div style={{ ...cardStyle, borderColor: 'rgba(184,153,83,0.4)', background: 'rgba(184,153,83,0.08)' }}>
-                <div style={labelStyle}>A Verdade Revelada</div>
-                {trueSolution ? <p style={{ fontSize: '15px', lineHeight: 1.7, margin: 0, fontFamily: 'var(--font-serif)', color: 'rgba(255,255,255,0.9)' }}>{trueSolution}</p> : <Loading message="Carregando solução..." fullPage={false} />}
-              </div>
-
-              <h3 style={{ fontFamily: 'var(--font-serif)', margin: 0, fontSize: '20px' }}>Teorias dos Investigadores</h3>
-              {theories.map((t: any, idx: number) => {
-                const author = players.find((p: any) => p.id === t.player_id);
-                const answers = JSON.parse(t.answers);
-                return (
-                  <div key={idx} style={cardStyle}>
-                    <div style={{ fontWeight: 700, color: 'var(--accent-gold)', marginBottom: '10px', fontSize: '13px', textTransform: 'uppercase', letterSpacing: '1px' }}>Investigador: {author?.display_name}</div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '14px', color: 'rgba(255,255,255,0.8)' }}>
-                      <div><strong style={{ color: 'rgba(255,255,255,0.5)' }}>O que:</strong> {answers.what_happened}</div>
-                      <div><strong style={{ color: 'rgba(255,255,255,0.5)' }}>Quem:</strong> {answers.who}</div>
-                      <div><strong style={{ color: 'rgba(255,255,255,0.5)' }}>Como:</strong> {answers.how}</div>
-                      <div><strong style={{ color: 'rgba(255,255,255,0.5)' }}>Motivo:</strong> {answers.why}</div>
-                    </div>
-                  </div>
-                );
-              })}
-
-              {isHost ? (
-                <button onClick={handleFinishGame} disabled={loading || Boolean(activeVote)} style={{ padding: '16px', background: 'var(--accent-gold)', color: '#000', border: 'none', borderRadius: '10px', fontWeight: 700, cursor: 'pointer', fontSize: '15px' }}>
-                  {activeVote ? 'Aguardando votação...' : loading ? 'Calculando...' : 'Obter Avaliação do Mestre'}
-                </button>
-              ) : (
-                <p style={{ textAlign: 'center', fontStyle: 'italic', color: 'rgba(255,255,255,0.5)' }}>Aguardando o anfitrião pedir a avaliação final...</p>
-              )}
-            </div>
-          )}
-
-          {/* Status: GAME_OVER */}
-          {status === 'GAME_OVER' && gameResult && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', textAlign: 'center' }}>
-              <div>
-                <h1 style={{ color: 'var(--accent-gold)', fontFamily: 'var(--font-serif)', fontSize: '40px', margin: '0 0 8px' }}>Caso Encerrado</h1>
-                <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '16px', margin: 0 }}>O Mestre avaliou as teorias.</p>
-              </div>
-
-              <div style={{ ...cardStyle, textAlign: 'center' }}>
-                <div style={{ ...labelStyle, marginBottom: '12px' }}>Precisão Geral da Equipe</div>
-                <div style={{ fontSize: '64px', fontFamily: 'var(--font-serif)', color: 'var(--accent-gold)', lineHeight: 1 }}>
-                  {Math.round(gameResult.groupScore)}<span style={{ fontSize: '28px', color: 'rgba(255,255,255,0.5)' }}>%</span>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', textAlign: 'left' }}>
-                {gameResult.evaluations.map((ev: any, idx: number) => {
-                  const author = players.find((p: any) => p.id === ev.playerId);
-                  return (
-                    <div key={idx} style={{ ...cardStyle, borderLeft: '3px solid var(--accent-gold)' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                        <div style={{ fontWeight: 700, fontSize: '16px' }}>{author?.display_name}</div>
-                        <div style={{ color: 'var(--accent-gold)', fontWeight: 700, fontSize: '20px' }}>{ev.score}%</div>
-                      </div>
-                      <div style={{ fontStyle: 'italic', color: 'rgba(255,255,255,0.65)', lineHeight: 1.5, fontSize: '14px' }}>"{ev.feedback}"</div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <button style={{ padding: '16px', background: 'var(--accent-gold)', color: '#000', border: 'none', borderRadius: '10px', fontWeight: 700, cursor: 'pointer', fontSize: '15px' }} onClick={() => navigate(`/room/${roomId}/feedback`)}>
-                  Responder feedback
-                </button>
-                <button onClick={() => window.location.href = '/'} style={{ padding: '14px', background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.7)', borderRadius: '10px', fontWeight: 600, cursor: 'pointer', fontSize: '14px' }}>
-                  Voltar ao Início
-                </button>
-              </div>
-            </div>
-          )}
 
       </div>
     </div>

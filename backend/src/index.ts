@@ -48,8 +48,17 @@ const roomState = async (roomId: string) => {
 const emitRoomState = async (roomId: string) => {
   const state = await roomState(roomId);
   if (state) {
-    const hint_usages = await prisma.hint_usages.findMany({ where: { room_id: roomId } });
-    io.to(roomId).emit('room_state_updated', { ...state, hint_usages });
+    const [usages, caseHints] = await Promise.all([
+      prisma.hint_usages.findMany({ where: { room_id: roomId } }),
+      prisma.case_hints.findMany({ where: { case_version_id: state.case_version_id } }),
+    ]);
+    const hintMap = new Map(caseHints.map(h => [h.hint_index, revealSecret(h.content_encrypted)]));
+    const hintContents = usages.map(u => ({
+      hintIndex: u.hint_index,
+      content: hintMap.get(u.hint_index) || 'Pista indisponível',
+      penalty: u.penalty,
+    }));
+    io.to(roomId).emit('room_state_updated', { ...state, hint_usages: hintContents });
   }
 };
 

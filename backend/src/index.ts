@@ -34,8 +34,7 @@ const roomState = async (roomId: string) => {
       turns: { where: { status: 'ACTIVE' } },
       theories: { select: { id: true, player_id: true, attempt_number: true, answers: true, status: true, submitted_at: true } },
       case_version: { select: { opening: true, case_ref: { select: { title: true, short_synopsis: true, difficulty: true, estimated_duration_minutes: true } } } },
-      questions: { orderBy: { sequence_number: 'asc' }, include: { master_answers: { orderBy: { created_at: 'asc' } }, interpretation: true } },
-      hint_usages: true
+      questions: { orderBy: { sequence_number: 'asc' }, include: { master_answers: { orderBy: { created_at: 'asc' } }, interpretation: true } }
     }
   });
   if (!room) return null;
@@ -48,7 +47,10 @@ const roomState = async (roomId: string) => {
 
 const emitRoomState = async (roomId: string) => {
   const state = await roomState(roomId);
-  if (state) io.to(roomId).emit('room_state_updated', state);
+  if (state) {
+    const hint_usages = await prisma.hint_usages.findMany({ where: { room_id: roomId } });
+    io.to(roomId).emit('room_state_updated', { ...state, hint_usages });
+  }
 };
 
 const recordAnalytics = async (event_name: string, room_id?: string, anonymous_hash?: string, payload: object = {}) => {

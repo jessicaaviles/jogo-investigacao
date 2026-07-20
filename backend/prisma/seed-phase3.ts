@@ -5,67 +5,114 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('Iniciando seed Fase 3 (Pistas e Teorias)...');
-  const caso = await prisma.cases.findUnique({ where: { slug: 'o-presente-desaparecido' } });
-  if (!caso) return;
-  const caseVersion = await prisma.case_versions.findFirst({ where: { case_id: caso.id } });
-  if (!caseVersion) return;
 
-  // 1. Inserir Pistas
-  const hints = [
-    { index: 1, content: 'A água não veio do céu (Ah, esse era do tutorial, vamos usar outra: A caixa já estava vazia antes da festa).', rule: '{}' },
-    { index: 2, content: 'O brinde foi o momento de distração perfeito para a caixa sumir.', rule: '{}' },
-    { index: 3, content: 'O anfitrião planejou tudo para iniciar uma caça ao tesouro.', rule: '{}' }
-  ];
-
-  for (const h of hints) {
-    await prisma.case_hints.upsert({
-      where: {
-        case_version_id_hint_index: { case_version_id: caseVersion.id, hint_index: h.index }
-      },
-       update: { content_encrypted: sealSecret(h.content) },
-      create: {
-        case_version_id: caseVersion.id,
-        hint_index: h.index,
-         content_encrypted: sealSecret(h.content),
-        unlock_rule: h.rule,
-        penalty_points: 100,
-        is_available_from_start: h.index === 1
-      }
-    });
-  }
-
-  // 2. Inserir Campos de Solução
-  const fields = [
+  // Campos de Solução Padrão (para todos os casos que não os tiverem)
+  const defaultFields = [
     { key: 'what_happened', label: 'O que aconteceu?', order: 1 },
     { key: 'who', label: 'Quem foi o responsável?', order: 2 },
     { key: 'how', label: 'Como foi feito?', order: 3 },
     { key: 'why', label: 'Qual foi o motivo?', order: 4 }
   ];
 
-  for (const f of fields) {
-    await prisma.case_solution_fields.upsert({
-      where: { case_version_id_field_key: { case_version_id: caseVersion.id, field_key: f.key } },
-       update: { accepted_answers_encrypted: sealSecret('[]') },
-      create: {
-        case_version_id: caseVersion.id,
-        field_key: f.key,
-        label: f.label,
-        is_required: true,
-        evaluation_weight: 1.0,
-         accepted_answers_encrypted: sealSecret('[]'),
-        display_order: f.order
-      }
-    });
+  // Dicionário de Pistas Corrigidas
+  const casesData = [
+    {
+      slug: 'o-presente-desaparecido',
+      hints: [
+        'A caixa parecia estar vazia desde o início.',
+        'O anfitrião desviou a atenção de todos durante um brinde.',
+        'O "roubo" foi, na verdade, o início de uma brincadeira planejada.'
+      ]
+    },
+    {
+      slug: 'o-quarto-7',
+      hints: [
+        'A fechadura da porta indica que alguém usou uma chave para entrar ou sair.',
+        'A câmera no corredor foi posicionada estrategicamente por alguém que trabalha no hotel.',
+        'O relógio quebrado não reflete a hora real do crime, mas sim a hora que o culpado queria que todos acreditassem.'
+      ]
+    },
+    {
+      slug: 'o-guarda-chuva-molhado',
+      hints: [
+        'Como não chovia lá fora, a água deve ter vindo de dentro do próprio edifício.',
+        'O teto do corredor do prédio estava passando por problemas técnicos recentes.',
+        'O guarda-chuva foi usado para proteger a pessoa de um forte vazamento do ar condicionado interno.'
+      ]
+    },
+    {
+      slug: 'o-elevador-que-nao-parou',
+      hints: [
+        'As câmeras só filmam as portas, não o que acontece no teto do elevador.',
+        'O trajeto do elevador levou muito mais tempo do que deveria para retornar ao térreo.',
+        'A mulher utilizou o alçapão do teto para escapar pelo poço de manutenção.'
+      ]
+    },
+    {
+      slug: 'a-mensagem-das-23h17',
+      hints: [
+        'O celular nunca saiu do carregador, mas a mensagem ainda assim foi enviada.',
+        'A vítima não estava fisicamente presente quando a mensagem foi disparada.',
+        'O envio foi feito automaticamente por um script agendado no computador da vítima.'
+      ]
+    },
+    {
+      slug: 'o-retrato-que-piscou',
+      hints: [
+        'O "piscar" não foi uma falha na luz, mas um intenso clarão óptico direcionado.',
+        'Os convidados ficaram momentaneamente cegos, criando a oportunidade perfeita.',
+        'O clarão veio de um equipamento escondido pelo garçom, que roubou a joia na confusão.'
+      ]
+    }
+  ];
+
+  for (const data of casesData) {
+    const caso = await prisma.cases.findUnique({ where: { slug: data.slug } });
+    if (!caso) continue;
+    
+    const caseVersion = await prisma.case_versions.findFirst({ where: { case_id: caso.id } });
+    if (!caseVersion) continue;
+
+    console.log(`Processando ${caso.title}...`);
+
+    // Inserir Pistas
+    for (let index = 0; index < data.hints.length; index++) {
+      const hintContent = data.hints[index];
+      await prisma.case_hints.upsert({
+        where: {
+          case_version_id_hint_index: { case_version_id: caseVersion.id, hint_index: index + 1 }
+        },
+        update: { content_encrypted: sealSecret(hintContent) },
+        create: {
+          case_version_id: caseVersion.id,
+          hint_index: index + 1,
+          content_encrypted: sealSecret(hintContent),
+          unlock_rule: '{}',
+          penalty_points: 100,
+          is_available_from_start: index === 0
+        }
+      });
+    }
+
+    // Inserir Campos de Solução
+    for (const f of defaultFields) {
+      await prisma.case_solution_fields.upsert({
+        where: { case_version_id_field_key: { case_version_id: caseVersion.id, field_key: f.key } },
+        update: {},
+        create: {
+          case_version_id: caseVersion.id,
+          field_key: f.key,
+          label: f.label,
+          is_required: true,
+          evaluation_weight: 1.0,
+          accepted_answers_encrypted: sealSecret('[]'),
+          display_order: f.order
+        }
+      });
+    }
   }
 
-  const officialCase = await prisma.cases.findUnique({ where: { slug: 'o-quarto-7' } });
-  const officialVersion = officialCase ? await prisma.case_versions.findFirst({ where: { case_id: officialCase.id } }) : null;
-  if (officialVersion) {
-    const officialHints = ['A câmera não registrou a entrada no quarto.', 'O relógio foi quebrado depois que a cena foi preparada.', 'A chave reserva reduz o número de pessoas capazes de entrar.'];
-    for (let index = 0; index < officialHints.length; index += 1) await prisma.case_hints.upsert({ where: { case_version_id_hint_index: { case_version_id: officialVersion.id, hint_index: index + 1 } }, update: { content_encrypted: sealSecret(officialHints[index]) }, create: { case_version_id: officialVersion.id, hint_index: index + 1, content_encrypted: sealSecret(officialHints[index]), unlock_rule: '{}', penalty_points: 100, is_available_from_start: index === 0 } });
-  }
-
-  console.log('Seed Fase 3 concluído!');
+  console.log('Seed Fase 3 concluído com sucesso!');
 }
 
 main().catch(console.error).finally(() => prisma.$disconnect());

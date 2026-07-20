@@ -409,6 +409,7 @@ const Game: React.FC = () => {
                   </span>
                   <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px', fontStyle: 'italic' }}>consultando os arquivos...</span>
                 </div>
+              )}
             </>
           )}
 

@@ -56,7 +56,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const isImmersive = ['/map', '/scene', '/board', '/case-files', '/evidence'].some(p => location.pathname.includes(p));
 
   return <div className="app-shell">
-    <header className={`topbar ${(scrolled || isImmersive) ? 'topbar-glass' : ''} ${isImmersive ? 'topbar-immersive' : ''}`} style={{
+    <header className="topbar" style={{
       position: scrolled || location.pathname !== '/' ? 'fixed' : 'absolute'
     }}>
       {location.pathname !== '/' ? (

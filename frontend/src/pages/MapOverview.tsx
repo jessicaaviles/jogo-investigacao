@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, ArrowRight, Lock } from 'lucide-react';
-
+import { Search, ArrowRight, Lock, LayoutGrid } from 'lucide-react';
 
 const MapOverview: React.FC = () => {
   const navigate = useNavigate();
@@ -32,13 +31,32 @@ const MapOverview: React.FC = () => {
 
       {/* Header Topo */}
       <div style={{ position: 'relative', zIndex: 2 }}>
-        {/* Título do Mapa */}
-        <div style={{ padding: '0 24px', marginTop: '100px' }}>
-          <span style={{ color: '#C5A880', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 600 }}>Planta Baixa</span>
-          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '32px', margin: '8px 0', color: '#F8F9FA', fontWeight: 400, lineHeight: 1.1 }}>Blackwell House</h1>
-          <p style={{ color: '#8E989F', fontSize: '13px', margin: '8px 0 24px 0', maxWidth: '80%', lineHeight: 1.5 }}>
-            Selecione um cômodo para investigar.
-          </p>
+        
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '0 24px', marginTop: '100px' }}>
+          {/* Título do Mapa */}
+          <div>
+            <span style={{ color: '#C5A880', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 600 }}>Planta Baixa</span>
+            <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '32px', margin: '8px 0', color: '#F8F9FA', fontWeight: 400, lineHeight: 1.1 }}>Blackwell House</h1>
+            <p style={{ color: '#8E989F', fontSize: '13px', margin: '8px 0 24px 0', maxWidth: '80%', lineHeight: 1.5 }}>
+              Selecione um cômodo para investigar.
+            </p>
+          </div>
+          
+          {/* Botão do Quadro de Cortiça */}
+          <button 
+            onClick={() => navigate('/board/blackwell')}
+            style={{ 
+              background: 'rgba(197, 168, 128, 0.1)', border: '1px solid rgba(197, 168, 128, 0.3)', 
+              color: '#C5A880', padding: '12px 16px', borderRadius: '12px', cursor: 'pointer',
+              backdropFilter: 'blur(4px)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.5)', transition: 'all 0.2s ease'
+            }}
+            onMouseOver={(e) => e.currentTarget.style.background = 'rgba(197, 168, 128, 0.2)'}
+            onMouseOut={(e) => e.currentTarget.style.background = 'rgba(197, 168, 128, 0.1)'}
+          >
+            <LayoutGrid size={20} />
+            <span style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 600 }}>Quadro</span>
+          </button>
         </div>
 
         {/* Barra de Progresso Global */}

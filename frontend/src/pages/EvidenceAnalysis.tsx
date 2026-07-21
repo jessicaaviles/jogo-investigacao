@@ -56,34 +56,125 @@ const EvidenceAnalysis: React.FC = () => {
       tags: ['Premeditação', 'Falsificação', 'Vingança']
     },
     'fireplace': {
-      id: 'fireplace',
-      title: 'Restos na Lareira',
-      type: 'Vestígio',
-      date: '12 Mai',
-      image: '/backgrounds/ev_diary.png',
+      id: 'fireplace', title: 'Restos na Lareira', type: 'Vestígio', date: '12 Mai', image: '/backgrounds/ev_photo.png',
       desc: 'Cinzas frias na lareira contêm um fragmento de papel parcialmente preservado.',
       notes: [
         'O fogo foi apagado antes de consumir tudo.',
         'O fragmento mostra o logo da "Aerolíneas Del Sur".',
         'É parte de uma passagem só de ida para Buenos Aires, comprada no nome de "C.M." para a manhã seguinte ao crime.'
       ],
-      conclusion: 'Por que alguém que foi sequestrado teria comprado uma passagem internacional de fuga antecipadamente?',
+      conclusion: 'A vítima planejava uma viagem, possivelmente uma fuga premeditada.',
       tags: ['Fuga', 'Premeditação']
     },
     'blood': {
-      id: 'blood',
-      title: 'Mancha de Sangue',
-      type: 'Vestígio Biológico',
-      date: '12 Mai',
-      image: '/backgrounds/ev_blood.png',
+      id: 'blood', title: 'Sangue Artificial', type: 'Vestígio Biológico', date: '12 Mai', image: '/backgrounds/ev_blood.png',
       desc: 'Uma grande mancha de sangue no tapete, quase invisível a olho nu na escuridão, mas brilhante sob a luz UV.',
       notes: [
-        'O padrão espirrado é muito artificial, concentrado em um único círculo perfeito.',
-        'Não há respingos satélites, típicos de sangramento por ferimento ou impacto.',
-        'Análise laboratorial revelou altíssima concentração de anticoagulantes sintéticos (usados em sangue cenográfico ou de transfusão).'
+        'O padrão espirrado é muito artificial.',
+        'Análise revelou altíssima concentração de anticoagulantes sintéticos (usados em sangue cenográfico).'
       ],
-      conclusion: 'O sangue foi derramado deliberadamente de um recipiente. Ninguém foi ferido aqui.',
+      conclusion: 'O sangue foi derramado deliberadamente. Ninguém foi ferido aqui.',
       tags: ['Fraude Biológica', 'Pista Falsa']
+    },
+    'wine_glass': {
+      id: 'wine_glass', title: 'Taça Quebrada', type: 'Objeto', date: '12 Mai', image: '/backgrounds/ev_photo.png',
+      desc: 'Cacos de uma taça de vinho espalhados pelo chão.',
+      notes: [
+        'Não há sangue ou tecido nos cacos.',
+        'O mordomo relatou ter derrubado uma bandeja acidentalmente na noite anterior.'
+      ],
+      conclusion: 'Um acidente irrelevante para o caso.',
+      tags: ['Pista Falsa']
+    },
+    'desk_letter': {
+      id: 'desk_letter', title: 'Carta de Helena', type: 'Documento', date: '12 Mai', image: '/backgrounds/ev_letter.png',
+      desc: 'Uma carta escondida debaixo de alguns livros na escrivaninha da biblioteca.',
+      notes: [
+        'Endereçada a Clara. Diz: "Ele descobriu. Você precisa sair da casa hoje à noite."',
+        'A assinatura é um "H" apressado.'
+      ],
+      conclusion: 'Helena estava ajudando Clara a fugir.',
+      tags: ['Cúmplice', 'Aviso']
+    },
+    'safe': {
+      id: 'safe', title: 'Cofre Oculto', type: 'Local', date: '12 Mai', image: '/backgrounds/ev_photo.png',
+      desc: 'Um cofre atrás de um quadro na biblioteca.',
+      notes: [
+        'Está trancado.',
+        'Marcas de poeira indicam que não é aberto há anos.'
+      ],
+      conclusion: 'Vazio e irrelevante.',
+      tags: ['Distração']
+    },
+    'cigar': {
+      id: 'cigar', title: 'Charuto Apagado', type: 'Vestígio', date: '12 Mai', image: '/backgrounds/ev_photo.png',
+      desc: 'Um charuto pela metade no cinzeiro da biblioteca.',
+      notes: [
+        'Tomás não fuma charutos.',
+        'Restos de cinza antigos.'
+      ],
+      conclusion: 'Deixado por um visitante dias atrás.',
+      tags: ['Pista Falsa']
+    },
+    'mirror_msg': {
+      id: 'mirror_msg', title: 'Mensagem no Espelho', type: 'Pista Oculta', date: '12 Mai', image: '/backgrounds/ev_letter.png',
+      desc: 'Sob luz UV, palavras rabiscadas aparecem no espelho do quarto.',
+      notes: [
+        'A mensagem diz: "O jardim esconde a verdade".',
+        'Escrita com tinta invisível à base de reagentes.'
+      ],
+      conclusion: 'Um recado deixado propositalmente para quem viesse investigar.',
+      tags: ['Segredo', 'Guia']
+    },
+    'suitcase': {
+      id: 'suitcase', title: 'Mala Semi-Pronta', type: 'Objeto', date: '12 Mai', image: '/backgrounds/ev_photo.png',
+      desc: 'Uma mala no chão do quarto, cheia de roupas pesadas de inverno.',
+      notes: [
+        'Roupas térmicas e casacos grossos.',
+        'A passagem de Clara é para Buenos Aires, que está no pico do verão.'
+      ],
+      conclusion: 'Feita para enganar investigadores sobre o destino real.',
+      tags: ['Pista Falsa', 'Fuga']
+    },
+    'pills': {
+      id: 'pills', title: 'Vidro de Remédios', type: 'Vestígio', date: '12 Mai', image: '/backgrounds/ev_photo.png',
+      desc: 'Um frasco de calmantes fortes na mesa de cabeceira.',
+      notes: [
+        'Prescritos para Clara Mendes.',
+        'O frasco está quase cheio.'
+      ],
+      conclusion: 'Apenas medicação de rotina.',
+      tags: ['Pista Falsa']
+    },
+    'fountain': {
+      id: 'fountain', title: 'Livro-caixa Desenterrado', type: 'Documento', date: '12 Mai', image: '/backgrounds/ev_diary.png',
+      desc: 'Um livro contábil meio queimado, escondido na fonte de pedra.',
+      notes: [
+        'Mostra desvios milionários feitos por Tomás Blackwell.',
+        'Anotações nas margens com a letra de Clara: "É o suficiente para destruí-lo".'
+      ],
+      conclusion: 'O motivo de tudo. Clara descobriu os crimes e chantageou a família.',
+      tags: ['Motivo', 'Chantagem', 'Prova']
+    },
+    'mud': {
+      id: 'mud', title: 'Pegadas Duplas', type: 'Vestígio', date: '12 Mai', image: '/backgrounds/ev_photo.png',
+      desc: 'Na lama perto do portão, duas trilhas de passos se afastam da casa.',
+      notes: [
+        'Um par de sapatos de salto alto (tamanho de Clara).',
+        'Um par de botas rasteiras (tamanho de Helena).'
+      ],
+      conclusion: 'Clara e Helena saíram caminhando juntas pelos fundos.',
+      tags: ['Fuga', 'Cúmplices']
+    },
+    'animal_bones': {
+      id: 'animal_bones', title: 'Ossos Pequenos', type: 'Vestígio Biológico', date: '12 Mai', image: '/backgrounds/ev_photo.png',
+      desc: 'Alguns ossos desenterrados perto do portão.',
+      notes: [
+        'Estrutura óssea incompatível com humanos.',
+        'Coleira velha enterrada junto com o nome "Buster".'
+      ],
+      conclusion: 'Restos do antigo cachorro da família.',
+      tags: ['Pista Falsa']
     }
   };
 

@@ -295,7 +295,7 @@ const Cases: React.FC = () => {
 
             {/* Botão de Escolha */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '12px' }}>
-                <button className="btn-primary"
+              <button className="btn-primary"
                 onClick={() => handleSelectCase(selectedCase.slug)}
                 style={{
                    backgroundColor: 'var(--olive)',
@@ -310,7 +310,28 @@ const Cases: React.FC = () => {
                   letterSpacing: '1px'
                 }}
               >
-                Escolher este caso
+                Escolher este caso (Clássico)
+              </button>
+              <button 
+                onClick={() => navigate(`/map/${selectedCase.slug}`)}
+                style={{
+                  backgroundColor: 'rgba(212,175,55,0.1)',
+                  color: 'var(--accent-gold)',
+                  border: '1px solid var(--accent-gold)',
+                  padding: '16px',
+                  borderRadius: '8px',
+                  fontWeight: 600,
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                Modo Imersivo (Beta)
               </button>
               <button 
                 onClick={() => setSelectedCase(null)}

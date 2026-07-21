@@ -19,6 +19,8 @@ import Tutorial from './pages/Tutorial';
 import RecoveryCode from './pages/RecoveryCode';
 import Briefing from './pages/Briefing';
 import RoomEntry from './pages/RoomEntry';
+import MapOverview from './pages/MapOverview';
+import SceneExplorer from './pages/SceneExplorer';
 import Layout from './components/Layout';
 import { SocketNotificationsBridge } from './contexts/SocketNotificationsBridge';
 import './App.css';
@@ -51,6 +53,10 @@ function App() {
             <Route path="/room/:roomId/briefing" element={<Layout><ProtectedRoute><Briefing /></ProtectedRoute></Layout>} />
             <Route path="/room/:roomId/game" element={<Layout><ProtectedRoute><Game /></ProtectedRoute></Layout>} />
             <Route path="/room/:roomId/feedback" element={<Layout><ProtectedRoute><Feedback /></ProtectedRoute></Layout>} />
+            
+            {/* Immersive Redesign Prototypes */}
+            <Route path="/map/:caseId" element={<Layout><ProtectedRoute><MapOverview /></ProtectedRoute></Layout>} />
+            <Route path="/scene/:sceneId" element={<Layout><ProtectedRoute><SceneExplorer /></ProtectedRoute></Layout>} />
           </Routes>
         </BrowserRouter>
       </div>

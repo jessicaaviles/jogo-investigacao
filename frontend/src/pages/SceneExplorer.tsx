@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronDown, ThumbsUp, ThumbsDown, Brain } from 'lucide-react';
+import { ChevronDown, ThumbsUp, ThumbsDown, Brain, X } from 'lucide-react';
 import { useInvestigation } from '../contexts/InvestigationContext';
 
 const SceneExplorer: React.FC = () => {
   const navigate = useNavigate();
-  const { discoveredClues, addClue } = useInvestigation();
   const [uvLight, setUvLight] = useState(false);
+  const [showMapModal, setShowMapModal] = useState(false);
+  const { discoveredClues, addClue } = useInvestigation();
 
   // Hardcoded for 'sala-de-estar'
   const totalClues = 5; // To match map 
@@ -71,7 +72,7 @@ const SceneExplorer: React.FC = () => {
 
           {/* Mini-map mock */}
           <button 
-            onClick={() => navigate('/map/blackwell')}
+            onClick={() => setShowMapModal(true)}
             style={{ 
               width: '120px', height: '120px', background: 'rgba(255,255,255,0.03)', 
               border: '1px solid rgba(255,255,255,0.05)', borderRadius: '16px', padding: '12px', 
@@ -137,7 +138,7 @@ const SceneExplorer: React.FC = () => {
                 boxShadow: uvLight ? '0 0 20px rgba(168, 85, 247, 0.3)' : 'none'
               }}
             >
-              <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: uvLight ? '#A855F7' : '#6b21a8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: uvLight ? 'rgba(168, 85, 247, 0.5)' : 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#fff' }} />
               </div>
               Visão com Luz UV

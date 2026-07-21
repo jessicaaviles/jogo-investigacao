@@ -126,7 +126,7 @@ const SceneExplorer: React.FC = () => {
 
         {/* Hotspots */}
         <div style={{ flex: 1, position: 'relative' }}>
-          {hotspots.map((hotspot) => {
+          {hotspots.map((hotspot: any) => {
             if (hotspot.requiresUv && !uvLight) return null;
             return (
               <div 

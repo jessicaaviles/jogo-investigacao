@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Flashlight, Eye } from 'lucide-react';
+import { useInvestigation } from '../contexts/InvestigationContext';
 
 const SceneExplorer: React.FC = () => {
   
   const [uvLight, setUvLight] = useState(false);
-  const [discoveredClues, setDiscoveredClues] = useState<string[]>([]);
+  const { discoveredClues, addClue } = useInvestigation();
   const [showHint, setShowHint] = useState(true);
 
   const hotspots = [
@@ -18,7 +19,7 @@ const SceneExplorer: React.FC = () => {
   const handleHotspotClick = (id: string, requiresUv?: boolean) => {
     if (requiresUv && !uvLight) return;
     if (!discoveredClues.includes(id)) {
-      setDiscoveredClues([...discoveredClues, id]);
+      addClue(id);
     }
   };
 

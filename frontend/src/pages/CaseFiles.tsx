@@ -1,21 +1,25 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, FileText, Image as ImageIcon, Key } from 'lucide-react';
+import { Search, FileText, Image as ImageIcon, Key, Droplet } from 'lucide-react';
+import { useInvestigation } from '../contexts/InvestigationContext';
 
 const CaseFiles: React.FC = () => {
   const navigate = useNavigate();
   const [filter, setFilter] = useState('all');
+  const { discoveredClues } = useInvestigation();
 
-  const evidences = [
-    { id: '1', type: 'document', title: 'Carta Anônima', desc: 'Encontrada sob a porta.', date: '12/05', icon: <FileText size={20} /> },
-    { id: '2', type: 'item', title: 'Chave do Quarto 7', desc: 'Estava escondida no vaso da sala de estar.', date: '13/05', icon: <Key size={20} /> },
-    { id: '3', type: 'photo', title: 'Foto da Família', desc: 'Retrato antigo rasgado no meio.', date: '13/05', icon: <ImageIcon size={20} /> },
-    { id: '4', type: 'document', title: 'Diário de Elisa', desc: 'Última anotação fala sobre "o homem de chapéu".', date: '14/05', icon: <FileText size={20} /> },
-    { id: '5', type: 'item', title: 'Relógio Quebrado', desc: 'Parado exatamente às 03:15.', date: '15/05', icon: <Key size={20} /> },
+  const allEvidences = [
+    { id: 'fireplace', type: 'document', title: 'Carta Anônima', desc: 'Encontrada sob a lareira apagada.', date: '12/05', icon: <FileText size={20} /> },
+    { id: 'armchair', type: 'item', title: 'Chave do Quarto 7', desc: 'Estava escondida na poltrona revirada.', date: '13/05', icon: <Key size={20} /> },
+    { id: 'window', type: 'photo', title: 'Foto da Família', desc: 'Retrato antigo perto da janela.', date: '13/05', icon: <ImageIcon size={20} /> },
+    { id: 'table', type: 'document', title: 'Diário de Elisa', desc: 'Última anotação fala sobre "o homem de chapéu".', date: '14/05', icon: <FileText size={20} /> },
+    { id: 'blood', type: 'item', title: 'Mancha de Sangue', desc: 'Detectada com luz UV perto da parede.', date: '15/05', icon: <Droplet size={20} /> },
     { id: '6', type: 'document', title: 'Recibo do Banco', desc: 'Transferência de alto valor para conta desconhecida.', date: '15/05', icon: <FileText size={20} /> },
   ];
 
-  const filtered = filter === 'all' ? evidences : evidences.filter(e => e.type === filter);
+  // Apenas as pistas que o usuário clicou e descobriu
+  const availableEvidences = allEvidences.filter(e => discoveredClues.includes(e.id));
+  const filtered = filter === 'all' ? availableEvidences : availableEvidences.filter(e => e.type === filter);
 
   return (
     <div className="layout" style={{ 
@@ -48,16 +52,22 @@ const CaseFiles: React.FC = () => {
 
         {/* Grid */}
         <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', alignContent: 'start', overflowY: 'auto' }}>
-          {filtered.map(item => (
-            <div key={item.id} style={{ backgroundColor: '#13191C', border: '1px solid rgba(255,255,255,0.03)', borderRadius: '12px', padding: '16px', cursor: 'pointer' }} onClick={() => navigate(`/evidence/${item.id}`)}>
-              <div style={{ backgroundColor: 'rgba(197,168,128,0.1)', width: '40px', height: '40px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#C5A880', marginBottom: '12px' }}>
-                {item.icon}
-              </div>
-              <div style={{ color: '#F8F9FA', fontSize: '14px', fontWeight: 600, marginBottom: '4px' }}>{item.title}</div>
-              <div style={{ color: '#8E989F', fontSize: '11px', lineHeight: 1.4, marginBottom: '12px' }}>{item.desc}</div>
-              <div style={{ color: '#C5A880', fontSize: '10px', fontWeight: 600 }}>{item.date}</div>
+          {filtered.length === 0 ? (
+            <div style={{ gridColumn: '1 / -1', textAlign: 'center', marginTop: '40px', color: '#8E989F', fontSize: '13px' }}>
+              Nenhuma evidência encontrada ainda.<br/>Explore os locais no mapa.
             </div>
-          ))}
+          ) : (
+            filtered.map(item => (
+              <div key={item.id} style={{ backgroundColor: '#13191C', border: '1px solid rgba(255,255,255,0.03)', borderRadius: '12px', padding: '16px', cursor: 'pointer' }} onClick={() => navigate(`/evidence/${item.id}`)}>
+                <div style={{ backgroundColor: 'rgba(197,168,128,0.1)', width: '40px', height: '40px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#C5A880', marginBottom: '12px' }}>
+                  {item.icon}
+                </div>
+                <div style={{ color: '#F8F9FA', fontSize: '14px', fontWeight: 600, marginBottom: '4px' }}>{item.title}</div>
+                <div style={{ color: '#8E989F', fontSize: '11px', lineHeight: 1.4, marginBottom: '12px' }}>{item.desc}</div>
+                <div style={{ color: '#C5A880', fontSize: '10px', fontWeight: 600 }}>{item.date}</div>
+              </div>
+            ))
+          )}
         </div>
 
       </div>

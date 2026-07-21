@@ -1,28 +1,32 @@
 import React from 'react';
-
 import { Brain, Filter, MoreHorizontal } from 'lucide-react';
+import { useInvestigation } from '../contexts/InvestigationContext';
 
 const InvestigationBoard: React.FC = () => {
-  
+  const { discoveredClues } = useInvestigation();
 
   // Mock data for board items
-  const items = [
+  const allItems = [
     { id: 'helena', type: 'person', label: 'Helena', image: '/images/portraits/default_f.png', top: '55%', left: '30%', note: 'Amiga próxima' },
     { id: 'clara', type: 'person', label: 'Clara Mendes', image: '/images/portraits/default_f.png', top: '25%', left: '25%', note: 'Desaparecida 12/05' },
     { id: 'tomas', type: 'person', label: 'Sr. Tomás Blackwell', image: '/images/portraits/default_m.png', top: '35%', left: '75%', note: '?' },
     { id: 'house', type: 'location', label: 'Blackwell House', image: '/backgrounds/map_blackwell.png', top: '45%', left: '50%' },
-    { id: 'key', type: 'item', label: 'Chave do quarto 7', image: '/backgrounds/scene_living_room.png', top: '75%', left: '60%', note: 'Encontrada na sala' },
-    { id: 'note', type: 'note', label: 'Carta anônima', text: 'Vocês pensam que sabem a verdade. Mas a casa guarda o que vocês preferem esquecer.', top: '15%', left: '55%' },
+    { id: 'key', clueId: 'armchair', type: 'item', label: 'Chave do quarto 7', image: '/backgrounds/scene_living_room.png', top: '75%', left: '60%', note: 'Encontrada na sala' },
+    { id: 'note', clueId: 'fireplace', type: 'note', label: 'Carta anônima', text: 'Vocês pensam que sabem a verdade. Mas a casa guarda o que vocês preferem esquecer.', top: '15%', left: '55%' },
   ];
 
+  const items = allItems.filter(item => !item.clueId || discoveredClues.includes(item.clueId));
+
   // Connections (Red Strings)
-  const connections = [
+  const allConnections = [
     { from: 'clara', to: 'house' },
     { from: 'tomas', to: 'house' },
     { from: 'house', to: 'helena' },
     { from: 'key', to: 'house' },
     { from: 'note', to: 'clara' },
   ];
+
+  const connections = allConnections.filter(c => items.some(i => i.id === c.from) && items.some(i => i.id === c.to));
 
   return (
     <div className="layout" style={{ 

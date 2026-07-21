@@ -8,9 +8,11 @@ const CaseFiles: React.FC = () => {
 
   const evidences = [
     { id: '1', type: 'document', title: 'Carta Anônima', desc: 'Encontrada sob a porta.', date: '12/05', icon: <FileText size={20} /> },
-    { id: '2', type: 'item', title: 'Chave do Quarto 7', desc: 'Estava na sala de estar.', date: '13/05', icon: <Key size={20} /> },
-    { id: '3', type: 'photo', title: 'Foto da Família', desc: 'Retrato antigo rasgado.', date: '13/05', icon: <ImageIcon size={20} /> },
-    { id: '4', type: 'document', title: 'Diário de Elisa', desc: 'Última anotação suspeita.', date: '11/05', icon: <FileText size={20} /> },
+    { id: '2', type: 'item', title: 'Chave do Quarto 7', desc: 'Estava escondida no vaso da sala de estar.', date: '13/05', icon: <Key size={20} /> },
+    { id: '3', type: 'photo', title: 'Foto da Família', desc: 'Retrato antigo rasgado no meio.', date: '13/05', icon: <ImageIcon size={20} /> },
+    { id: '4', type: 'document', title: 'Diário de Elisa', desc: 'Última anotação fala sobre "o homem de chapéu".', date: '14/05', icon: <FileText size={20} /> },
+    { id: '5', type: 'item', title: 'Relógio Quebrado', desc: 'Parado exatamente às 03:15.', date: '15/05', icon: <Key size={20} /> },
+    { id: '6', type: 'document', title: 'Recibo do Banco', desc: 'Transferência de alto valor para conta desconhecida.', date: '15/05', icon: <FileText size={20} /> },
   ];
 
   const filtered = filter === 'all' ? evidences : evidences.filter(e => e.type === filter);

@@ -7,12 +7,12 @@ const InvestigationBoard: React.FC = () => {
 
   // Mock data for board items
   const items = [
-    { id: 'helena', type: 'person', label: 'Helena', image: '/images/portraits/default_f.png', top: '60%', left: '40%', note: 'Amiga próxima' },
-    { id: 'clara', type: 'person', label: 'Clara Mendes', image: '/images/portraits/default_f.png', top: '25%', left: '20%', note: 'Desaparecida 12/05' },
-    { id: 'tomas', type: 'person', label: 'Sr. Tomás Blackwell', image: '/images/portraits/default_m.png', top: '30%', left: '75%', note: '?' },
-    { id: 'house', type: 'location', label: 'Blackwell House', image: '/backgrounds/map_blackwell.png', top: '45%', left: '45%' },
-    { id: 'key', type: 'item', label: 'Chave do quarto 7', image: '/backgrounds/scene_living_room.png', top: '65%', left: '15%', note: 'Encontrada na sala' },
-    { id: 'note', type: 'note', label: 'Carta anônima', text: 'Vocês pensam que sabem a verdade. Mas a casa guarda o que vocês preferem esquecer.', top: '25%', left: '45%' },
+    { id: 'helena', type: 'person', label: 'Helena', image: '/images/portraits/default_f.png', top: '55%', left: '30%', note: 'Amiga próxima' },
+    { id: 'clara', type: 'person', label: 'Clara Mendes', image: '/images/portraits/default_f.png', top: '25%', left: '25%', note: 'Desaparecida 12/05' },
+    { id: 'tomas', type: 'person', label: 'Sr. Tomás Blackwell', image: '/images/portraits/default_m.png', top: '35%', left: '75%', note: '?' },
+    { id: 'house', type: 'location', label: 'Blackwell House', image: '/backgrounds/map_blackwell.png', top: '45%', left: '50%' },
+    { id: 'key', type: 'item', label: 'Chave do quarto 7', image: '/backgrounds/scene_living_room.png', top: '75%', left: '60%', note: 'Encontrada na sala' },
+    { id: 'note', type: 'note', label: 'Carta anônima', text: 'Vocês pensam que sabem a verdade. Mas a casa guarda o que vocês preferem esquecer.', top: '15%', left: '55%' },
   ];
 
   // Connections (Red Strings)
@@ -26,30 +26,33 @@ const InvestigationBoard: React.FC = () => {
 
   return (
     <div className="layout" style={{ 
-      backgroundColor: '#0F1417',
+      backgroundImage: 'url(/backgrounds/corkboard_texture.png)',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
       minHeight: '100vh',
-      position: 'relative'
+      position: 'relative',
+      overflow: 'hidden'
     }}>
+      {/* Overlay Escuro para escurecer a cortiça */}
+      <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)', pointerEvents: 'none' }} />
+
       <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', height: '100vh', padding: '80px 24px 96px 24px' }}>
         
         {/* Header */}
-        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
+        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px', backgroundColor: 'rgba(19, 25, 28, 0.85)', backdropFilter: 'blur(10px)', padding: '16px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
           <div>
             <span style={{ color: '#C5A880', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 600 }}>Investigação</span>
-            <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '32px', margin: '4px 0', color: '#F8F9FA', fontWeight: 400 }}>Mural de Conexões</h1>
-            <p style={{ color: '#8E989F', fontSize: '13px' }}>Conecte pistas, descubra relações e revele a verdade.</p>
+            <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '28px', margin: '4px 0', color: '#F8F9FA', fontWeight: 400 }}>Mural de Conexões</h1>
+            <p style={{ color: '#8E989F', fontSize: '13px', margin: 0 }}>Conecte pistas e revele a verdade.</p>
           </div>
-          <div style={{ display: 'flex', gap: '8px' }}>
-             <button style={{ backgroundColor: '#13191C', border: '1px solid rgba(255,255,255,0.05)', color: '#F8F9FA', padding: '10px', borderRadius: '50%' }}><Filter size={16} /></button>
-             <button style={{ backgroundColor: '#13191C', border: '1px solid rgba(255,255,255,0.05)', color: '#F8F9FA', padding: '10px', borderRadius: '50%' }}><MoreHorizontal size={16} /></button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+             <button style={{ backgroundColor: '#13191C', border: '1px solid rgba(255,255,255,0.1)', color: '#F8F9FA', padding: '8px', borderRadius: '50%' }}><Filter size={14} /></button>
+             <button style={{ backgroundColor: '#13191C', border: '1px solid rgba(255,255,255,0.1)', color: '#F8F9FA', padding: '8px', borderRadius: '50%' }}><MoreHorizontal size={14} /></button>
           </div>
         </header>
 
         {/* Board Area */}
-        <div style={{ flex: 1, position: 'relative', overflow: 'hidden', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', backgroundImage: 'url(/backgrounds/corkboard_texture.png)', backgroundSize: 'cover', backgroundPosition: 'center', boxShadow: 'inset 0 0 40px rgba(0,0,0,0.8)' }}>
-          {/* Overlay Escuro para o fundo de cortiça combinar com o app */}
-          <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', pointerEvents: 'none' }} />
-
+        <div style={{ flex: 1, position: 'relative' }}>
           {/* We would draw SVG lines here connecting the pins */}
           
           <div style={{ position: 'relative', width: '100%', height: '100%', zIndex: 2 }}>
@@ -62,7 +65,7 @@ const InvestigationBoard: React.FC = () => {
                 backgroundColor: 'var(--paper)',
                 padding: '6px',
                 boxShadow: '2px 4px 10px rgba(0,0,0,0.5)',
-                width: item.type === 'note' ? '120px' : '90px',
+                width: item.type === 'note' ? '120px' : '85px',
                 cursor: 'grab'
               }}>
                 {/* Pin */}
@@ -82,7 +85,7 @@ const InvestigationBoard: React.FC = () => {
                 </div>
 
                 {item.note && (
-                  <div style={{ position: 'absolute', bottom: '-10px', right: '-15px', backgroundColor: '#eab308', padding: '2px 6px', fontSize: '9px', fontFamily: '"Kalam", cursive', color: '#000', transform: 'rotate(-5deg)', boxShadow: '1px 2px 4px rgba(0,0,0,0.3)', zIndex: 3, whiteSpace: 'nowrap' }}>
+                  <div style={{ position: 'absolute', bottom: '-10px', right: '-10px', backgroundColor: '#eab308', padding: '2px 6px', fontSize: '8px', fontFamily: '"Kalam", cursive', color: '#000', transform: 'rotate(-5deg)', boxShadow: '1px 2px 4px rgba(0,0,0,0.3)', zIndex: 3, whiteSpace: 'nowrap' }}>
                     {item.note}
                   </div>
                 )}
@@ -92,7 +95,7 @@ const InvestigationBoard: React.FC = () => {
         </div>
 
         {/* Bottom AI Panel */}
-        <div style={{ display: 'flex', gap: '16px', marginTop: '24px' }}>
+        <div style={{ display: 'flex', gap: '16px', marginTop: '16px', backgroundColor: 'rgba(19, 25, 28, 0.85)', backdropFilter: 'blur(10px)', padding: '16px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
           <button style={{ 
             flex: 1, backgroundColor: '#13191C', border: '1px solid rgba(197, 168, 128, 0.2)', 
             padding: '16px', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '16px', cursor: 'pointer' 

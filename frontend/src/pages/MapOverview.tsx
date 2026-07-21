@@ -18,16 +18,16 @@ const MapOverview: React.FC = () => {
       <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', height: '100vh', padding: '80px 24px 96px 24px' }}>
         
         {/* Header */}
-        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
-          <div>
-            <span style={{ color: '#C5A880', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 600 }}>Caso Ativo</span>
-            <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '32px', margin: '4px 0', lineHeight: 1.1, color: '#F8F9FA' }}>O Segredo de<br/>Blackwell House</h1>
-            <p style={{ color: '#8E989F', fontSize: '13px', maxWidth: '280px', marginTop: '8px' }}>Explore os locais, encontre pistas e descubra o que realmente aconteceu.</p>
-          </div>
-          <div style={{ background: 'rgba(20,20,20,0.8)', backdropFilter: 'blur(10px)', padding: '12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', textAlign: 'right' }}>
-            <div style={{ fontSize: '9px', color: '#8E989F', textTransform: 'uppercase', marginBottom: '4px' }}>Progresso</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{ flex: 1, height: '4px', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '2px', width: '60px' }}>
+        <header style={{ display: 'flex', flexDirection: 'column', marginBottom: '24px' }}>
+          <span style={{ color: '#C5A880', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 600 }}>Caso Ativo</span>
+          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '32px', margin: '4px 0', lineHeight: 1.1, color: '#F8F9FA' }}>O Segredo de<br/>Blackwell House</h1>
+          <p style={{ color: '#8E989F', fontSize: '13px', maxWidth: '280px', marginTop: '8px', marginBottom: '24px' }}>Explore os locais, encontre pistas e descubra o que realmente aconteceu.</p>
+          
+          {/* Progress */}
+          <div style={{ backgroundColor: '#13191C', padding: '16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: '10px', color: '#8E989F', textTransform: 'uppercase', letterSpacing: '1px' }}>Progresso da Investigação</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ height: '4px', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '2px', width: '80px' }}>
                 <div style={{ height: '100%', width: '68%', backgroundColor: '#C5A880', borderRadius: '2px' }} />
               </div>
               <span style={{ color: '#F8F9FA', fontWeight: 600, fontSize: '12px' }}>68%</span>

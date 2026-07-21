@@ -1,147 +1,158 @@
 import React, { useState } from 'react';
-import { Flashlight, Eye } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Flashlight, MoreHorizontal, ChevronDown, ThumbsUp, ThumbsDown, Brain } from 'lucide-react';
 import { useInvestigation } from '../contexts/InvestigationContext';
 
 const SceneExplorer: React.FC = () => {
-  
-  const [uvLight, setUvLight] = useState(false);
+  const navigate = useNavigate();
   const { discoveredClues, addClue } = useInvestigation();
-  const [showHint, setShowHint] = useState(true);
+  const [uvLight, setUvLight] = useState(false);
 
+  // Hardcoded for 'sala-de-estar'
+  const totalClues = 5; // To match map 
   const hotspots = [
-    { id: 'window', label: 'Janela Entreaberta', top: '30%', left: '30%', isFound: discoveredClues.includes('window') },
-    { id: 'armchair', label: 'Poltrona Revirada', top: '55%', left: '35%', isFound: discoveredClues.includes('armchair') },
-    { id: 'table', label: 'Anotações Rasgadas', top: '70%', left: '55%', isFound: discoveredClues.includes('table') },
-    { id: 'fireplace', label: 'Lareira Apagada', top: '50%', left: '80%', isFound: discoveredClues.includes('fireplace') },
-    { id: 'blood', label: 'Mancha de Sangue', top: '80%', left: '75%', isFound: discoveredClues.includes('blood'), requiresUv: true },
+    { id: 'window', label: 'Janela', subLabel: 'Entreaberta', top: '35%', left: '15%' },
+    { id: 'armchair', label: 'Poltrona', subLabel: 'Revirada', top: '48%', left: '38%' },
+    { id: 'table', label: 'Anotações', subLabel: 'Rasgadas', top: '56%', left: '55%' },
+    { id: 'fireplace', label: 'Lareira', subLabel: 'Apagada', top: '42%', left: '85%' },
+    { id: 'blood', label: 'Mancha de Sangue', subLabel: 'Recente', top: '65%', left: '78%', requiresUv: true },
   ];
 
-  const handleHotspotClick = (id: string, requiresUv?: boolean) => {
-    if (requiresUv && !uvLight) return;
-    if (!discoveredClues.includes(id)) {
-      addClue(id);
-    }
+  const handleHotspotClick = (id: string) => {
+    addClue(id);
+    navigate(`/evidence/${id}`);
   };
 
-  return (
-    <div className="layout" style={{ 
-      backgroundImage: uvLight ? 'url(/backgrounds/scene_living_room.png)' : 'url(/backgrounds/scene_living_room.png)',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      minHeight: '100vh',
-      position: 'relative',
-      filter: uvLight ? 'contrast(1.2) hue-rotate(240deg) saturate(1.5) brightness(0.6)' : 'none',
-      transition: 'all 0.5s ease'
-    }}>
-      {/* Overlay gradient */}
-      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 20%, rgba(0,0,0,0.1) 70%, rgba(0,0,0,0.9) 100%)', zIndex: 1, pointerEvents: 'none' }} />
+  const foundImages = [
+    '/backgrounds/ev_letter.png',
+    '/backgrounds/ev_key_7.png',
+    '/backgrounds/ev_photo.png',
+  ];
 
-      <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', height: '100vh', paddingTop: '80px' }}>
+  return (
+    <div style={{ backgroundColor: '#0A0D10', minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', overflowX: 'hidden', paddingBottom: '96px' }}>
+      
+      {/* Background da Cena */}
+      <div style={{ 
+        position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+        backgroundImage: 'url(/backgrounds/scene_living_room.png)', backgroundSize: 'cover', backgroundPosition: 'center', zIndex: 0,
+        filter: uvLight ? 'brightness(0.3) contrast(1.5) sepia(1) hue-rotate(200deg) saturate(3)' : 'none',
+        transition: 'filter 0.5s ease'
+      }} />
+      <div style={{
+        position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+        background: 'linear-gradient(180deg, rgba(10,13,16,0.9) 0%, rgba(10,13,16,0.3) 40%, rgba(10,13,16,0.8) 80%, #0A0D10 100%)', zIndex: 1
+      }} />
+
+      <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', height: '100vh' }}>
         
-        {/* Header */}
-        <header style={{ padding: '0 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <div>
-            <span style={{ color: '#C5A880', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 600 }}>Cena do Crime</span>
-            <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '32px', margin: '4px 0', color: '#F8F9FA', fontWeight: 400 }}>Sala de Estar</h1>
-            <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '13px' }}>Explore a cena. Cada detalhe pode ser uma pista.</p>
-            
-            <div style={{ marginTop: '16px', display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(0,0,0,0.6)', padding: '8px 16px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.1)' }}>
-               <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' }}>Pistas Encontradas</span>
-               <span style={{ color: 'var(--accent-gold)', fontWeight: 'bold' }}>{discoveredClues.length} / {hotspots.length}</span>
+        {/* Header Topo */}
+        <header style={{ padding: '48px 24px 16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <button onClick={() => navigate(-1)} style={{ background: 'transparent', border: 'none', color: '#F8F9FA', cursor: 'pointer', padding: 0 }}>
+            <ArrowLeft size={24} />
+          </button>
+          <div style={{ color: '#C5A880', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 600 }}>Cena do Crime</div>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#F8F9FA', backdropFilter: 'blur(10px)' }}>
+              <Flashlight size={18} />
             </div>
-          </div>
-          
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '16px' }}>
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <button 
-                onClick={() => setUvLight(!uvLight)}
-                style={{ background: uvLight ? 'var(--accent-gold)' : 'rgba(0,0,0,0.6)', color: uvLight ? '#000' : '#fff', border: '1px solid ' + (uvLight ? 'var(--accent-gold)' : 'rgba(255,255,255,0.2)'), padding: '12px', borderRadius: '50%', cursor: 'pointer', transition: 'all 0.3s ease' }}
-              >
-                <Flashlight size={20} />
-              </button>
-            </div>
-            
-            {/* Mini Map */}
-            <div style={{ width: '120px', height: '120px', background: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '12px', position: 'relative' }}>
-               <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)', marginBottom: '8px' }}>Térreo</div>
-               {/* Simplified floor plan drawing */}
-               <div style={{ width: '100%', height: '70%', border: '1px solid rgba(255,255,255,0.2)', position: 'relative' }}>
-                 <div style={{ position: 'absolute', top: '40%', left: '30%', width: '30%', height: '30%', background: 'rgba(212,175,55,0.3)', border: '1px solid var(--accent-gold)' }}>
-                   <div style={{ width: '4px', height: '4px', background: 'var(--accent-gold)', borderRadius: '50%', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
-                 </div>
-               </div>
+            <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#F8F9FA', backdropFilter: 'blur(10px)' }}>
+              <MoreHorizontal size={20} />
             </div>
           </div>
         </header>
 
+        {/* Informações Superiores e Minimapa */}
+        <div style={{ display: 'flex', padding: '0 24px', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div>
+            <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '32px', margin: '0 0 8px 0', color: '#F8F9FA', fontWeight: 400 }}>Sala de Estar</h1>
+            <p style={{ color: '#8E989F', fontSize: '13px', margin: '0 0 24px 0', maxWidth: '200px', lineHeight: 1.4 }}>
+              Explore a cena. Cada detalhe pode ser uma pista.
+            </p>
+            
+            <div style={{ color: '#C5A880', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 600, marginBottom: '4px' }}>Pistas Encontradas</div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+              <span style={{ color: '#F8F9FA', fontSize: '24px', fontWeight: 400 }}>{discoveredClues.length}</span>
+              <span style={{ color: '#8E989F', fontSize: '14px' }}>/ {totalClues}</span>
+            </div>
+          </div>
+
+          {/* Mini-map mock */}
+          <div style={{ width: '120px', height: '120px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '16px', padding: '12px', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', color: '#8E989F', fontSize: '10px' }}>
+              Térreo <ChevronDown size={12} />
+            </div>
+            <div style={{ flex: 1, border: '1px solid rgba(255,255,255,0.1)', borderRadius: '4px', position: 'relative' }}>
+              {/* Box da sala */}
+              <div style={{ position: 'absolute', top: '30%', left: '20%', width: '30%', height: '30%', border: '1px solid #C5A880', background: 'rgba(197,168,128,0.2)' }}>
+                <div style={{ width: '4px', height: '4px', background: '#C5A880', borderRadius: '50%', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }} />
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Hotspots */}
         <div style={{ flex: 1, position: 'relative' }}>
-          {hotspots.map(hotspot => {
+          {hotspots.map((hotspot) => {
             if (hotspot.requiresUv && !uvLight) return null;
-
             return (
               <div 
                 key={hotspot.id} 
-                onClick={() => handleHotspotClick(hotspot.id, hotspot.requiresUv)}
-                style={{ 
-                  position: 'absolute', 
-                  top: hotspot.top, 
-                  left: hotspot.left,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  cursor: 'pointer'
-                }}
+                style={{ position: 'absolute', top: hotspot.top, left: hotspot.left, display: 'flex', alignItems: 'center', gap: '8px', transform: 'translate(-50%, -50%)', cursor: 'pointer' }}
+                onClick={() => handleHotspotClick(hotspot.id)}
               >
-                <div style={{ 
-                  width: '24px', 
-                  height: '24px', 
-                  borderRadius: '50%', 
-                  background: hotspot.isFound ? (hotspot.requiresUv ? '#eab308' : 'var(--accent-gold)') : 'transparent', 
-                  border: `2px solid ${hotspot.requiresUv ? '#eab308' : 'var(--accent-gold)'}`,
-                  boxShadow: hotspot.isFound ? `0 0 15px ${hotspot.requiresUv ? '#eab308' : 'var(--accent-gold)'}` : 'none',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: '8px'
-                }}>
-                  {hotspot.isFound && <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#fff' }} />}
+                <div style={{ width: '24px', height: '24px', borderRadius: '50%', border: '1px solid rgba(197, 168, 128, 0.5)', background: 'rgba(10,13,16,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(4px)' }}>
+                  <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#C5A880' }} />
                 </div>
-                
-                <div style={{ 
-                  background: 'rgba(0,0,0,0.7)', 
-                  padding: '4px 8px', 
-                  borderRadius: '4px', 
-                  color: '#fff', 
-                  fontSize: '11px',
-                  opacity: hotspot.isFound ? 1 : 0.5,
-                  transition: 'opacity 0.3s',
-                  pointerEvents: 'none',
-                  border: `1px solid ${hotspot.requiresUv ? '#eab308' : 'rgba(255,255,255,0.1)'}`
-                }}>
-                  {hotspot.label}
+                <div style={{ background: 'rgba(10,13,16,0.7)', padding: '4px 8px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)', backdropFilter: 'blur(4px)' }}>
+                  <div style={{ color: '#F8F9FA', fontSize: '11px', fontWeight: 600 }}>{hotspot.label}</div>
+                  <div style={{ color: '#8E989F', fontSize: '9px' }}>{hotspot.subLabel}</div>
                 </div>
               </div>
             );
           })}
         </div>
 
-        {/* Bottom Panel */}
-        <div style={{ padding: '24px', pointerEvents: 'auto' }}>
+        {/* Bottom controls */}
+        <div style={{ padding: '0 24px', marginTop: 'auto', marginBottom: '24px' }}>
           
-          {/* AI Tip */}
-          {showHint && (
-            <div style={{ background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', padding: '16px', display: 'flex', gap: '16px', alignItems: 'center', marginBottom: '24px', maxWidth: '400px' }}>
-              <div style={{ background: 'rgba(212,175,55,0.1)', padding: '12px', borderRadius: '50%', color: 'var(--accent-gold)' }}>
-                <Eye size={20} />
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ color: 'var(--accent-gold)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>Dica da IA</div>
-                <div style={{ color: '#fff', fontSize: '13px', lineHeight: 1.4 }}>A posição do copo e a mancha de sangue sugerem que houve uma discussão antes do crime.</div>
-              </div>
-              <button onClick={() => setShowHint(false)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', cursor: 'pointer', fontSize: '24px', lineHeight: 1 }}>×</button>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '24px' }}>
+            {/* Found images carousel */}
+            <div style={{ display: 'flex', gap: '8px' }}>
+              {foundImages.map((img, i) => (
+                <div key={i} style={{ width: '56px', height: '56px', borderRadius: '8px', border: '1px solid rgba(197, 168, 128, 0.3)', backgroundImage: `url(${img})`, backgroundSize: 'cover', opacity: 0.8 }} />
+              ))}
             </div>
-          )}
+            
+            {/* UV Button */}
+            <button 
+              onClick={() => setUvLight(!uvLight)}
+              style={{ background: uvLight ? 'var(--olive)' : 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: uvLight ? '#13191C' : '#F8F9FA', padding: '12px 16px', borderRadius: '24px', fontSize: '11px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', backdropFilter: 'blur(10px)', transition: 'all 0.3s ease' }}
+            >
+              <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: uvLight ? '#13191C' : '#6b21a8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#fff' }} />
+              </div>
+              Visão com Luz UV
+            </button>
+          </div>
+
+          {/* AI Tip Box */}
+          <div style={{ background: '#13191C', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)', padding: '20px', display: 'flex', gap: '16px' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8E989F' }}>
+              <Brain size={20} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ color: '#C5A880', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 600, marginBottom: '6px' }}>Dica da IA</div>
+              <p style={{ color: '#F8F9FA', fontSize: '13px', margin: '0 0 8px 0', lineHeight: 1.5 }}>
+                A posição do copo e a mancha de sangue sugerem que houve uma discussão antes do crime.
+              </p>
+              <div style={{ color: '#8E989F', fontSize: '11px' }}>Confiança: 68%</div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', justifyContent: 'center' }}>
+              <button style={{ background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '6px', color: '#8E989F', cursor: 'pointer' }}><ThumbsUp size={14} /></button>
+              <button style={{ background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '6px', color: '#8E989F', cursor: 'pointer' }}><ThumbsDown size={14} /></button>
+            </div>
+          </div>
 
         </div>
       </div>

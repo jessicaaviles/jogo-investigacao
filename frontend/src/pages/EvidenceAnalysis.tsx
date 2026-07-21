@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Brain, Search, Fingerprint, Clock, Key } from 'lucide-react';
 import { analyzeEvidenceApi } from '../services/aiApi';
 
@@ -14,13 +14,20 @@ const EvidenceAnalysis: React.FC = () => {
     title: 'Chave do quarto 7',
     image: '/backgrounds/ev_key_7.png',
     date: '12 Mai',
+    type: 'physical',
+    desc: 'Chave antiga do quarto'
   };
 
   const handleAnalyze = async () => {
     setAnalyzing(true);
     setTimeout(async () => {
       try {
-        const result = await analyzeEvidenceApi({ evidenceId: mockEvidence.id, roomId: 'local' });
+        const result = await analyzeEvidenceApi({ 
+          evidenceId: mockEvidence.id,
+          title: mockEvidence.title,
+          desc: mockEvidence.desc,
+          type: mockEvidence.type
+        });
         setAiReport(result);
       } catch (err) {
         setAiReport({

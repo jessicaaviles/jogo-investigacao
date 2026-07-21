@@ -42,15 +42,15 @@ const EvidenceAnalysis: React.FC = () => {
   return (
     <div style={{ backgroundColor: '#0A0D10', minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', overflowX: 'hidden' }}>
       
-      {/* Imagem de Fundo e Gradiente */}
+      {/* Imagem da Evidência (Background) */}
       <div style={{ 
-        position: 'absolute', top: 0, left: 0, width: '100%', height: '55vh',
+        position: 'absolute', top: 0, left: 0, width: '100%', height: '50vh',
         backgroundImage: `url(${mockEvidence.image})`, backgroundSize: 'cover', backgroundPosition: 'center', zIndex: 0
       }} />
-      {/* Fade para mesclar com o conteúdo */}
+      {/* Fade para mesclar com o conteúdo e máscara 10% */}
       <div style={{
-        position: 'absolute', top: 0, left: 0, width: '100%', height: '55vh',
-        background: 'linear-gradient(180deg, rgba(10,13,16,0) 0%, rgba(10,13,16,0.1) 50%, rgba(10,13,16,0.9) 90%, #0A0D10 100%)', zIndex: 1
+        position: 'absolute', top: 0, left: 0, width: '100%', height: '50vh',
+        background: 'linear-gradient(180deg, rgba(10,13,16,0.1) 0%, rgba(10,13,16,0.1) 50%, rgba(10,13,16,0.95) 90%, #0A0D10 100%)', zIndex: 1
       }} />
 
       {/* Header */}
@@ -60,17 +60,16 @@ const EvidenceAnalysis: React.FC = () => {
         </button>
       </header>
 
-      {/* Título da Evidência */}
-      <div style={{ padding: '0 24px', marginTop: '160px', position: 'relative', zIndex: 2 }}>
+      {/* Título da Evidência (Abaixo da Imagem) */}
+      <div style={{ padding: '0 24px', marginTop: '38vh', position: 'relative', zIndex: 2 }}>
         <div style={{ 
-          display: 'inline-block',
-          background: 'rgba(10, 13, 16, 0.65)', 
-          backdropFilter: 'blur(10px)', 
-          WebkitBackdropFilter: 'blur(10px)', 
-          padding: '20px 24px', 
+          background: 'rgba(10, 13, 16, 0.4)', 
+          backdropFilter: 'blur(12px)', 
+          WebkitBackdropFilter: 'blur(12px)', 
+          padding: '24px', 
           borderRadius: '16px',
           border: '1px solid rgba(255,255,255,0.05)',
-          marginLeft: '-12px'
+          boxShadow: '0 8px 32px rgba(0,0,0,0.4)'
         }}>
           <span style={{ color: '#C5A880', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 600 }}>Análise de Evidências</span>
           <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '32px', margin: '8px 0', color: '#F8F9FA', fontWeight: 400 }}>{mockEvidence.title}</h1>

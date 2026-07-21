@@ -36,8 +36,8 @@ const SceneExplorer: React.FC = () => {
       <div style={{ 
         position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
         backgroundImage: 'url(/backgrounds/scene_living_room.png)', backgroundSize: 'cover', backgroundPosition: 'center', zIndex: 0,
-        filter: uvLight ? 'brightness(0.3) contrast(1.5) sepia(1) hue-rotate(200deg) saturate(3)' : 'none',
-        transition: 'filter 0.5s ease', transform: 'translateZ(0)', willChange: 'filter'
+        filter: uvLight ? 'brightness(0.7) contrast(1.4) sepia(1) hue-rotate(240deg) saturate(2.5)' : 'none',
+        transition: 'filter 0.5s ease'
       }} />
       <div style={{
         position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
@@ -96,11 +96,17 @@ const SceneExplorer: React.FC = () => {
                 style={{ position: 'absolute', top: hotspot.top, left: hotspot.left, display: 'flex', alignItems: 'center', gap: '8px', transform: 'translate(-50%, -50%)', cursor: 'pointer' }}
                 onClick={() => handleHotspotClick(hotspot.id)}
               >
-                <div style={{ width: '24px', height: '24px', borderRadius: '50%', border: '1px solid rgba(197, 168, 128, 0.5)', background: 'rgba(10,13,16,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(4px)' }}>
-                  <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#C5A880' }} />
+                <div style={{ 
+                  width: '24px', height: '24px', borderRadius: '50%', 
+                  border: `1px solid ${hotspot.requiresUv && uvLight ? 'rgba(168, 85, 247, 0.8)' : 'rgba(197, 168, 128, 0.5)'}`, 
+                  background: hotspot.requiresUv && uvLight ? 'rgba(168, 85, 247, 0.2)' : 'rgba(10,13,16,0.6)', 
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(4px)',
+                  boxShadow: hotspot.requiresUv && uvLight ? '0 0 15px rgba(168, 85, 247, 0.5)' : 'none'
+                }}>
+                  <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: hotspot.requiresUv && uvLight ? '#D8B4FE' : '#C5A880' }} />
                 </div>
                 <div style={{ background: 'rgba(10,13,16,0.7)', padding: '4px 8px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)', backdropFilter: 'blur(4px)' }}>
-                  <div style={{ color: '#F8F9FA', fontSize: '11px', fontWeight: 600 }}>{hotspot.label}</div>
+                  <div style={{ color: hotspot.requiresUv && uvLight ? '#D8B4FE' : '#F8F9FA', fontSize: '11px', fontWeight: 600 }}>{hotspot.label}</div>
                   <div style={{ color: '#8E989F', fontSize: '9px' }}>{hotspot.subLabel}</div>
                 </div>
               </div>
@@ -122,9 +128,16 @@ const SceneExplorer: React.FC = () => {
             {/* UV Button */}
             <button 
               onClick={() => setUvLight(!uvLight)}
-              style={{ background: uvLight ? 'var(--olive)' : 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: uvLight ? '#13191C' : '#F8F9FA', padding: '12px 16px', borderRadius: '24px', fontSize: '11px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', backdropFilter: 'blur(10px)', transition: 'all 0.3s ease' }}
+              style={{ 
+                background: uvLight ? 'rgba(168, 85, 247, 0.2)' : 'rgba(255,255,255,0.05)', 
+                border: `1px solid ${uvLight ? 'rgba(168, 85, 247, 0.5)' : 'rgba(255,255,255,0.1)'}`, 
+                color: uvLight ? '#D8B4FE' : '#F8F9FA', 
+                padding: '12px 16px', borderRadius: '24px', fontSize: '11px', fontWeight: 600, 
+                display: 'flex', alignItems: 'center', gap: '8px', backdropFilter: 'blur(10px)', transition: 'all 0.3s ease',
+                boxShadow: uvLight ? '0 0 20px rgba(168, 85, 247, 0.3)' : 'none'
+              }}
             >
-              <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: uvLight ? '#13191C' : '#6b21a8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: uvLight ? '#A855F7' : '#6b21a8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#fff' }} />
               </div>
               Visão com Luz UV

@@ -37,7 +37,7 @@ const SceneExplorer: React.FC = () => {
         position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
         backgroundImage: 'url(/backgrounds/scene_living_room.png)', backgroundSize: 'cover', backgroundPosition: 'center', zIndex: 0,
         filter: uvLight ? 'brightness(0.3) contrast(1.5) sepia(1) hue-rotate(200deg) saturate(3)' : 'none',
-        transition: 'filter 0.5s ease'
+        transition: 'filter 0.5s ease', transform: 'translateZ(0)', willChange: 'filter'
       }} />
       <div style={{
         position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',

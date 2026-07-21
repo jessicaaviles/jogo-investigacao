@@ -56,9 +56,20 @@ const SceneExplorer: React.FC = () => {
         {/* Header Topo */}
         <header style={{ padding: '100px 24px 16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ color: '#C5A880', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 600 }}>Cena do Crime</div>
-          <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#F8F9FA', backdropFilter: 'blur(10px)' }}>
+          <button 
+            onClick={() => setUvLight(!uvLight)}
+            style={{ 
+              width: '40px', height: '40px', borderRadius: '50%', 
+              border: `1px solid ${uvLight ? 'rgba(168, 85, 247, 0.5)' : 'rgba(255,255,255,0.1)'}`, 
+              background: uvLight ? 'rgba(168, 85, 247, 0.2)' : 'transparent',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', 
+              color: uvLight ? '#D8B4FE' : '#F8F9FA', 
+              backdropFilter: 'blur(10px)', cursor: 'pointer', transition: 'all 0.3s ease',
+              boxShadow: uvLight ? '0 0 15px rgba(168, 85, 247, 0.3)' : 'none'
+            }}
+          >
             <Flashlight size={18} />
-          </div>
+          </button>
         </header>
 
         {/* Informações Superiores e Minimapa */}

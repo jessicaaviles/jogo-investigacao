@@ -95,6 +95,7 @@ import roomRoutes from './routes/roomRoutes';
 import feedbackRoutes from './routes/feedbackRoutes';
 import profileRoutes from './routes/profileRoutes';
 import authRoutes from './routes/authRoutes';
+import aiRoutes from './routes/aiRoutes';
 
 // Routes
 app.use('/api', userRoutes);
@@ -102,6 +103,7 @@ app.use('/api', roomRoutes);
 app.use('/api', feedbackRoutes);
 app.use('/api', profileRoutes);
 app.use('/api', authRoutes);
+app.use('/api/ai', aiRoutes);
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });

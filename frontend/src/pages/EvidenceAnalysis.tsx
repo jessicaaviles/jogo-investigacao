@@ -1,34 +1,41 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Brain, Scan } from 'lucide-react';
+import { analyzeEvidenceApi } from '../services/aiApi';
 
 const EvidenceAnalysis: React.FC = () => {
   
   const { evidenceId } = useParams();
   const [analyzing, setAnalyzing] = useState(false);
   const [aiReport, setAiReport] = useState<any>(null);
+  const [aiError, setAiError] = useState('');
 
-  const mockEvidence = {
-    id: evidenceId,
-    title: 'Carta Anônima',
-    type: 'Documento',
-    content: 'Vocês pensam que sabem a verdade. Mas a casa guarda o que vocês preferem esquecer.',
-    foundAt: 'Hall de Entrada',
-    date: '12/05/1994',
-    image: '/images/portraits/default_m.png' // Mock
-  };
+  const allEvidences = [
+    { id: 'fireplace', type: 'Documento', title: 'Carta Anônima', content: 'Vocês pensam que sabem a verdade. Mas a casa guarda o que vocês preferem esquecer.', foundAt: 'Sala de Estar', date: '12/05/1994' },
+    { id: 'armchair', type: 'Item Físico', title: 'Chave do Quarto 7', content: 'Uma chave de metal dourada, pesada, com o número 7 entalhado.', foundAt: 'Sala de Estar', date: '13/05/1994' },
+    { id: 'window', type: 'Foto', title: 'Foto da Família', content: 'Retrato antigo rasgado no meio. O rosto de uma pessoa foi riscado com caneta.', foundAt: 'Sala de Estar', date: '13/05/1994' },
+    { id: 'table', type: 'Documento', title: 'Diário de Elisa', content: '2 de maio. Eu vi o homem de chapéu novamente. Ele fica observando o jardim da casa ao lado.', foundAt: 'Sala de Estar', date: '14/05/1994' },
+    { id: 'blood', type: 'Material Orgânico', title: 'Mancha de Sangue', content: 'Vestígio bioluminescente sob luz UV. Formato de arrasto.', foundAt: 'Sala de Estar', date: '15/05/1994' },
+  ];
 
-  const handleAnalyze = () => {
+  const mockEvidence = allEvidences.find(e => e.id === evidenceId) || allEvidences[0];
+
+  const handleAnalyze = async () => {
     setAnalyzing(true);
-    // Simulate AI delay
-    setTimeout(() => {
-      setAiReport({
-        summary: 'O tipo de papel e a tinta sugerem que foi escrita recentemente, não na época da construção da casa.',
-        points: ['Escrita apressada', 'Mancha de café no canto inferior'],
-        hypothesis: 'O autor provavelmente estava nervoso e consumindo cafeína enquanto escrevia, indicando premeditação sob estresse.',
+    setAiError('');
+    try {
+      const result = await analyzeEvidenceApi({
+        evidenceId: mockEvidence.id,
+        title: mockEvidence.title,
+        desc: mockEvidence.content,
+        type: mockEvidence.type
       });
+      setAiReport({ summary: result, points: [], hypothesis: '' });
+    } catch (err) {
+      setAiError('A máquina do laboratório falhou.');
+    } finally {
       setAnalyzing(false);
-    }, 2500);
+    }
   };
 
   return (
@@ -76,28 +83,22 @@ const EvidenceAnalysis: React.FC = () => {
           </button>
         )}
 
+        {aiError && (
+          <div style={{ color: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(239,68,68,0.2)', marginBottom: '24px', fontSize: '13px' }}>
+            {aiError}
+          </div>
+        )}
+
         {/* AI Report */}
         {aiReport && (
           <div style={{ backgroundColor: '#13191C', border: '1px solid rgba(197, 168, 128, 0.3)', borderRadius: '12px', padding: '24px', animation: 'fadeIn 0.5s ease-out' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#C5A880', marginBottom: '16px' }}>
               <Brain size={24} />
-              <h3 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: '18px', fontWeight: 400 }}>Parecer da IA</h3>
+              <h3 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: '18px', fontWeight: 400 }}>Parecer Forense</h3>
             </div>
             
-            <p style={{ color: '#F8F9FA', fontSize: '14px', lineHeight: 1.6, marginBottom: '16px' }}>{aiReport.summary}</p>
-            
-            <div style={{ marginBottom: '16px' }}>
-              <div style={{ color: '#8E989F', fontSize: '11px', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '1px' }}>Pontos de Interesse Detectados</div>
-              <ul style={{ color: '#C5A880', margin: 0, paddingLeft: '20px', fontSize: '13px' }}>
-                {aiReport.points.map((pt: string, idx: number) => <li key={idx}>{pt}</li>)}
-              </ul>
-            </div>
-
-            <div>
-              <div style={{ color: '#8E989F', fontSize: '11px', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '1px' }}>Hipótese Gerada</div>
-              <div style={{ background: 'rgba(255,255,255,0.03)', padding: '12px', borderRadius: '8px', color: '#F8F9FA', fontSize: '13px', fontStyle: 'italic', borderLeft: '2px solid #C5A880' }}>
-                {aiReport.hypothesis}
-              </div>
+            <div style={{ color: '#F8F9FA', fontSize: '14px', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+              {aiReport.summary}
             </div>
           </div>
         )}

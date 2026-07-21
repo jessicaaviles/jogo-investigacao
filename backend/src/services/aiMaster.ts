@@ -195,3 +195,35 @@ Instruções ESTRITAS:
     };
   }
 };
+
+export const analyzeEvidence = async (evidenceId: string, title: string, desc: string, type: string) => {
+  try {
+    const prompt = `Você é um detetive forense experiente analisando evidências em um jogo de mistério.
+O detetive novato trouxe a seguinte pista para o laboratório:
+
+ID: ${evidenceId}
+Tipo: ${type}
+Título: "${title}"
+Descrição encontrada na cena: "${desc}"
+
+Sua tarefa: Forneça uma análise técnica e imersiva sobre essa evidência. 
+Se for uma carta, analise a caligrafia, as pressões da caneta ou a procedência do papel.
+Se for um objeto físico, analise arranhões, impressões digitais, desgaste, fabricante, etc.
+
+REGRA CRUCIAL: Nunca dê a resposta mastigada. O jogador deve desvendar o caso. Dê apenas dicas fortes, aponte inconsistências ou levante perguntas intrigantes que façam o jogador pensar. Deixe o mistério no ar. NÃO invente fatos que resolvam o caso sozinhos.
+
+Responda APENAS com a dedução em texto corrido, de forma imersiva (no máximo 2 parágrafos pequenos). Em português do Brasil.`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-3.5-flash',
+      contents: prompt,
+      config: { temperature: 0.6 }
+    });
+
+    if (!response.text) return "Não foi possível extrair dados conclusivos dessa amostra.";
+    return response.text;
+  } catch (error) {
+    console.error("Erro na analise de evidencia (Gemini):", error);
+    return "A análise forense foi interrompida devido a uma falha no equipamento do laboratório.";
+  }
+};

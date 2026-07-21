@@ -43,12 +43,20 @@ const MapOverview: React.FC = () => {
 
         {/* Barra de Progresso Global */}
         <div style={{ padding: '0 24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <span style={{ color: '#8E989F', fontSize: '11px', fontWeight: 600 }}>Exploração da Mansão</span>
-            <span style={{ color: '#C5A880', fontSize: '11px', fontWeight: 600 }}>68%</span>
-          </div>
-          <div style={{ height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
-            <div style={{ width: '68%', height: '100%', background: '#C5A880' }} />
+          <div style={{ 
+            background: 'rgba(255,255,255,0.02)', 
+            border: '1px solid rgba(255,255,255,0.05)', 
+            borderRadius: '16px', 
+            padding: '16px',
+            backdropFilter: 'blur(4px)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <span style={{ color: '#8E989F', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>Exploração da Mansão</span>
+              <span style={{ color: '#C5A880', fontSize: '11px', fontWeight: 600 }}>68%</span>
+            </div>
+            <div style={{ height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden' }}>
+              <div style={{ width: '68%', height: '100%', background: '#C5A880', borderRadius: '2px' }} />
+            </div>
           </div>
         </div>
       </div>

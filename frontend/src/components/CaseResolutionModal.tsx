@@ -12,19 +12,19 @@ const CaseResolutionModal: React.FC<CaseResolutionModalProps> = ({ onClose }) =>
 
   const questions = [
     {
-      title: 'Quem é o responsável principal?',
+      title: 'Quem orquestrou o crime desta noite?',
       options: ['Clara Mendes', 'Sr. Tomás Blackwell', 'Helena'],
-      correct: 'Sr. Tomás Blackwell'
+      correct: 'Clara Mendes'
     },
     {
-      title: 'Qual foi a motivação principal do crime?',
-      options: ['Disputa por herança', 'Vingança pessoal', 'Ocultar um segredo do passado'],
-      correct: 'Ocultar um segredo do passado'
+      title: 'Qual foi a verdadeira motivação do assassino?',
+      options: ['Disputa pela herança da família', 'Vingança meticulosamente orquestrada', 'Ocultar rituais do passado'],
+      correct: 'Vingança meticulosamente orquestrada'
     },
     {
-      title: 'Qual evidência chave comprova essa teoria?',
-      options: ['Carta Anônima', 'Diário de Elisa', 'Chave do quarto 7'],
-      correct: 'Diário de Elisa'
+      title: 'Qual evidência prova a premeditação e incrimina a mansão?',
+      options: ['Carta Anônima', 'Diário de Elisa', 'Mancha de Sangue'],
+      correct: 'Carta Anônima'
     }
   ];
 
@@ -51,7 +51,7 @@ const CaseResolutionModal: React.FC<CaseResolutionModalProps> = ({ onClose }) =>
           </div>
           <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '32px', color: '#F8F9FA', margin: '0 0 16px 0', fontWeight: 400 }}>Caso Encerrado</h2>
           <p style={{ color: '#8E989F', fontSize: '14px', lineHeight: 1.5, marginBottom: '32px', maxWidth: '300px', margin: '0 auto 32px auto' }}>
-            Sua dedução foi precisa. As peças se encaixam perfeitamente e a verdade sobre Blackwell House finalmente veio à tona.
+            Sua dedução foi genial. Clara forjou o próprio desaparecimento e plantou a carta falsa para incriminar o Sr. Tomás em vingança pela morte de Elisa. O feitiço virou contra o feiticeiro.
           </p>
           <button 
             onClick={onClose}

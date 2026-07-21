@@ -153,9 +153,9 @@ const SceneExplorer: React.FC = () => {
             <div style={{ flex: 1 }}>
               <div style={{ color: '#C5A880', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 600, marginBottom: '6px' }}>Dica da IA</div>
               <p style={{ color: '#F8F9FA', fontSize: '13px', margin: '0 0 8px 0', lineHeight: 1.5 }}>
-                A posição do copo e a mancha de sangue sugerem que houve uma discussão antes do crime.
+                Análise comportamental: As pistas (Carta e Chave) estão posicionadas de forma quase teatral, sugerindo uma cena montada.
               </p>
-              <div style={{ color: '#8E989F', fontSize: '11px' }}>Confiança: 68%</div>
+              <div style={{ color: '#8E989F', fontSize: '11px' }}>Confiança: 82%</div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', justifyContent: 'center' }}>
               <button style={{ background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '6px', color: '#8E989F', cursor: 'pointer' }}><ThumbsUp size={14} /></button>

@@ -56,10 +56,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const isImmersive = ['/map', '/scene', '/board', '/case-files', '/evidence'].some(p => location.pathname.includes(p));
 
   return <div className="app-shell">
-    <header className="topbar" style={{
-      position: scrolled || location.pathname !== '/' ? 'fixed' : 'absolute',
-      ...((scrolled || isImmersive) ? { background: 'rgba(10,13,16,0.1)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)', borderBottom: isImmersive ? '1px solid rgba(255,255,255,0.05)' : 'none' } : {}),
-    } as React.CSSProperties}>
+    <header className={`topbar ${(scrolled || isImmersive) ? 'topbar-glass' : ''} ${isImmersive ? 'topbar-immersive' : ''}`} style={{
+      position: scrolled || location.pathname !== '/' ? 'fixed' : 'absolute'
+    }}>
       {location.pathname !== '/' ? (
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <button aria-label="Ir para início" onClick={() => navigate('/')} style={{ background: 'none', border: 0 }}>

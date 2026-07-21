@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, FileText, Image as ImageIcon, Key } from 'lucide-react';
+import { Search, FileText, Image as ImageIcon, Key } from 'lucide-react';
 
 const CaseFiles: React.FC = () => {
   const navigate = useNavigate();
@@ -17,46 +17,43 @@ const CaseFiles: React.FC = () => {
 
   return (
     <div className="layout" style={{ 
-      backgroundColor: '#0a0a0a',
+      backgroundColor: '#0F1417',
       minHeight: '100vh',
       position: 'relative'
     }}>
-      <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', height: '100vh' }}>
+      <div style={{ padding: '80px 24px 96px 24px', display: 'flex', flexDirection: 'column', height: '100vh' }}>
         
         {/* Header */}
         <header style={{ marginBottom: '24px' }}>
-          <button onClick={() => navigate('/map/blackwell')} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px', padding: 0 }}>
-            <ArrowLeft size={20} /> Voltar
-          </button>
-          <span style={{ color: 'var(--accent-gold)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 600 }}>Inventário</span>
-          <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: '32px', margin: '4px 0', color: '#fff' }}>Arquivos do Caso</h1>
+          <span style={{ color: '#C5A880', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 600 }}>Inventário</span>
+          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '32px', margin: '4px 0', color: '#F8F9FA', fontWeight: 400 }}>Arquivos do Caso</h1>
         </header>
 
         {/* Search & Filters */}
         <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
-          <div style={{ flex: 1, background: 'rgba(255,255,255,0.05)', borderRadius: '8px', padding: '12px', display: 'flex', alignItems: 'center', gap: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>
-            <Search size={18} color="rgba(255,255,255,0.5)" />
-            <input type="text" placeholder="Buscar evidências..." style={{ background: 'none', border: 'none', color: '#fff', width: '100%', outline: 'none', fontSize: '14px' }} />
+          <div style={{ flex: 1, backgroundColor: '#13191C', borderRadius: '8px', padding: '12px', display: 'flex', alignItems: 'center', gap: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <Search size={18} color="#8E989F" />
+            <input type="text" placeholder="Buscar evidências..." style={{ background: 'none', border: 'none', color: '#F8F9FA', width: '100%', outline: 'none', fontSize: '14px' }} />
           </div>
         </div>
 
         <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '12px', marginBottom: '12px' }}>
-          <button onClick={() => setFilter('all')} style={{ background: filter === 'all' ? 'var(--accent-gold)' : 'rgba(255,255,255,0.05)', color: filter === 'all' ? '#000' : '#fff', border: 'none', padding: '8px 16px', borderRadius: '20px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>Todos</button>
-          <button onClick={() => setFilter('document')} style={{ background: filter === 'document' ? 'var(--accent-gold)' : 'rgba(255,255,255,0.05)', color: filter === 'document' ? '#000' : '#fff', border: 'none', padding: '8px 16px', borderRadius: '20px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>Documentos</button>
-          <button onClick={() => setFilter('item')} style={{ background: filter === 'item' ? 'var(--accent-gold)' : 'rgba(255,255,255,0.05)', color: filter === 'item' ? '#000' : '#fff', border: 'none', padding: '8px 16px', borderRadius: '20px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>Objetos</button>
-          <button onClick={() => setFilter('photo')} style={{ background: filter === 'photo' ? 'var(--accent-gold)' : 'rgba(255,255,255,0.05)', color: filter === 'photo' ? '#000' : '#fff', border: 'none', padding: '8px 16px', borderRadius: '20px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>Fotos</button>
+          <button onClick={() => setFilter('all')} style={{ background: filter === 'all' ? 'var(--olive)' : 'rgba(255,255,255,0.05)', color: filter === 'all' ? 'var(--paper)' : '#F8F9FA', border: 'none', padding: '8px 16px', borderRadius: '20px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>Todos</button>
+          <button onClick={() => setFilter('document')} style={{ background: filter === 'document' ? 'var(--olive)' : 'rgba(255,255,255,0.05)', color: filter === 'document' ? 'var(--paper)' : '#F8F9FA', border: 'none', padding: '8px 16px', borderRadius: '20px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>Documentos</button>
+          <button onClick={() => setFilter('item')} style={{ background: filter === 'item' ? 'var(--olive)' : 'rgba(255,255,255,0.05)', color: filter === 'item' ? 'var(--paper)' : '#F8F9FA', border: 'none', padding: '8px 16px', borderRadius: '20px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>Objetos</button>
+          <button onClick={() => setFilter('photo')} style={{ background: filter === 'photo' ? 'var(--olive)' : 'rgba(255,255,255,0.05)', color: filter === 'photo' ? 'var(--paper)' : '#F8F9FA', border: 'none', padding: '8px 16px', borderRadius: '20px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>Fotos</button>
         </div>
 
         {/* Grid */}
         <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', alignContent: 'start', overflowY: 'auto' }}>
           {filtered.map(item => (
-            <div key={item.id} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '16px', cursor: 'pointer' }} onClick={() => navigate(`/evidence/${item.id}`)}>
-              <div style={{ background: 'rgba(212,175,55,0.1)', width: '40px', height: '40px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-gold)', marginBottom: '12px' }}>
+            <div key={item.id} style={{ backgroundColor: '#13191C', border: '1px solid rgba(255,255,255,0.03)', borderRadius: '12px', padding: '16px', cursor: 'pointer' }} onClick={() => navigate(`/evidence/${item.id}`)}>
+              <div style={{ backgroundColor: 'rgba(197,168,128,0.1)', width: '40px', height: '40px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#C5A880', marginBottom: '12px' }}>
                 {item.icon}
               </div>
-              <div style={{ color: '#fff', fontSize: '14px', fontWeight: 600, marginBottom: '4px' }}>{item.title}</div>
-              <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '11px', lineHeight: 1.4, marginBottom: '12px' }}>{item.desc}</div>
-              <div style={{ color: 'var(--accent-gold)', fontSize: '10px', fontWeight: 600 }}>{item.date}</div>
+              <div style={{ color: '#F8F9FA', fontSize: '14px', fontWeight: 600, marginBottom: '4px' }}>{item.title}</div>
+              <div style={{ color: '#8E989F', fontSize: '11px', lineHeight: 1.4, marginBottom: '12px' }}>{item.desc}</div>
+              <div style={{ color: '#C5A880', fontSize: '10px', fontWeight: 600 }}>{item.date}</div>
             </div>
           ))}
         </div>

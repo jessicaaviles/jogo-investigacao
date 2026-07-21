@@ -1,9 +1,9 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Brain, Filter, MoreHorizontal } from 'lucide-react';
+
+import { Brain, Filter, MoreHorizontal } from 'lucide-react';
 
 const InvestigationBoard: React.FC = () => {
-  const navigate = useNavigate();
+  
 
   // Mock data for board items
   const items = [
@@ -26,96 +26,92 @@ const InvestigationBoard: React.FC = () => {
 
   return (
     <div className="layout" style={{ 
-      backgroundImage: 'url(/backgrounds/corkboard_texture.png)',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
+      backgroundColor: '#0F1417',
       minHeight: '100vh',
-      position: 'relative',
-      overflow: 'hidden'
+      position: 'relative'
     }}>
-      {/* Overlay */}
-      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 20%, rgba(0,0,0,0.4) 100%)', zIndex: 1, pointerEvents: 'none' }} />
-
-      <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', height: '100vh', padding: '24px' }}>
+      <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', height: '100vh', padding: '80px 24px 96px 24px' }}>
         
         {/* Header */}
         <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
           <div>
-            <button onClick={() => navigate('/map/blackwell')} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px', padding: 0 }}>
-              <ArrowLeft size={20} /> Voltar
-            </button>
-            <span style={{ color: 'var(--accent-gold)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 600 }}>Investigação</span>
-            <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: '32px', margin: '4px 0' }}>Mural de Conexões</h1>
-            <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '13px' }}>Conecte pistas, descubra relações e revele a verdade.</p>
+            <span style={{ color: '#C5A880', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 600 }}>Investigação</span>
+            <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '32px', margin: '4px 0', color: '#F8F9FA', fontWeight: 400 }}>Mural de Conexões</h1>
+            <p style={{ color: '#8E989F', fontSize: '13px' }}>Conecte pistas, descubra relações e revele a verdade.</p>
           </div>
-          <div style={{ display: 'flex', gap: '12px' }}>
-             <button style={{ background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '12px', borderRadius: '50%' }}><Filter size={18} /></button>
-             <button style={{ background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '12px', borderRadius: '50%' }}><MoreHorizontal size={18} /></button>
+          <div style={{ display: 'flex', gap: '8px' }}>
+             <button style={{ backgroundColor: '#13191C', border: '1px solid rgba(255,255,255,0.05)', color: '#F8F9FA', padding: '10px', borderRadius: '50%' }}><Filter size={16} /></button>
+             <button style={{ backgroundColor: '#13191C', border: '1px solid rgba(255,255,255,0.05)', color: '#F8F9FA', padding: '10px', borderRadius: '50%' }}><MoreHorizontal size={16} /></button>
           </div>
         </header>
 
         {/* Board Area */}
-        <div style={{ flex: 1, position: 'relative' }}>
+        <div style={{ flex: 1, position: 'relative', overflow: 'hidden', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', backgroundImage: 'url(/backgrounds/corkboard_texture.png)', backgroundSize: 'cover', backgroundPosition: 'center', boxShadow: 'inset 0 0 40px rgba(0,0,0,0.8)' }}>
+          {/* Overlay Escuro para o fundo de cortiça combinar com o app */}
+          <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', pointerEvents: 'none' }} />
+
           {/* We would draw SVG lines here connecting the pins */}
           
-          {items.map(item => (
-            <div key={item.id} style={{
-              position: 'absolute',
-              top: item.top,
-              left: item.left,
-              transform: 'translate(-50%, -50%) rotate(' + (Math.random() * 10 - 5) + 'deg)',
-              background: '#e8e4d9',
-              padding: '8px',
-              boxShadow: '2px 4px 10px rgba(0,0,0,0.5)',
-              width: item.type === 'note' ? '140px' : '110px',
-              cursor: 'grab'
-            }}>
-              {/* Pin */}
-              <div style={{ position: 'absolute', top: '-6px', left: '50%', transform: 'translateX(-50%)', width: '12px', height: '12px', borderRadius: '50%', background: '#991b1b', boxShadow: 'inset -2px -2px 4px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.5)' }} />
-              
-              {item.type !== 'note' && (
-                <div style={{ width: '100%', height: item.type === 'location' ? '70px' : '90px', background: '#333', marginBottom: '8px', backgroundImage: `url(${item.image})`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'sepia(0.3) contrast(1.1)' }} />
-              )}
-              {item.type === 'note' && (
-                <div style={{ fontFamily: '"Kalam", cursive', fontSize: '13px', color: '#1a1a1a', padding: '8px 4px', lineHeight: 1.4 }}>
-                  {item.text}
+          <div style={{ position: 'relative', width: '100%', height: '100%', zIndex: 2 }}>
+            {items.map(item => (
+              <div key={item.id} style={{
+                position: 'absolute',
+                top: item.top,
+                left: item.left,
+                transform: 'translate(-50%, -50%) rotate(' + (Math.random() * 8 - 4) + 'deg)',
+                backgroundColor: 'var(--paper)',
+                padding: '6px',
+                boxShadow: '2px 4px 10px rgba(0,0,0,0.5)',
+                width: item.type === 'note' ? '120px' : '90px',
+                cursor: 'grab'
+              }}>
+                {/* Pin */}
+                <div style={{ position: 'absolute', top: '-6px', left: '50%', transform: 'translateX(-50%)', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#991b1b', boxShadow: 'inset -2px -2px 4px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.5)' }} />
+                
+                {item.type !== 'note' && (
+                  <div style={{ width: '100%', height: item.type === 'location' ? '50px' : '70px', backgroundColor: '#333', marginBottom: '6px', backgroundImage: `url(${item.image})`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'sepia(0.3) contrast(1.1)' }} />
+                )}
+                {item.type === 'note' && (
+                  <div style={{ fontFamily: '"Kalam", cursive', fontSize: '11px', color: '#1a1a1a', padding: '6px 2px', lineHeight: 1.4 }}>
+                    {item.text}
+                  </div>
+                )}
+                
+                <div style={{ fontFamily: '"Kalam", cursive', fontSize: '10px', color: '#333', textAlign: 'center' }}>
+                  {item.label}
                 </div>
-              )}
-              
-              <div style={{ fontFamily: '"Kalam", cursive', fontSize: '12px', color: '#333', textAlign: 'center' }}>
-                {item.label}
-              </div>
 
-              {item.note && (
-                <div style={{ position: 'absolute', bottom: '-15px', right: '-20px', background: '#eab308', padding: '4px 8px', fontSize: '10px', fontFamily: '"Kalam", cursive', color: '#000', transform: 'rotate(-5deg)', boxShadow: '1px 2px 4px rgba(0,0,0,0.3)' }}>
-                  {item.note}
-                </div>
-              )}
-            </div>
-          ))}
+                {item.note && (
+                  <div style={{ position: 'absolute', bottom: '-10px', right: '-15px', backgroundColor: '#eab308', padding: '2px 6px', fontSize: '9px', fontFamily: '"Kalam", cursive', color: '#000', transform: 'rotate(-5deg)', boxShadow: '1px 2px 4px rgba(0,0,0,0.3)', zIndex: 3, whiteSpace: 'nowrap' }}>
+                    {item.note}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Bottom AI Panel */}
         <div style={{ display: 'flex', gap: '16px', marginTop: '24px' }}>
           <button style={{ 
-            flex: 1, background: 'rgba(20,20,20,0.9)', border: '1px solid rgba(255,255,255,0.1)', 
+            flex: 1, backgroundColor: '#13191C', border: '1px solid rgba(197, 168, 128, 0.2)', 
             padding: '16px', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '16px', cursor: 'pointer' 
           }}>
-            <div style={{ color: 'var(--accent-gold)' }}><Brain size={32} /></div>
+            <div style={{ color: '#C5A880' }}><Brain size={32} /></div>
             <div style={{ textAlign: 'left' }}>
-              <div style={{ color: '#fff', fontSize: '14px', fontWeight: 600 }}>Análise da IA <span style={{ background: '#991b1b', padding: '2px 6px', borderRadius: '10px', fontSize: '10px', marginLeft: '8px' }}>3</span></div>
-              <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px' }}>Padrões detectados</div>
+              <div style={{ color: '#F8F9FA', fontSize: '14px', fontWeight: 600 }}>Análise da IA <span style={{ backgroundColor: '#991b1b', color: '#fff', padding: '2px 6px', borderRadius: '10px', fontSize: '10px', marginLeft: '8px' }}>3</span></div>
+              <div style={{ color: '#8E989F', fontSize: '12px' }}>Padrões detectados</div>
             </div>
           </button>
           
           <div style={{ 
-            flex: 1, background: 'rgba(20,20,20,0.9)', border: '1px solid rgba(255,255,255,0.1)', 
+            flex: 1, backgroundColor: '#13191C', border: '1px solid rgba(255,255,255,0.05)', 
             padding: '16px', borderRadius: '16px' 
           }}>
-            <div style={{ color: 'var(--accent-gold)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Conexões Feitas</div>
-            <div style={{ color: '#fff', fontSize: '20px', fontWeight: 300, marginBottom: '8px' }}>{connections.length} <span style={{ fontSize: '14px', color: 'rgba(255,255,255,0.3)' }}>/ 12</span></div>
-            <div style={{ width: '100%', height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px' }}>
-              <div style={{ width: `${(connections.length / 12) * 100}%`, height: '100%', background: 'var(--accent-gold)', borderRadius: '2px' }} />
+            <div style={{ color: '#C5A880', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Conexões Feitas</div>
+            <div style={{ color: '#F8F9FA', fontSize: '20px', fontWeight: 300, marginBottom: '8px' }}>{connections.length} <span style={{ fontSize: '14px', color: '#8E989F' }}>/ 12</span></div>
+            <div style={{ width: '100%', height: '4px', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '2px' }}>
+              <div style={{ width: `${(connections.length / 12) * 100}%`, height: '100%', backgroundColor: '#C5A880', borderRadius: '2px' }} />
             </div>
           </div>
         </div>

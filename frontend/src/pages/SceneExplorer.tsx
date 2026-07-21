@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Flashlight, Eye, MessageSquare, Briefcase, Plus, Trophy } from 'lucide-react';
+import { Flashlight, Eye } from 'lucide-react';
 
 const SceneExplorer: React.FC = () => {
-  const navigate = useNavigate();
+  
   const [uvLight, setUvLight] = useState(false);
   const [discoveredClues, setDiscoveredClues] = useState<string[]>([]);
   const [showHint, setShowHint] = useState(true);
@@ -36,16 +35,13 @@ const SceneExplorer: React.FC = () => {
       {/* Overlay gradient */}
       <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 20%, rgba(0,0,0,0.1) 70%, rgba(0,0,0,0.9) 100%)', zIndex: 1, pointerEvents: 'none' }} />
 
-      <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', height: '100vh' }}>
+      <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', height: '100vh', paddingTop: '80px' }}>
         
         {/* Header */}
-        <header style={{ padding: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <header style={{ padding: '0 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
-            <button onClick={() => navigate('/map/blackwell')} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px', padding: 0 }}>
-              <ArrowLeft size={20} /> Voltar
-            </button>
-            <span style={{ color: 'var(--accent-gold)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 600 }}>Cena do Crime</span>
-            <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: '32px', margin: '4px 0' }}>Sala de Estar</h1>
+            <span style={{ color: '#C5A880', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 600 }}>Cena do Crime</span>
+            <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '32px', margin: '4px 0', color: '#F8F9FA', fontWeight: 400 }}>Sala de Estar</h1>
             <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '13px' }}>Explore a cena. Cada detalhe pode ser uma pista.</p>
             
             <div style={{ marginTop: '16px', display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(0,0,0,0.6)', padding: '8px 16px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.1)' }}>
@@ -58,13 +54,7 @@ const SceneExplorer: React.FC = () => {
             <div style={{ display: 'flex', gap: '12px' }}>
               <button 
                 onClick={() => setUvLight(!uvLight)}
-                style={{ 
-                  background: uvLight ? 'rgba(138,43,226,0.8)' : 'rgba(0,0,0,0.6)', 
-                  border: `1px solid ${uvLight ? 'rgba(138,43,226,1)' : 'rgba(255,255,255,0.2)'}`, 
-                  color: '#fff', padding: '12px', borderRadius: '50%', cursor: 'pointer',
-                  boxShadow: uvLight ? '0 0 20px rgba(138,43,226,0.5)' : 'none',
-                  transition: 'all 0.3s ease'
-                }}
+                style={{ background: uvLight ? 'var(--accent-gold)' : 'rgba(0,0,0,0.6)', color: uvLight ? '#000' : '#fff', border: '1px solid ' + (uvLight ? 'var(--accent-gold)' : 'rgba(255,255,255,0.2)'), padding: '12px', borderRadius: '50%', cursor: 'pointer', transition: 'all 0.3s ease' }}
               >
                 <Flashlight size={20} />
               </button>
@@ -83,43 +73,52 @@ const SceneExplorer: React.FC = () => {
           </div>
         </header>
 
-        {/* Hotspots Container */}
+        {/* Hotspots */}
         <div style={{ flex: 1, position: 'relative' }}>
-          {hotspots.map(spot => {
-            const isVisible = spot.requiresUv ? uvLight : true;
-            if (!isVisible) return null;
-            
+          {hotspots.map(hotspot => {
+            if (hotspot.requiresUv && !uvLight) return null;
+
             return (
               <div 
-                key={spot.id}
-                onClick={() => handleHotspotClick(spot.id, spot.requiresUv)}
-                style={{
-                  position: 'absolute',
-                  top: spot.top,
-                  left: spot.left,
+                key={hotspot.id} 
+                onClick={() => handleHotspotClick(hotspot.id, hotspot.requiresUv)}
+                style={{ 
+                  position: 'absolute', 
+                  top: hotspot.top, 
+                  left: hotspot.left,
                   display: 'flex',
+                  flexDirection: 'column',
                   alignItems: 'center',
-                  gap: '8px',
-                  cursor: 'pointer',
-                  opacity: spot.isFound ? 0.6 : 1,
-                  transform: spot.isFound ? 'scale(0.9)' : 'scale(1)',
-                  transition: 'all 0.3s ease'
+                  cursor: 'pointer'
                 }}
               >
-                <div style={{
-                  width: '24px', height: '24px', borderRadius: '50%',
-                  background: spot.isFound ? 'rgba(0,0,0,0.6)' : (spot.requiresUv ? 'rgba(138,43,226,0.8)' : 'rgba(212,175,55,0.8)'),
-                  border: `2px solid ${spot.isFound ? 'rgba(255,255,255,0.3)' : (spot.requiresUv ? '#fff' : '#fff')}`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  boxShadow: spot.isFound ? 'none' : `0 0 15px ${spot.requiresUv ? 'rgba(138,43,226,0.8)' : 'rgba(212,175,55,0.5)'}`
+                <div style={{ 
+                  width: '24px', 
+                  height: '24px', 
+                  borderRadius: '50%', 
+                  background: hotspot.isFound ? (hotspot.requiresUv ? '#eab308' : 'var(--accent-gold)') : 'transparent', 
+                  border: `2px solid ${hotspot.requiresUv ? '#eab308' : 'var(--accent-gold)'}`,
+                  boxShadow: hotspot.isFound ? `0 0 15px ${hotspot.requiresUv ? '#eab308' : 'var(--accent-gold)'}` : 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '8px'
                 }}>
-                  <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#fff' }} />
+                  {hotspot.isFound && <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#fff' }} />}
                 </div>
-                <div style={{ background: 'rgba(0,0,0,0.7)', padding: '6px 12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>
-                  <div style={{ color: '#fff', fontSize: '12px', fontWeight: 500 }}>{spot.label}</div>
-                  <div style={{ color: spot.isFound ? 'rgba(255,255,255,0.5)' : (spot.requiresUv ? '#b088ff' : 'var(--accent-gold)'), fontSize: '10px' }}>
-                    {spot.isFound ? 'Verificada' : 'Investigar'}
-                  </div>
+                
+                <div style={{ 
+                  background: 'rgba(0,0,0,0.7)', 
+                  padding: '4px 8px', 
+                  borderRadius: '4px', 
+                  color: '#fff', 
+                  fontSize: '11px',
+                  opacity: hotspot.isFound ? 1 : 0.5,
+                  transition: 'opacity 0.3s',
+                  pointerEvents: 'none',
+                  border: `1px solid ${hotspot.requiresUv ? '#eab308' : 'rgba(255,255,255,0.1)'}`
+                }}>
+                  {hotspot.label}
                 </div>
               </div>
             );
@@ -139,41 +138,12 @@ const SceneExplorer: React.FC = () => {
                 <div style={{ color: 'var(--accent-gold)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>Dica da IA</div>
                 <div style={{ color: '#fff', fontSize: '13px', lineHeight: 1.4 }}>A posição do copo e a mancha de sangue sugerem que houve uma discussão antes do crime.</div>
               </div>
-              <button onClick={() => setShowHint(false)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', cursor: 'pointer' }}><ArrowLeft size={16} style={{ transform: 'rotate(-90deg)' }} /></button>
+              <button onClick={() => setShowHint(false)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', cursor: 'pointer', fontSize: '24px', lineHeight: 1 }}>×</button>
             </div>
           )}
 
-          {/* Bottom Nav Bar (Standardized) */}
-          <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', background: 'rgba(20,20,20,0.95)', borderTop: '1px solid rgba(255,255,255,0.1)', padding: '16px', margin: '0 -24px -24px -24px' }}>
-            <button className="nav-item">
-              <Eye size={20} />
-              <span>Início</span>
-            </button>
-            <button className="nav-item active">
-              <Briefcase size={20} />
-              <span>Casos</span>
-            </button>
-            <button className="nav-fab">
-              <Plus size={24} />
-            </button>
-            <button className="nav-item">
-              <MessageSquare size={20} />
-              <span>Mensagens</span>
-            </button>
-            <button className="nav-item">
-              <Trophy size={20} />
-              <span>Ranking</span>
-            </button>
-          </div>
-
         </div>
       </div>
-      
-      <style>{`
-        .nav-item { background: none; border: none; color: rgba(255,255,255,0.4); display: flex; flexDirection: column; alignItems: center; gap: 4px; font-size: 10px; cursor: pointer; }
-        .nav-item.active { color: var(--accent-gold); }
-        .nav-fab { background: #4a2b2b; border: 1px solid rgba(255,255,255,0.1); color: #fff; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transform: translateY(-20px); }
-      `}</style>
     </div>
   );
 };

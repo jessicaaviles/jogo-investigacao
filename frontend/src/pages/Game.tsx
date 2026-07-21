@@ -4,6 +4,15 @@ import { Mic, Square, Volume2 } from 'lucide-react';
 import { useSocket } from '../contexts/useSocket';
 import Loading from '../components/Loading';
 
+const dedupeHints = (hintsList: any[]) => {
+  const seen = new Set();
+  return hintsList.filter(h => {
+    const idx = h.hintIndex || h.hint_index;
+    if (seen.has(idx)) return false;
+    seen.add(idx);
+    return true;
+  });
+};
 const Game: React.FC = () => {
   const { roomId } = useParams();
   const navigate = useNavigate();

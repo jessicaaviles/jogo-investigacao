@@ -14,7 +14,7 @@ const SceneExplorer: React.FC = () => {
   
   const sceneConfig: Record<string, any> = {
     living_room: {
-      title: 'Sala de Estar', subtitle: 'Cena do Crime', bg: '/backgrounds/scene_living_room.png?v=4',
+      title: 'Sala de Estar', subtitle: 'Cena do Crime', bg: '/backgrounds/scene_living_room.png?v=5',
       hotspots: [
         { id: 'fireplace', label: 'Restos na Lareira', subLabel: 'Passagem aérea', top: '40%', left: '80%' },
         { id: 'blood', label: 'Sangue Artificial', subLabel: 'Sem respingos', top: '90%', left: '75%', requiresUv: true },
@@ -22,7 +22,7 @@ const SceneExplorer: React.FC = () => {
       ]
     },
     library: {
-      title: 'Biblioteca', subtitle: 'Escritório de Tomás', bg: '/backgrounds/scene_library.png?v=4',
+      title: 'Biblioteca', subtitle: 'Escritório de Tomás', bg: '/backgrounds/scene_library.png?v=5',
       hotspots: [
         { id: 'desk_letter', label: 'Carta de Helena', subLabel: 'Aviso urgente', top: '65%', left: '55%' },
         { id: 'safe', label: 'Cofre Oculto', subLabel: 'Trancado e vazio?', top: '50%', left: '22%' },
@@ -30,7 +30,7 @@ const SceneExplorer: React.FC = () => {
       ]
     },
     bedroom: {
-      title: 'Quarto Principal', subtitle: 'Aposentos de Clara', bg: '/backgrounds/scene_bedroom.png?v=4',
+      title: 'Quarto Principal', subtitle: 'Aposentos de Clara', bg: '/backgrounds/scene_bedroom.png?v=5',
       hotspots: [
         { id: 'mirror_msg', label: 'Mensagem no Espelho', subLabel: 'Escrita em segredo', top: '35%', left: '70%', requiresUv: true },
         { id: 'suitcase', label: 'Mala', subLabel: 'Roupas de frio intenso', top: '80%', left: '60%' },
@@ -38,7 +38,7 @@ const SceneExplorer: React.FC = () => {
       ]
     },
     garden: {
-      title: 'Jardins', subtitle: 'Área Externa', bg: '/backgrounds/scene_garden.png?v=4',
+      title: 'Jardins', subtitle: 'Área Externa', bg: '/backgrounds/scene_garden.png?v=5',
       hotspots: [
         { id: 'fountain', label: 'Fonte de Pedra', subLabel: 'Livro-caixa queimado', top: '70%', left: '30%' },
         { id: 'mud', label: 'Pegadas na Lama', subLabel: 'Duas pessoas', top: '85%', left: '65%' },
@@ -57,18 +57,18 @@ const SceneExplorer: React.FC = () => {
   };
 
   const clueImages: Record<string, string> = {
-    fireplace: '/backgrounds/ev_matches.png?v=6',
-    blood: '/backgrounds/ev_receipt.png?v=6',
-    wine_glass: '/backgrounds/ev_glass.png?v=6',
-    desk_letter: '/backgrounds/ev_ledger.png?v=6',
-    safe: '/backgrounds/ev_safe.png?v=6',
-    cigar: '/backgrounds/ev_cigar.png?v=6',
-    mirror_msg: '/backgrounds/ev_mirror.png?v=6',
-    suitcase: '/backgrounds/ev_suitcase.png?v=6',
-    pills: '/backgrounds/ev_pills.png?v=6',
-    fountain: '/backgrounds/ev_fountain.png?v=6',
-    mud: '/backgrounds/ev_mud.png?v=6',
-    animal_bones: '/backgrounds/ev_bones.png?v=6'
+    fireplace: '/backgrounds/ev_matches.png?v=7',
+    blood: '/backgrounds/ev_receipt.png?v=7',
+    wine_glass: '/backgrounds/ev_glass.png?v=7',
+    desk_letter: '/backgrounds/ev_ledger.png?v=7',
+    safe: '/backgrounds/ev_safe.png?v=7',
+    cigar: '/backgrounds/ev_cigar.png?v=7',
+    mirror_msg: '/backgrounds/ev_mirror.png?v=7',
+    suitcase: '/backgrounds/ev_suitcase.png?v=7',
+    pills: '/backgrounds/ev_pills.png?v=7',
+    fountain: '/backgrounds/ev_fountain.png?v=7',
+    mud: '/backgrounds/ev_mud.png?v=7',
+    animal_bones: '/backgrounds/ev_bones.png?v=7'
   };
 
   const foundClues = discoveredClues

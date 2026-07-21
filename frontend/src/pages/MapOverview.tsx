@@ -42,8 +42,8 @@ const MapOverview: React.FC = () => {
         {/* Tabs */}
         <div style={{ display: 'flex', gap: '24px', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: 'auto' }}>
           <button style={{ background: 'none', border: 'none', borderBottom: '2px solid var(--accent-gold)', color: 'var(--accent-gold)', padding: '12px 0', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', cursor: 'pointer' }}>Mapa</button>
-          <button style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', padding: '12px 0', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', cursor: 'pointer' }}>Pistas</button>
-          <button style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', padding: '12px 0', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', cursor: 'pointer' }}>Pessoas</button>
+          <button onClick={() => navigate('/case-files/active')} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', padding: '12px 0', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', cursor: 'pointer' }}>Pistas</button>
+          <button onClick={() => navigate('/board/active')} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', padding: '12px 0', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', cursor: 'pointer' }}>Mural</button>
         </div>
 
         {/* Map Pins */}

@@ -54,12 +54,56 @@ const Cases: React.FC = () => {
             tension: item.tension_level, image, cover_image_data: item.cover_image_data
           };
         });
-        setCases(mapped);
+        
+        // Injetar caso do protótipo imersivo para demonstração
+        const blackwellCase = {
+          slug: 'blackwell-house',
+          title: 'O Segredo de Blackwell House',
+          synopsis: 'Explore os locais, encontre pistas e descubra o que realmente aconteceu.',
+          type: 'Mistério',
+          duration: '60 min',
+          difficulty: 'Média' as const,
+          players: '1-4 Jogadores',
+          tension: 4,
+          image: '/backgrounds/map_blackwell.png',
+          cover_image_data: null
+        };
+        
+        setCases([...mapped, blackwellCase]);
+      } else {
+        // Se a API não retornar nada, pelo menos mostre o caso de demonstração
+        setCases([{
+          slug: 'blackwell-house',
+          title: 'O Segredo de Blackwell House',
+          synopsis: 'Explore os locais, encontre pistas e descubra o que realmente aconteceu.',
+          type: 'Mistério',
+          duration: '60 min',
+          difficulty: 'Média' as const,
+          players: '1-4 Jogadores',
+          tension: 4,
+          image: '/backgrounds/map_blackwell.png',
+          cover_image_data: null
+        }]);
       }
       setLoading(false);
     }).catch((err) => {
       console.error(err);
       setError('Não foi possível carregar os casos. Tente novamente mais tarde.');
+      
+      // Fallback para exibir o protótipo mesmo com erro na API
+      setCases([{
+        slug: 'blackwell-house',
+        title: 'O Segredo de Blackwell House',
+        synopsis: 'Explore os locais, encontre pistas e descubra o que realmente aconteceu.',
+        type: 'Mistério',
+        duration: '60 min',
+        difficulty: 'Média' as const,
+        players: '1-4 Jogadores',
+        tension: 4,
+        image: '/backgrounds/map_blackwell.png',
+        cover_image_data: null
+      }]);
+      
       setLoading(false);
     });
   }, [user?.userId]);

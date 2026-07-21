@@ -21,6 +21,9 @@ import Briefing from './pages/Briefing';
 import RoomEntry from './pages/RoomEntry';
 import MapOverview from './pages/MapOverview';
 import SceneExplorer from './pages/SceneExplorer';
+import InvestigationBoard from './pages/InvestigationBoard';
+import CaseFiles from './pages/CaseFiles';
+import EvidenceAnalysis from './pages/EvidenceAnalysis';
 import Layout from './components/Layout';
 import { SocketNotificationsBridge } from './contexts/SocketNotificationsBridge';
 import './App.css';
@@ -57,6 +60,9 @@ function App() {
             {/* Immersive Redesign Prototypes */}
             <Route path="/map/:caseId" element={<Layout><ProtectedRoute><MapOverview /></ProtectedRoute></Layout>} />
             <Route path="/scene/:sceneId" element={<Layout><ProtectedRoute><SceneExplorer /></ProtectedRoute></Layout>} />
+            <Route path="/board/:caseId" element={<Layout><ProtectedRoute><InvestigationBoard /></ProtectedRoute></Layout>} />
+            <Route path="/case-files/:caseId" element={<Layout><ProtectedRoute><CaseFiles /></ProtectedRoute></Layout>} />
+            <Route path="/evidence/:evidenceId" element={<Layout><ProtectedRoute><EvidenceAnalysis /></ProtectedRoute></Layout>} />
           </Routes>
         </BrowserRouter>
       </div>

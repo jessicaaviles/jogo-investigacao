@@ -9,16 +9,14 @@ const MapOverview: React.FC = () => {
 
   const { discoveredClues } = useInvestigation();
   const libraryUnlocked = discoveredClues.includes('fireplace');
+  const bedroomUnlocked = discoveredClues.includes('desk_letter');
   const gardenUnlocked = discoveredClues.includes('mirror_msg');
 
   const locations = [
-    { id: 'attic', title: 'Sótão', status: 'locked', top: '15%', left: '75%', totalPistas: 2, clueIds: [], image: '/backgrounds/scene_bedroom_landscape.png?v=11', desc: 'Espaço escuro e empoeirado, trancado há anos.' },
-    { id: 'room7', title: 'Quarto 7', status: 'locked', top: '25%', left: '50%', totalPistas: 4, clueIds: [], image: '/backgrounds/scene_bedroom_landscape.png?v=11', desc: 'Um quarto de hóspedes isolado.' },
-    { id: 'library', title: 'Biblioteca', status: libraryUnlocked ? 'investigating' : 'locked', top: '35%', left: '85%', totalPistas: 3, clueIds: ['desk_letter', 'safe', 'cigar'], image: '/backgrounds/scene_library_landscape.png?v=11', desc: 'O escritório particular e santuário do Tomás.' },
-    { id: 'living_room', title: 'Sala de Estar', status: 'investigating', top: '40%', left: '20%', totalPistas: 5, clueIds: ['fireplace', 'blood', 'wine_glass'], image: '/backgrounds/scene_living_room_landscape.png?v=11', desc: 'Principal ponto de encontro da família. Foi aqui que Clara Mendes foi vista pela última vez.' },
-    { id: 'garden', title: 'Jardim', status: gardenUnlocked ? 'investigating' : 'locked', top: '65%', left: '50%', totalPistas: 3, clueIds: ['fountain', 'mud', 'animal_bones'], image: '/backgrounds/scene_garden_landscape.png?v=11', desc: 'Os vastos jardins da mansão contêm mais segredos do que parecem.' },
-    { id: 'cliff', title: 'Falésia', status: 'locked', top: '80%', left: '15%', totalPistas: 2, clueIds: [], image: '/backgrounds/scene_garden_landscape.png?v=11', desc: 'As pedras escorregadias perto do mar.' },
-    { id: 'garage', title: 'Garagem', status: 'locked', top: '82%', left: '85%', totalPistas: 2, clueIds: [], image: '/backgrounds/scene_library_landscape.png?v=11', desc: 'Onde ficam os carros da família. Um veículo está faltando.' },
+    { id: 'bedroom', title: 'Quarto Principal', status: bedroomUnlocked ? 'investigating' : 'locked', top: '35%', left: '40%', totalPistas: 3, clueIds: ['mirror_msg', 'suitcase', 'pills'], image: '/backgrounds/scene_bedroom_landscape.png?v=11', desc: 'Aposentos de Clara. Um cômodo cheio de segredos bem guardados.' },
+    { id: 'library', title: 'Biblioteca', status: libraryUnlocked ? 'investigating' : 'locked', top: '45%', left: '75%', totalPistas: 3, clueIds: ['desk_letter', 'safe', 'cigar'], image: '/backgrounds/scene_library_landscape.png?v=11', desc: 'O escritório particular e santuário de Tomás.' },
+    { id: 'living_room', title: 'Sala de Estar', status: 'investigating', top: '55%', left: '25%', totalPistas: 3, clueIds: ['fireplace', 'blood', 'wine_glass'], image: '/backgrounds/scene_living_room_landscape.png?v=11', desc: 'Principal ponto de encontro da família. Foi aqui que Clara Mendes foi vista pela última vez.' },
+    { id: 'garden', title: 'Jardim', status: gardenUnlocked ? 'investigating' : 'locked', top: '75%', left: '50%', totalPistas: 3, clueIds: ['fountain', 'mud', 'animal_bones'], image: '/backgrounds/scene_garden_landscape.png?v=11', desc: 'Os vastos jardins da mansão contêm mais segredos do que parecem.' }
   ];
 
   const totalPossibleClues = 12;
@@ -155,7 +153,7 @@ const MapOverview: React.FC = () => {
       </div>
 
       {/* Card Fixo de Local em Destaque (Bottom Card) */}
-      <div style={{ position: 'relative', zIndex: 3, padding: '0 16px', marginBottom: '24px' }}>
+      <div style={{ position: 'relative', zIndex: 3, padding: '0 16px', marginBottom: '100px' }}>
         <div style={{
           background: '#0D1115',
           border: '1px solid rgba(255,255,255,0.05)',

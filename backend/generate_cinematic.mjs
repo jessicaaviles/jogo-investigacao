@@ -7,19 +7,19 @@ const STYLE_PREFIX = `Dark cinematic noir aesthetic, photorealistic, high-detail
 const ROOMS = [
   {
     id: 'scene_living_room',
-    prompt: `${STYLE_PREFIX} A luxurious old living room at night, dimly lit by a fireplace. In the fireplace, faint burned paper remnants glow. On the dark carpet, a subtle blood stain is barely visible. Near an armchair, shards of a broken wine glass are scattered on the floor. Each clue has a small glowing amber circular marker hovering above it.`,
+    prompt: `${STYLE_PREFIX} A luxurious old living room at night, dimly lit by a fireplace. In the fireplace, faint burned paper remnants glow. On the dark carpet, a subtle blood stain is barely visible. Near an armchair, shards of a broken wine glass are scattered on the floor.`,
   },
   {
     id: 'scene_library',
-    prompt: `${STYLE_PREFIX} A classic dark library with tall bookshelves. On the main desk, an opened letter with a red seal lies under a book. A small wall safe is visible behind a slightly displaced painting. In a crystal ashtray on the desk, a half-smoked premium cigar rests. Each clue has a small glowing amber circular marker hovering above it.`,
+    prompt: `${STYLE_PREFIX} A classic dark library with tall bookshelves. On the main desk, an opened letter with a red seal lies under a book. A small wall safe is visible behind a slightly displaced painting. In a crystal ashtray on the desk, a half-smoked premium cigar rests.`,
   },
   {
     id: 'scene_bedroom',
-    prompt: `${STYLE_PREFIX} A grand master bedroom with an unmade canopy bed. On the vanity, an antique mirror reflects a faint message written on its surface. A open leather suitcase filled with heavy winter coats sits on the floor. On the nightstand, a spilled bottle of pills lies on its side. Each clue has a small glowing amber circular marker hovering above it.`,
+    prompt: `${STYLE_PREFIX} A grand master bedroom with an unmade canopy bed. On the vanity, an antique mirror reflects a faint message written on its surface. A open leather suitcase filled with heavy winter coats sits on the floor. On the nightstand, a spilled bottle of pills lies on its side.`,
   },
   {
     id: 'scene_garden',
-    prompt: `${STYLE_PREFIX} A dark misty garden at night with an old stone fountain. Near the fountain base, a charred ledger book with leather binding lies half-buried. On the muddy path, two sets of footprints lead away from the house. Scattered bones with a small collar lie near the iron gate. Each clue has a small glowing amber circular marker hovering above it.`,
+    prompt: `${STYLE_PREFIX} A dark misty garden at night with an old stone fountain. Near the fountain base, a charred ledger book with leather binding lies half-buried. On the muddy path, two sets of footprints lead away from the house. Scattered bones with a small collar lie near the iron gate.`,
   },
 ];
 

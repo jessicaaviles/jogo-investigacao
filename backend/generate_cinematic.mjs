@@ -2,7 +2,7 @@ import { GoogleGenAI } from '@google/genai';
 import fs from 'fs';
 import path from 'path';
 
-const STYLE_PREFIX = `Cinematic mystery game background, photorealistic, high-detail, film-quality rendering. Moody low-key lighting but with clear visibility of objects, deep shadows, warm golden spotlights illuminating key items. Color palette: desaturated cool shadows (deep teals, navy) with selective warm tones (amber, gold). Atmospheric haze. No text overlays. 16:9 aspect ratio.`;
+const STYLE_PREFIX = `Cinematic mystery game background, photorealistic, high-detail, film-quality rendering. Moody low-key lighting but with clear visibility of objects, deep shadows, warm golden spotlights illuminating key items. Color palette: desaturated cool shadows (deep teals, navy) with selective warm tones (amber, gold). Atmospheric haze. No text overlays.`;
 
 const ROOMS = [
   {
@@ -100,16 +100,30 @@ async function main() {
   const ai = new GoogleGenAI({ apiKey });
   console.log(`Generating ${ROOMS.length} room scenes and ${CLUES.length} clue images...\n`);
 
-  // Generate room scenes
+  // Generate room scenes (Landscape and Portrait)
   for (let i = 0; i < ROOMS.length; i++) {
     const room = ROOMS[i];
-    console.log(`[${i + 1}/${ROOMS.length}] Generating room: ${room.id}...`);
+    
+    // Landscape
+    console.log(`[${i + 1}/${ROOMS.length}] Generating room (Landscape): ${room.id}...`);
     try {
-      const buffer = await generateImage(ai, room.prompt);
-      fs.writeFileSync(path.join(outputPath, `${room.id}.png`), buffer);
-      console.log(`  ✅ Saved ${room.id}.png`);
+      const promptLandscape = room.prompt + " 16:9 aspect ratio.";
+      const buffer = await generateImage(ai, promptLandscape);
+      fs.writeFileSync(path.join(outputPath, `${room.id}_landscape.png`), buffer);
+      console.log(`  ✅ Saved ${room.id}_landscape.png`);
     } catch (e) {
-      console.error(`  ❌ Failed: ${e.message}`);
+      console.error(`  ❌ Failed (Landscape): ${e.message}`);
+    }
+
+    // Portrait
+    console.log(`[${i + 1}/${ROOMS.length}] Generating room (Portrait): ${room.id}...`);
+    try {
+      const promptPortrait = room.prompt + " 9:16 aspect ratio.";
+      const buffer = await generateImage(ai, promptPortrait);
+      fs.writeFileSync(path.join(outputPath, `${room.id}_portrait.png`), buffer);
+      console.log(`  ✅ Saved ${room.id}_portrait.png`);
+    } catch (e) {
+      console.error(`  ❌ Failed (Portrait): ${e.message}`);
     }
   }
 

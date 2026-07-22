@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronDown, ThumbsUp, ThumbsDown, Brain, X } from 'lucide-react';
 import { useInvestigation } from '../contexts/InvestigationContext';
@@ -9,37 +9,65 @@ const SceneExplorer: React.FC = () => {
   const [showMapModal, setShowMapModal] = useState(false);
   const { discoveredClues, addClue } = useInvestigation();
 
+  const [isPortrait, setIsPortrait] = useState(window.innerHeight > window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setIsPortrait(window.innerHeight > window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const { sceneId } = useParams<{ sceneId: string }>();
   const id = sceneId || 'living_room';
   
   const sceneConfig: Record<string, any> = {
     living_room: {
-      title: 'Sala de Estar', subtitle: 'Cena do Crime', bg: '/backgrounds/scene_living_room.png?v=9',
-      hotspots: [
+      title: 'Sala de Estar', subtitle: 'Cena do Crime', bgBase: '/backgrounds/scene_living_room',
+      hotspotsLandscape: [
+        { id: 'fireplace', label: 'Restos na Lareira', subLabel: 'Passagem aérea', top: '40%', left: '80%' },
+        { id: 'blood', label: 'Sangue Artificial', subLabel: 'Sem respingos', top: '90%', left: '75%', requiresUv: true },
+        { id: 'wine_glass', label: 'Taça Quebrada', subLabel: 'Briga ou acidente?', top: '75%', left: '25%' },
+      ],
+      hotspotsPortrait: [
         { id: 'fireplace', label: 'Restos na Lareira', subLabel: 'Passagem aérea', top: '40%', left: '80%' },
         { id: 'blood', label: 'Sangue Artificial', subLabel: 'Sem respingos', top: '90%', left: '75%', requiresUv: true },
         { id: 'wine_glass', label: 'Taça Quebrada', subLabel: 'Briga ou acidente?', top: '75%', left: '25%' },
       ]
     },
     library: {
-      title: 'Biblioteca', subtitle: 'Escritório de Tomás', bg: '/backgrounds/scene_library.png?v=9',
-      hotspots: [
+      title: 'Biblioteca', subtitle: 'Escritório de Tomás', bgBase: '/backgrounds/scene_library',
+      hotspotsLandscape: [
+        { id: 'desk_letter', label: 'Carta de Helena', subLabel: 'Aviso urgente', top: '65%', left: '55%' },
+        { id: 'safe', label: 'Cofre Oculto', subLabel: 'Trancado e vazio?', top: '50%', left: '22%' },
+        { id: 'cigar', label: 'Charuto Apagado', subLabel: 'Visita recente', top: '70%', left: '45%' },
+      ],
+      hotspotsPortrait: [
         { id: 'desk_letter', label: 'Carta de Helena', subLabel: 'Aviso urgente', top: '65%', left: '55%' },
         { id: 'safe', label: 'Cofre Oculto', subLabel: 'Trancado e vazio?', top: '50%', left: '22%' },
         { id: 'cigar', label: 'Charuto Apagado', subLabel: 'Visita recente', top: '70%', left: '45%' },
       ]
     },
     bedroom: {
-      title: 'Quarto Principal', subtitle: 'Aposentos de Clara', bg: '/backgrounds/scene_bedroom.png?v=9',
-      hotspots: [
+      title: 'Quarto Principal', subtitle: 'Aposentos de Clara', bgBase: '/backgrounds/scene_bedroom',
+      hotspotsLandscape: [
+        { id: 'mirror_msg', label: 'Mensagem no Espelho', subLabel: 'Escrita em segredo', top: '35%', left: '70%', requiresUv: true },
+        { id: 'suitcase', label: 'Mala', subLabel: 'Roupas de frio intenso', top: '80%', left: '60%' },
+        { id: 'pills', label: 'Remédios', subLabel: 'Para ansiedade', top: '55%', left: '25%' },
+      ],
+      hotspotsPortrait: [
         { id: 'mirror_msg', label: 'Mensagem no Espelho', subLabel: 'Escrita em segredo', top: '35%', left: '70%', requiresUv: true },
         { id: 'suitcase', label: 'Mala', subLabel: 'Roupas de frio intenso', top: '80%', left: '60%' },
         { id: 'pills', label: 'Remédios', subLabel: 'Para ansiedade', top: '55%', left: '25%' },
       ]
     },
     garden: {
-      title: 'Jardins', subtitle: 'Área Externa', bg: '/backgrounds/scene_garden.png?v=9',
-      hotspots: [
+      title: 'Jardins', subtitle: 'Área Externa', bgBase: '/backgrounds/scene_garden',
+      hotspotsLandscape: [
+        { id: 'fountain', label: 'Fonte de Pedra', subLabel: 'Livro-caixa queimado', top: '70%', left: '30%' },
+        { id: 'mud', label: 'Pegadas na Lama', subLabel: 'Duas pessoas', top: '85%', left: '65%' },
+        { id: 'animal_bones', label: 'Ossos Pequenos', subLabel: 'Cachorro ou humano?', top: '75%', left: '15%' },
+      ],
+      hotspotsPortrait: [
         { id: 'fountain', label: 'Fonte de Pedra', subLabel: 'Livro-caixa queimado', top: '70%', left: '30%' },
         { id: 'mud', label: 'Pegadas na Lama', subLabel: 'Duas pessoas', top: '85%', left: '65%' },
         { id: 'animal_bones', label: 'Ossos Pequenos', subLabel: 'Cachorro ou humano?', top: '75%', left: '15%' },
@@ -48,7 +76,8 @@ const SceneExplorer: React.FC = () => {
   };
 
   const scene = sceneConfig[id] || sceneConfig['living_room'];
-  const hotspots = scene.hotspots;
+  const hotspots = isPortrait ? scene.hotspotsPortrait : scene.hotspotsLandscape;
+  const currentBg = `${scene.bgBase}_${isPortrait ? 'portrait' : 'landscape'}.png?v=10`;
   const totalClues = hotspots.length;
 
   const handleHotspotClick = (clueId: string) => {
@@ -81,7 +110,7 @@ const SceneExplorer: React.FC = () => {
       {/* Background da Cena */}
       <div style={{ 
         position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-        backgroundImage: `url(${scene.bg})`, backgroundSize: 'cover', backgroundPosition: 'center', zIndex: 0,
+        backgroundImage: `url(${currentBg})`, backgroundSize: 'cover', backgroundPosition: 'center', zIndex: 0,
         filter: uvLight ? 'brightness(0.7) contrast(1.4) sepia(1) hue-rotate(240deg) saturate(2.5)' : 'none',
         transition: 'filter 0.5s ease'
       }} />

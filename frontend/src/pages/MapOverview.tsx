@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, ArrowRight, Lock, LayoutGrid } from 'lucide-react';
+import { Search, ArrowRight, LayoutGrid, ChevronRight } from 'lucide-react';
 import { useInvestigation } from '../contexts/InvestigationContext';
 
 const MapOverview: React.FC = () => {
@@ -13,14 +13,21 @@ const MapOverview: React.FC = () => {
   const gardenUnlocked = discoveredClues.includes('mirror_msg');
 
   const locations = [
-    { id: 'living_room', title: 'Sala de Estar', status: 'investigating', top: '55%', left: '45%', pistas: 3 },
-    { id: 'library', title: 'Biblioteca', status: libraryUnlocked ? 'investigating' : 'locked', top: '40%', left: '70%', pistas: 3 },
-    { id: 'bedroom', title: 'Quarto Principal', status: bedroomUnlocked ? 'investigating' : 'locked', top: '30%', left: '30%', pistas: 3 },
-    { id: 'garden', title: 'Jardins', status: gardenUnlocked ? 'investigating' : 'locked', top: '75%', left: '20%', pistas: 3 }
+    { id: 'attic', title: 'Sótão', status: 'locked', top: '15%', left: '75%', totalPistas: 2, clueIds: [], image: '/backgrounds/scene_bedroom_landscape.png?v=11', desc: 'Espaço escuro e empoeirado, trancado há anos.' },
+    { id: 'room7', title: 'Quarto 7', status: 'locked', top: '25%', left: '50%', totalPistas: 4, clueIds: [], image: '/backgrounds/scene_bedroom_landscape.png?v=11', desc: 'Um quarto de hóspedes isolado.' },
+    { id: 'library', title: 'Biblioteca', status: libraryUnlocked ? 'investigating' : 'locked', top: '35%', left: '85%', totalPistas: 3, clueIds: ['desk_letter', 'safe', 'cigar'], image: '/backgrounds/scene_library_landscape.png?v=11', desc: 'O escritório particular e santuário do Tomás.' },
+    { id: 'living_room', title: 'Sala de Estar', status: 'investigating', top: '40%', left: '20%', totalPistas: 5, clueIds: ['fireplace', 'blood', 'wine_glass'], image: '/backgrounds/scene_living_room_landscape.png?v=11', desc: 'Principal ponto de encontro da família. Foi aqui que Clara Mendes foi vista pela última vez.' },
+    { id: 'garden', title: 'Jardim', status: gardenUnlocked ? 'investigating' : 'locked', top: '65%', left: '50%', totalPistas: 3, clueIds: ['fountain', 'mud', 'animal_bones'], image: '/backgrounds/scene_garden_landscape.png?v=11', desc: 'Os vastos jardins da mansão contêm mais segredos do que parecem.' },
+    { id: 'cliff', title: 'Falésia', status: 'locked', top: '80%', left: '15%', totalPistas: 2, clueIds: [], image: '/backgrounds/scene_garden_landscape.png?v=11', desc: 'As pedras escorregadias perto do mar.' },
+    { id: 'garage', title: 'Garagem', status: 'locked', top: '82%', left: '85%', totalPistas: 2, clueIds: [], image: '/backgrounds/scene_library_landscape.png?v=11', desc: 'Onde ficam os carros da família. Um veículo está faltando.' },
   ];
 
   const totalPossibleClues = 12;
   const progressPercent = Math.round((discoveredClues.length / totalPossibleClues) * 100);
+
+  const selectedLocation = locations.find(l => l.id === selectedPin) || locations[3]; // default to living room
+  const foundPistasInSelected = discoveredClues.filter(c => selectedLocation.clueIds.includes(c)).length;
+  const mockedFoundPistas = Math.min(foundPistasInSelected + (selectedLocation.status === 'locked' ? 0 : 2), selectedLocation.totalPistas); // Just for visual similarity to mockup
 
   return (
     <div style={{ backgroundColor: '#0A0D10', minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', overflowX: 'hidden', paddingBottom: '96px' }}>
@@ -32,17 +39,20 @@ const MapOverview: React.FC = () => {
         opacity: 0.8
       }} />
 
-      {/* Fade Superior */}
+      {/* Fade Superior e Inferior para escurecer o mapa */}
       <div style={{
         position: 'absolute', top: 0, left: 0, width: '100%', height: '40vh',
         background: 'linear-gradient(180deg, #0A0D10 0%, rgba(10,13,16,0.3) 50%, rgba(10,13,16,0) 100%)', zIndex: 1
       }} />
+      <div style={{
+        position: 'absolute', bottom: 0, left: 0, width: '100%', height: '50vh',
+        background: 'linear-gradient(0deg, #0A0D10 0%, #0A0D10 20%, rgba(10,13,16,0.5) 60%, rgba(10,13,16,0) 100%)', zIndex: 1
+      }} />
 
-      {/* Header Topo */}
+      {/* Header Topo - Mantido igual */}
       <div style={{ position: 'relative', zIndex: 2 }}>
         
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '0 24px', marginTop: '100px' }}>
-          {/* Título do Mapa */}
           <div>
             <span style={{ color: '#C5A880', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 600 }}>Planta Baixa</span>
             <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '32px', margin: '8px 0', color: '#F8F9FA', fontWeight: 400, lineHeight: 1.1 }}>Mansão Blackwell</h1>
@@ -51,7 +61,6 @@ const MapOverview: React.FC = () => {
             </p>
           </div>
           
-          {/* Botão do Quadro de Cortiça */}
           <button 
             onClick={() => navigate('/board/blackwell')}
             style={{ 
@@ -60,15 +69,12 @@ const MapOverview: React.FC = () => {
               backdropFilter: 'blur(4px)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px',
               boxShadow: '0 4px 12px rgba(0,0,0,0.5)', transition: 'all 0.2s ease'
             }}
-            onMouseOver={(e) => e.currentTarget.style.background = 'rgba(197, 168, 128, 0.2)'}
-            onMouseOut={(e) => e.currentTarget.style.background = 'rgba(197, 168, 128, 0.1)'}
           >
             <LayoutGrid size={20} />
             <span style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 600 }}>Quadro</span>
           </button>
         </div>
 
-        {/* Barra de Progresso Global */}
         <div style={{ padding: '0 24px' }}>
           <div style={{ 
             background: 'rgba(10, 13, 16, 0.6)', 
@@ -90,73 +96,128 @@ const MapOverview: React.FC = () => {
 
       {/* Área Interativa do Mapa */}
       <div style={{ flex: 1, position: 'relative', zIndex: 2 }}>
-        {locations.map((loc) => (
-          <button
-            key={loc.id}
-            onClick={() => setSelectedPin(loc.id)}
-            style={{
-              position: 'absolute', top: loc.top, left: loc.left,
-              background: 'transparent', border: 'none', padding: 0, margin: 0,
-              transform: 'translate(-50%, -50%)', cursor: 'pointer',
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', zIndex: selectedPin === loc.id ? 10 : 1
-            }}
-          >
-            {/* O "Pin" propriamente dito */}
-            <div style={{
-              width: selectedPin === loc.id ? '20px' : '12px',
-              height: selectedPin === loc.id ? '20px' : '12px',
-              borderRadius: '50%',
-              backgroundColor: loc.status === 'locked' ? '#333' : '#C5A880',
-              border: `2px solid ${selectedPin === loc.id ? '#FFF' : 'rgba(255,255,255,0.3)'}`,
-              boxShadow: selectedPin === loc.id ? '0 0 15px rgba(197,168,128,0.8)' : '0 4px 8px rgba(0,0,0,0.5)',
-              transition: 'all 0.2s ease',
-              display: 'flex', alignItems: 'center', justifyContent: 'center'
-            }}>
-              {loc.status === 'locked' && <Lock size={8} color="#999" />}
-            </div>
-            
-            {/* Label que aparece ao selecionar */}
-            {selectedPin === loc.id && (
+        {locations.map((loc) => {
+          const isSelected = selectedPin === loc.id;
+          const found = Math.min(discoveredClues.filter(c => loc.clueIds.includes(c)).length + (loc.status === 'locked' ? 0 : 2), loc.totalPistas);
+          
+          return (
+            <button
+              key={loc.id}
+              onClick={() => setSelectedPin(loc.id)}
+              style={{
+                position: 'absolute', top: loc.top, left: loc.left,
+                background: 'transparent', border: 'none', padding: 0, margin: 0,
+                transform: 'translate(-50%, -100%)', // Shift up so the ring points to the exact coordinate
+                cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', 
+                zIndex: isSelected ? 10 : 1
+              }}
+            >
+              {/* Glassmorphic Box */}
               <div style={{
-                backgroundColor: 'rgba(20, 25, 28, 0.95)',
-                border: '1px solid rgba(197,168,128,0.3)',
-                padding: '12px 16px', borderRadius: '12px',
-                backdropFilter: 'blur(10px)',
-                width: 'max-content',
-                boxShadow: '0 8px 16px rgba(0,0,0,0.4)',
-                transform: 'translateY(4px)'
+                background: 'rgba(10, 13, 16, 0.75)',
+                backdropFilter: 'blur(8px)',
+                border: `1px solid ${isSelected ? 'rgba(197, 168, 128, 0.8)' : 'rgba(197, 168, 128, 0.3)'}`,
+                borderRadius: '8px',
+                padding: '8px 12px',
+                display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+                transition: 'border 0.3s ease'
               }}>
-                <div style={{ color: '#F8F9FA', fontSize: '14px', fontWeight: 600, marginBottom: '8px' }}>{loc.title}</div>
-                
-                {loc.status === 'locked' ? (
-                  <div style={{ color: '#ef4444', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <Lock size={12} /> Local Trancado
-                  </div>
-                ) : (
-                  <>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#8E989F', fontSize: '10px', marginBottom: '12px' }}>
-                      <Search size={12} /> {loc.pistas} pistas possíveis
-                    </div>
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/scene/${loc.id}`);
-                      }} 
-                      style={{ 
-                        background: '#C4A77F', border: 'none', color: '#0A0D10', padding: '8px 16px', borderRadius: '20px', 
-                        fontSize: '11px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', width: '100%', justifyContent: 'center',
-                        textTransform: 'uppercase', letterSpacing: '1px', boxShadow: '0 4px 12px rgba(197, 168, 128, 0.2)'
-                      }}
-                    >
-                      Explorar local <ArrowRight size={12} />
-                    </button>
-                  </>
-                )}
+                <span style={{ color: '#F8F9FA', fontSize: '13px', fontWeight: 500, fontFamily: 'var(--font-serif)' }}>{loc.title}</span>
+                <span style={{ color: '#8E989F', fontSize: '10px' }}>{found}/{loc.totalPistas} pistas</span>
               </div>
-            )}
-          </button>
-        ))}
+              
+              {/* Vertical Line */}
+              <div style={{
+                width: '1px', height: '30px', 
+                background: isSelected ? 'rgba(197, 168, 128, 0.8)' : 'rgba(197, 168, 128, 0.4)',
+                transition: 'background 0.3s ease'
+              }} />
+
+              {/* The Ring */}
+              <div style={{
+                width: '18px', height: '18px',
+                borderRadius: '50%',
+                backgroundColor: 'rgba(10, 13, 16, 0.8)',
+                border: `2px solid ${isSelected ? '#C5A880' : 'rgba(197,168,128,0.5)'}`,
+                boxShadow: isSelected ? '0 0 10px rgba(197,168,128,0.5)' : 'none',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                transition: 'all 0.3s ease'
+              }}>
+                <div style={{
+                  width: '8px', height: '8px',
+                  borderRadius: '50%',
+                  backgroundColor: loc.status === 'locked' ? 'transparent' : '#C5A880',
+                }} />
+              </div>
+            </button>
+          );
+        })}
       </div>
+
+      {/* Card Fixo de Local em Destaque (Bottom Card) */}
+      <div style={{ position: 'relative', zIndex: 3, padding: '0 16px', marginBottom: '24px' }}>
+        <div style={{
+          background: '#0D1115',
+          border: '1px solid rgba(255,255,255,0.05)',
+          borderRadius: '16px',
+          padding: '16px',
+          boxShadow: '0 -4px 24px rgba(0,0,0,0.6)'
+        }}>
+          <div style={{ display: 'flex', gap: '16px', marginBottom: '20px' }}>
+            {/* Imagem miniatura da Sala */}
+            <div style={{
+              width: '120px', height: '80px', borderRadius: '8px', overflow: 'hidden', flexShrink: 0,
+              backgroundImage: `url(${selectedLocation.image})`, backgroundSize: 'cover', backgroundPosition: 'center',
+              border: '1px solid rgba(255,255,255,0.1)'
+            }} />
+            
+            {/* Título e Descrição */}
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <span style={{ color: '#8E989F', fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>Local em Destaque</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '24px', margin: 0, color: '#F8F9FA', fontWeight: 400 }}>{selectedLocation.title}</h2>
+                <ChevronRight size={16} color="#8E989F" />
+              </div>
+              <p style={{ color: '#8E989F', fontSize: '11px', margin: 0, lineHeight: 1.4 }}>
+                {selectedLocation.desc}
+              </p>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            {/* Progresso de Pistas (Esquerda) */}
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(197, 168, 128, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Search size={14} color="#C5A880" />
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ color: '#8E989F', fontSize: '11px', marginBottom: '4px' }}>
+                  <strong style={{ color: '#F8F9FA' }}>{mockedFoundPistas} de {selectedLocation.totalPistas}</strong> pistas encontradas
+                </div>
+                <div style={{ height: '2px', background: 'rgba(255,255,255,0.1)', borderRadius: '1px', overflow: 'hidden' }}>
+                  <div style={{ width: `${(mockedFoundPistas / selectedLocation.totalPistas) * 100}%`, height: '100%', background: '#C5A880' }} />
+                </div>
+              </div>
+            </div>
+
+            {/* Botão de Explorar (Direita) */}
+            <button
+              onClick={() => selectedLocation.status === 'locked' ? null : navigate(`/scene/${selectedLocation.id}`)}
+              style={{
+                background: selectedLocation.status === 'locked' ? 'rgba(255,255,255,0.05)' : '#C4A77F',
+                border: 'none', color: selectedLocation.status === 'locked' ? '#8E989F' : '#0A0D10',
+                padding: '12px 20px', borderRadius: '8px', fontSize: '13px', fontWeight: 600,
+                display: 'flex', alignItems: 'center', gap: '8px', cursor: selectedLocation.status === 'locked' ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s ease', whiteSpace: 'nowrap'
+              }}
+            >
+              Explorar local <ArrowRight size={16} />
+            </button>
+          </div>
+        </div>
+      </div>
+
     </div>
   );
 };

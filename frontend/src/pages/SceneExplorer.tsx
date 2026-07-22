@@ -77,7 +77,7 @@ const SceneExplorer: React.FC = () => {
 
   const scene = sceneConfig[id] || sceneConfig['living_room'];
   const hotspots = isPortrait ? scene.hotspotsPortrait : scene.hotspotsLandscape;
-  const currentBg = `${scene.bgBase}_${isPortrait ? 'portrait' : 'landscape'}.png?v=10`;
+  const currentBg = `${scene.bgBase}_${isPortrait ? 'portrait' : 'landscape'}.png?v=11`;
   const totalClues = hotspots.length;
 
   const handleHotspotClick = (clueId: string) => {

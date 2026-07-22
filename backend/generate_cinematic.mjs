@@ -7,19 +7,19 @@ const STYLE_PREFIX = `Cinematic mystery game background, photorealistic, high-de
 const ROOMS = [
   {
     id: 'scene_living_room',
-    prompt: `${STYLE_PREFIX} A luxurious old living room at night. CRITICAL VISUAL ELEMENTS THAT MUST BE CLEARLY VISIBLE AND ILLUMINATED: 1. Burned paper remnants glowing inside the fireplace. 2. A distinct bright red blood stain on the carpet. 3. Shattered pieces of a broken wine glass catching the light on the floor near an armchair.`,
+    prompt: `${STYLE_PREFIX} A luxurious old living room at night. CRITICAL VISUAL ELEMENTS THAT MUST BE CLEARLY VISIBLE AND ILLUMINATED: 1. A partially burned flight ticket glowing inside the fireplace. 2. A distinct bright red artificial blood stain on the carpet. 3. Shattered pieces of a broken wine glass catching the light on the floor near an armchair.`,
   },
   {
     id: 'scene_library',
-    prompt: `${STYLE_PREFIX} A classic dark library with tall bookshelves. CRITICAL VISUAL ELEMENTS THAT MUST BE CLEARLY VISIBLE AND ILLUMINATED: 1. An opened letter with a bright red wax seal prominently placed on the main desk. 2. An open wall safe clearly visible behind a crooked painting on the wall. 3. A half-smoked premium cigar resting in a glass ashtray on the desk.`,
+    prompt: `${STYLE_PREFIX} A classic dark library with tall bookshelves. CRITICAL VISUAL ELEMENTS THAT MUST BE CLEARLY VISIBLE AND ILLUMINATED: 1. An opened letter with a bright red wax seal prominently placed on the main desk. 2. An open, completely empty wall safe clearly visible behind a crooked painting on the wall. 3. A half-smoked premium cigar resting in a glass ashtray on the desk.`,
   },
   {
     id: 'scene_bedroom',
-    prompt: `${STYLE_PREFIX} A grand master bedroom with an unmade canopy bed. CRITICAL VISUAL ELEMENTS THAT MUST BE CLEARLY VISIBLE AND ILLUMINATED: 1. A glowing handwritten message clearly visible on the surface of the vanity mirror. 2. A large open vintage leather suitcase sitting on the floor. 3. A bright bottle of pills spilled openly on the nightstand.`,
+    prompt: `${STYLE_PREFIX} A grand master bedroom with an unmade canopy bed. CRITICAL VISUAL ELEMENTS THAT MUST BE CLEARLY VISIBLE AND ILLUMINATED: 1. A glowing handwritten message clearly visible on the surface of the vanity mirror. 2. A large open vintage leather suitcase packed with thick winter coats sitting on the floor. 3. A bright bottle of prescription sleeping pills spilled openly on the nightstand.`,
   },
   {
     id: 'scene_garden',
-    prompt: `${STYLE_PREFIX} A misty garden at night with an old stone fountain. CRITICAL VISUAL ELEMENTS THAT MUST BE CLEARLY VISIBLE AND ILLUMINATED: 1. A charred ledger book sitting explicitly on the edge of the fountain. 2. Clear muddy footprints on the path. 3. Scattered white animal bones catching the moonlight near an iron gate.`,
+    prompt: `${STYLE_PREFIX} A misty garden at night with an old stone fountain. CRITICAL VISUAL ELEMENTS THAT MUST BE CLEARLY VISIBLE AND ILLUMINATED: 1. A charred accounting ledger book sitting explicitly on the edge of the fountain. 2. Clear muddy footprints of two different people on the path. 3. Scattered white dog bones and a dog collar catching the moonlight near an iron gate.`,
   },
 ];
 

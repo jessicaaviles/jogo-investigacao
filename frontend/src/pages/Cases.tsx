@@ -55,13 +55,13 @@ const Cases: React.FC = () => {
           };
         });
         
-        // Injetar caso do protótipo imersivo para demonstração
+        // Injetar caso do protótipo imersivo para demonstração (apenas se não vier da API)
         const blackwellCase = {
-          slug: 'blackwell-house',
-          title: 'O Segredo da Mansão Blackwell',
-          synopsis: 'Explore os locais, encontre pistas e descubra o que realmente aconteceu.',
+          slug: 'blackwell',
+          title: 'Mansão Blackwell',
+          synopsis: 'Investigue o sumiço misterioso de Clara Mendes na mansão da família Blackwell.',
           type: 'Mistério',
-          duration: '60 min',
+          duration: '30 min',
           difficulty: 'Média' as const,
           players: '1-4 Jogadores',
           tension: 4,
@@ -69,15 +69,16 @@ const Cases: React.FC = () => {
           cover_image_data: null
         };
         
-        setCases([...mapped, blackwellCase]);
+        const hasBlackwell = mapped.some((m: any) => m.slug === 'blackwell');
+        setCases(hasBlackwell ? mapped : [...mapped, blackwellCase]);
       } else {
         // Se a API não retornar nada, pelo menos mostre o caso de demonstração
         setCases([{
-          slug: 'blackwell-house',
-          title: 'O Segredo da Mansão Blackwell',
-          synopsis: 'Explore os locais, encontre pistas e descubra o que realmente aconteceu.',
+          slug: 'blackwell',
+          title: 'Mansão Blackwell',
+          synopsis: 'Investigue o sumiço misterioso de Clara Mendes na mansão da família Blackwell.',
           type: 'Mistério',
-          duration: '60 min',
+          duration: '30 min',
           difficulty: 'Média' as const,
           players: '1-4 Jogadores',
           tension: 4,
@@ -92,11 +93,11 @@ const Cases: React.FC = () => {
       
       // Fallback para exibir o protótipo mesmo com erro na API
       setCases([{
-        slug: 'blackwell-house',
-        title: 'O Segredo da Mansão Blackwell',
-        synopsis: 'Explore os locais, encontre pistas e descubra o que realmente aconteceu.',
+        slug: 'blackwell',
+        title: 'Mansão Blackwell',
+        synopsis: 'Investigue o sumiço misterioso de Clara Mendes na mansão da família Blackwell.',
         type: 'Mistério',
-        duration: '60 min',
+        duration: '30 min',
         difficulty: 'Média' as const,
         players: '1-4 Jogadores',
         tension: 4,
@@ -340,7 +341,13 @@ const Cases: React.FC = () => {
             {/* Botão de Escolha */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '12px' }}>
               <button className="btn-primary"
-                onClick={() => handleSelectCase(selectedCase.slug)}
+                onClick={() => {
+                  if (!user || !user.email) {
+                    navigate(`/register?return=/create?caseId=${selectedCase.slug}`);
+                  } else {
+                    handleSelectCase(selectedCase.slug);
+                  }
+                }}
                 style={{
                    backgroundColor: 'var(--olive)',
                    color: 'var(--paper)',
@@ -357,7 +364,13 @@ const Cases: React.FC = () => {
                 Escolher este caso (Clássico)
               </button>
               <button 
-                onClick={() => navigate(`/map/${selectedCase.slug}`)}
+                onClick={() => {
+                  if (!user || !user.email) {
+                    navigate(`/register?return=/map/${selectedCase.slug}`);
+                  } else {
+                    navigate(`/map/${selectedCase.slug}`);
+                  }
+                }}
                 style={{
                   backgroundColor: 'rgba(212,175,55,0.1)',
                   color: 'var(--accent-gold)',

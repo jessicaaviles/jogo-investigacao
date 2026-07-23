@@ -22,7 +22,6 @@ const Game: React.FC = () => {
   const [question, setQuestion] = useState('');
   const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [theoryText, setTheoryText] = useState('');
   const [trueSolution, setTrueSolution] = useState<string | null>(null);
   const [gameResult, setGameResult] = useState<any>(null);
   const [activeVote, setActiveVote] = useState<any>(null);
@@ -269,11 +268,6 @@ const Game: React.FC = () => {
   const handleHint = () => { const hintIndex = hints.length + 1; socket?.emit('use_hint', { roomId, userId, hintIndex, idempotencyKey: `${roomId}:${userId}:hint:${hintIndex}` }); };
   const requestClarification = (questionId: string) => socket?.emit('request_clarification', { roomId, userId, questionId });
   const contestAnswer = (questionId: string) => socket?.emit('contest_answer', { roomId, userId, questionId, reason: 'possible_contradiction' });
-  const handleSubmitTheory = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!theoryText.trim()) return;
-    socket?.emit('submit_theory', { roomId, userId: localStorage.getItem('userId'), answers: { theory: theoryText } });
-  };
   const handleFinishGame = () => { setLoading(true); socket?.emit('finish_game', { roomId, userId: localStorage.getItem('userId') }); };
 
   const userId = localStorage.getItem('userId');

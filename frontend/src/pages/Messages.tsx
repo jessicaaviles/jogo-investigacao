@@ -44,8 +44,7 @@ const Messages: React.FC = () => {
     setUnreadMessages(unreadCount);
   }, [chats, setUnreadMessages]);
 
-  const { socket } = window as any; // Fallback se não usar o hook diretamente, ou idealmente import useSocket
-
+  // Fallback se não usar o hook diretamente, ou idealmente import useSocket
   useEffect(() => {
     const handleClueUnlocked = (data: any) => {
       setChats(prev => prev.map(chat => {

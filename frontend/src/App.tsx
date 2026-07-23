@@ -48,7 +48,7 @@ function App() {
               {/* Rotas protegidas */}
               <Route path="/create" element={<Layout><ProtectedRoute><CreateRoom /></ProtectedRoute></Layout>} />
               <Route path="/join" element={<Layout><ProtectedRoute><JoinRoom /></ProtectedRoute></Layout>} />
-              <Route path="/cases" element={<Layout><ProtectedRoute><Cases /></ProtectedRoute></Layout>} />
+              <Route path="/cases" element={<Layout><Cases /></Layout>} />
               <Route path="/messages" element={<Layout><ProtectedRoute><Messages /></ProtectedRoute></Layout>} />
               <Route path="/profile" element={<Layout><ProtectedRoute><Profile /></ProtectedRoute></Layout>} />
               <Route path="/lobby" element={<Layout><ProtectedRoute><LobbyList /></ProtectedRoute></Layout>} />

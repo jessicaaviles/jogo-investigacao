@@ -127,7 +127,7 @@ const Register: React.FC = () => {
         </form>
         <p style={{ color: 'var(--muted)', fontSize: 13, marginTop: 24, textAlign: 'center' }}>
           Já tem conta?{' '}
-          <button onClick={() => navigate('/login')} style={{ color: 'var(--gold-soft)', background: 'none', border: 'none', textDecoration: 'underline', cursor: 'pointer' }}>
+          <button onClick={() => navigate(returnUrl ? `/login?return=${encodeURIComponent(returnUrl)}` : '/login')} style={{ color: 'var(--gold-soft)', background: 'none', border: 'none', textDecoration: 'underline', cursor: 'pointer' }}>
             Entrar
           </button>
         </p>

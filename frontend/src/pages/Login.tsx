@@ -112,7 +112,7 @@ const Login: React.FC = () => {
         </form>
         <p style={{ color: 'var(--muted)', fontSize: 13, marginTop: 24, textAlign: 'center' }}>
           Ainda não tem conta?{' '}
-          <button onClick={() => navigate('/register')} style={{ color: 'var(--gold-soft)', background: 'none', border: 'none', textDecoration: 'underline', cursor: 'pointer' }}>
+          <button onClick={() => navigate(returnUrl ? `/register?return=${encodeURIComponent(returnUrl)}` : '/register')} style={{ color: 'var(--gold-soft)', background: 'none', border: 'none', textDecoration: 'underline', cursor: 'pointer' }}>
             Criar conta
           </button>
         </p>

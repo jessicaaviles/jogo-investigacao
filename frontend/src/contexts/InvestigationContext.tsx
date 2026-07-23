@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
+import { useSocket } from './useSocket';
 
 interface InvestigationContextData {
   activeCaseId: string | null;
@@ -29,10 +30,47 @@ export const InvestigationProvider: React.FC<{ children: ReactNode }> = ({ child
     localStorage.setItem('jogo_investigacao_clues', JSON.stringify(discoveredClues));
   }, [discoveredClues]);
 
+  const socket = useSocket();
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleClueDiscovered = (data: { clueId: string; finderName: string }) => {
+      setDiscoveredClues((prev) => {
+        if (prev.includes(data.clueId)) return prev;
+        return [...prev, data.clueId];
+      });
+      
+      const event = new CustomEvent('clue_discovered_notification', { 
+        detail: { clueId: data.clueId, finderName: data.finderName } 
+      });
+      window.dispatchEvent(event);
+    };
+
+    socket.on('clue_discovered_alert', handleClueDiscovered);
+
+    return () => {
+      socket.off('clue_discovered_alert', handleClueDiscovered);
+    };
+  }, [socket]);
+
   const addClue = (clueId: string) => {
-    if (!discoveredClues.includes(clueId)) {
-      setDiscoveredClues((prev) => [...prev, clueId]);
-    }
+    setDiscoveredClues((prev) => {
+      if (prev.includes(clueId)) return prev;
+      
+      // Emitir via socket se estivermos em uma sala cooperativa
+      const roomId = localStorage.getItem('currentRoomId');
+      if (socket && roomId) {
+        const userName = localStorage.getItem('userName') || 'Investigador';
+        socket.emit('broadcast_to_room', {
+          roomId,
+          event: 'clue_discovered_alert',
+          data: { clueId, finderName: userName }
+        });
+      }
+
+      return [...prev, clueId];
+    });
   };
 
   const hasClue = (clueId: string) => {

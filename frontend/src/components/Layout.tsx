@@ -28,6 +28,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const socket = useSocket();
   const lobbyRef = useRef<HTMLDivElement>(null);
   const [lobbyOpen, setLobbyOpen] = useState(false);
+  const [discoveredClueNotification, setDiscoveredClueNotification] = useState<{ title: string; desc: string } | null>(null);
   const [roomId, setRoomId] = useState<string | null>(() => localStorage.getItem('currentRoomId'));
   const [roomCode, setRoomCode] = useState<string | null>(() => localStorage.getItem('currentRoomCode'));
   const [players, setPlayers] = useState<any[]>([]);
@@ -167,6 +168,42 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    const handleNotification = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      const clueTitles: Record<string, string> = {
+        'window': 'Janela Entreaberta',
+        'armchair': 'Poltrona Revirada',
+        'table': 'Carta Anônima',
+        'fireplace': 'Restos na Lareira',
+        'blood': 'Sangue Artificial',
+        'wine_glass': 'Taça Quebrada',
+        'desk_letter': 'Carta de Helena',
+        'safe': 'Cofre Oculto',
+        'cigar': 'Charuto Apagado',
+        'mirror_msg': 'Mensagem no Espelho',
+        'suitcase': 'Mala Semi-Pronta',
+        'pills': 'Vidro de Remédios',
+        'fountain': 'Livro-caixa Desenterrado',
+        'mud': 'Pegadas Duplas',
+        'animal_bones': 'Ossos Pequenos'
+      };
+
+      const title = clueTitles[detail.clueId] || 'Nova Pista';
+      setDiscoveredClueNotification({
+        title,
+        desc: `foi encontrada por ${detail.finderName}!`
+      });
+
+      setTimeout(() => {
+        setDiscoveredClueNotification(null);
+      }, 5000);
+    };
+
+    window.addEventListener('clue_discovered_notification', handleNotification);
+    return () => window.removeEventListener('clue_discovered_notification', handleNotification);
   }, []);
 
   const isImmersive = ['/map', '/scene', '/board', '/case-files', '/evidence'].some(p => location.pathname.includes(p));
@@ -435,6 +472,31 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </button>
       ))}
     </div></nav>
+
+    {discoveredClueNotification && (
+      <div style={{
+        position: 'fixed',
+        top: '90px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        background: 'rgba(10,13,16,0.95)',
+        backdropFilter: 'blur(10px)',
+        border: '1px solid #C5A880',
+        borderRadius: '12px',
+        padding: '12px 24px',
+        zIndex: 9999,
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+        boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+        color: '#F8F9FA'
+      }}>
+        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#C5A880' }}></div>
+        <div style={{ fontSize: '12px' }}>
+          <strong style={{ color: '#C5A880' }}>{discoveredClueNotification.title}</strong> {discoveredClueNotification.desc}
+        </div>
+      </div>
+    )}
   </div>;
 };
 

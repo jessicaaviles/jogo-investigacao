@@ -400,7 +400,8 @@ const EvidenceAnalysis: React.FC = () => {
                 </div>
               ) : (
                 <>
-                  <div style={{ flex: 1, paddingRight: '16px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px' }}>
+                    <div style={{ flex: 1, paddingRight: '16px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#C5A880', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px' }}>
                       <Search size={14} /> Resumo da Análise
                     </div>
@@ -445,8 +446,8 @@ const EvidenceAnalysis: React.FC = () => {
                     Ver detalhes da hipótese <ChevronRight size={14} />
                   </button>
                 </div>
-              </div>
-            )}
+              </>
+              )}
 
             {activeTab === 'Conexões' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>

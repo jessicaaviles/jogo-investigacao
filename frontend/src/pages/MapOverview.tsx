@@ -169,7 +169,15 @@ const MapOverview: React.FC = () => {
       </div>
 
       {/* Card Fixo de Local em Destaque (Bottom Card) */}
-      <div style={{ position: 'relative', zIndex: 3, padding: '0 16px', marginBottom: '80px' }}>
+      <div style={{ 
+        position: 'fixed', 
+        bottom: '85px', 
+        left: 0, 
+        width: '100%', 
+        zIndex: 10, 
+        padding: '0 16px',
+        boxSizing: 'border-box'
+      }}>
         <div style={{
           background: '#0D1115',
           border: '1px solid rgba(255,255,255,0.05)',

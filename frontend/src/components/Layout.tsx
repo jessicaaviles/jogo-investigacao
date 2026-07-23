@@ -85,7 +85,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     try {
       const userId = localStorage.getItem('userId') || 'anon_user';
       const userName = localStorage.getItem('userName') || 'Investigador';
-      const caseId = 'blackwell'; // Caso padrão
+      const caseId = 'o-presente-desaparecido'; // Caso padrão
       
       const res = await createRoom(caseId, userId, userName);
       if (res.success && res.data) {

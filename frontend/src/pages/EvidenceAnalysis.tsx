@@ -289,7 +289,7 @@ const EvidenceAnalysis: React.FC = () => {
   };
 
   return (
-    <div style={{ backgroundColor: '#0A0D10', minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', overflowX: 'hidden', paddingBottom: '100px' }}>
+    <div style={{ backgroundColor: '#0A0D10', minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', overflowX: 'hidden', paddingBottom: '200px' }}>
       
       {/* Imagem da Evidência (Background) */}
       <div style={{ 
@@ -517,7 +517,7 @@ const EvidenceAnalysis: React.FC = () => {
 
       {/* Sticky Bottom Bar */}
       <div style={{ 
-        position: 'fixed', bottom: 0, left: 0, width: '100%', padding: '16px 24px',
+        position: 'fixed', bottom: '88px', left: 0, width: '100%', padding: '16px 24px',
         background: 'rgba(10,13,16,0.85)', backdropFilter: 'blur(10px)', borderTop: '1px solid rgba(255,255,255,0.05)',
         display: 'flex', gap: '16px', zIndex: 10
       }}>

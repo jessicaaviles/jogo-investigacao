@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ChevronDown, ThumbsUp, ThumbsDown, Brain, X } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, Brain } from 'lucide-react';
 import { useInvestigation } from '../contexts/InvestigationContext';
 
 const SceneExplorer: React.FC = () => {
   const navigate = useNavigate();
   const [uvLight, setUvLight] = useState(false);
-  const [showMapModal, setShowMapModal] = useState(false);
+
   const { discoveredClues, addClue } = useInvestigation();
 
   const [isPortrait, setIsPortrait] = useState(window.innerHeight > window.innerWidth);
@@ -211,37 +211,7 @@ const SceneExplorer: React.FC = () => {
 
         </div>
       </div>
-      {/* Map Modal */}
-      {showMapModal && (
-        <div style={{ 
-          position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', 
-          background: 'rgba(10, 13, 16, 0.95)', zIndex: 100, display: 'flex', flexDirection: 'column',
-          backdropFilter: 'blur(10px)'
-        }}>
-          <header style={{ padding: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
-              <div style={{ color: '#C5A880', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 600 }}>Planta Baixa</div>
-              <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '24px', margin: '4px 0 0 0', color: '#F8F9FA', fontWeight: 400 }}>Térreo</h2>
-            </div>
-            <button onClick={() => setShowMapModal(false)} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#F8F9FA', borderRadius: '50%', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-              <X size={20} />
-            </button>
-          </header>
-          <div style={{ flex: 1, padding: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ width: '100%', maxWidth: '400px', aspectRatio: '1/1.2', border: '1px solid rgba(197, 168, 128, 0.3)', borderRadius: '16px', background: 'rgba(197, 168, 128, 0.05)', position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', top: '10%', left: '10%', right: '10%', bottom: '10%', border: '2px solid rgba(255,255,255,0.1)' }}>
-                {/* Rooms Outline Mock */}
-                <div style={{ position: 'absolute', top: 0, left: 0, width: '50%', height: '40%', borderRight: '2px solid rgba(255,255,255,0.1)', borderBottom: '2px solid rgba(255,255,255,0.1)' }} />
-                <div style={{ position: 'absolute', top: 0, right: 0, width: '50%', height: '30%', borderBottom: '2px solid rgba(255,255,255,0.1)' }} />
-                <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '60%', background: 'rgba(197, 168, 128, 0.1)', border: '1px solid #C5A880' }}>
-                  <div style={{ color: '#C5A880', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 600, padding: '8px' }}>Sala de Estar (Você está aqui)</div>
-                  <div style={{ width: '8px', height: '8px', background: '#C5A880', borderRadius: '50%', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', boxShadow: '0 0 10px #C5A880' }} />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+
     </div>
   );
 };

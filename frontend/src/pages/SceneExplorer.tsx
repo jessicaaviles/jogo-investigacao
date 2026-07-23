@@ -7,7 +7,7 @@ const SceneExplorer: React.FC = () => {
   const navigate = useNavigate();
   const [uvLight, setUvLight] = useState(false);
 
-  const { discoveredClues, addClue } = useInvestigation();
+  const { unlockedClues } = useInvestigation();
 
   const [isPortrait, setIsPortrait] = useState(window.innerHeight > window.innerWidth);
 
@@ -81,7 +81,6 @@ const SceneExplorer: React.FC = () => {
   const totalClues = hotspots.length;
 
   const handleHotspotClick = (clueId: string) => {
-    addClue(clueId);
     navigate(`/evidence/${clueId}`);
   };
 
@@ -100,9 +99,9 @@ const SceneExplorer: React.FC = () => {
     animal_bones: '/backgrounds/ev_bones.png?v=11'
   };
 
-  const foundClues = discoveredClues
-    .filter(cid => hotspots.some((h: any) => h.id === cid))
-    .map(cid => ({ id: cid, url: clueImages[cid] || '/backgrounds/ev_letter.png' }));
+  const foundClues = unlockedClues
+    .filter(c => hotspots.some((h: any) => h.id === c.clueId))
+    .map(c => ({ id: c.clueId, url: clueImages[c.clueId] || '/backgrounds/ev_letter.png' }));
 
   return (
     <div style={{ backgroundColor: '#0A0D10', minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', overflowX: 'hidden', paddingBottom: '96px' }}>

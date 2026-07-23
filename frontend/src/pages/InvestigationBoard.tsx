@@ -4,7 +4,7 @@ import { useInvestigation } from '../contexts/InvestigationContext';
 import CaseResolutionModal from '../components/CaseResolutionModal';
 
 const InvestigationBoard: React.FC = () => {
-  const { discoveredClues } = useInvestigation();
+  const { unlockedClues } = useInvestigation();
   const [activeTab, setActiveTab] = useState('mural');
   const [showResolution, setShowResolution] = useState(false);
 
@@ -21,8 +21,8 @@ const InvestigationBoard: React.FC = () => {
     { id: 'mud', type: 'item', image: '/backgrounds/ev_mud.png', title: 'Pegadas Duplas', label: 'Fugiram pelo portão', top: '85%', left: '15%', rotation: '2deg' },
   ];
 
-  const totalClues = 12;
-  const cluesFound = discoveredClues.length;
+  const totalClues = 14;
+  const cluesFound = unlockedClues.length;
   const progress = Math.round((cluesFound / totalClues) * 100);
 
   const renderPin = () => (

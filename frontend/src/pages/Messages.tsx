@@ -44,6 +44,40 @@ const Messages: React.FC = () => {
     setUnreadMessages(unreadCount);
   }, [chats, setUnreadMessages]);
 
+  const { socket } = window as any; // Fallback se não usar o hook diretamente, ou idealmente import useSocket
+
+  useEffect(() => {
+    const handleClueUnlocked = (data: any) => {
+      setChats(prev => prev.map(chat => {
+        if (chat.id === 'system-ia') {
+          const newMsg = {
+            sender: 'them' as const,
+            text: `Nova pista desbloqueada: ${data.clueId}. Investigador responsável: ${data.discoveredBy}. Verifique seu mapa ou painel de investigação para acessá-la.`,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          };
+          return {
+            ...chat,
+            messages: [...chat.messages, newMsg],
+            lastMessage: newMsg.text,
+            time: newMsg.time,
+            unread: true
+          };
+        }
+        return chat;
+      }));
+    };
+
+    const globalSocket = (window as any).globalSocketInstance;
+    if (globalSocket) {
+      globalSocket.on('clue_unlocked', handleClueUnlocked);
+      return () => globalSocket.off('clue_unlocked', handleClueUnlocked);
+    }
+    
+    const handleCustomEvent = (e: any) => handleClueUnlocked(e.detail);
+    window.addEventListener('clue_discovered_notification', handleCustomEvent);
+    return () => window.removeEventListener('clue_discovered_notification', handleCustomEvent);
+  }, []);
+
   const handleSendMessage = () => {
     if (!inputMessage.trim() || !activeChat) return;
 

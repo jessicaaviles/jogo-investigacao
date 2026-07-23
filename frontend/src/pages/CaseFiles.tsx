@@ -4,7 +4,7 @@ import { useInvestigation } from '../contexts/InvestigationContext';
 
 const CaseFiles: React.FC = () => {
   const navigate = useNavigate();
-  const { discoveredClues } = useInvestigation();
+  const { unlockedClues } = useInvestigation();
 
   const allEvidences = [
     { id: 'fireplace', title: 'Carta Anônima', type: 'Documento', date: '12/05', image: '/backgrounds/ev_letter.png' },
@@ -14,7 +14,7 @@ const CaseFiles: React.FC = () => {
     { id: 'blood', title: 'Mancha de Sangue', type: 'Vestígio', date: '15/05', image: '/backgrounds/ev_blood.png' },
   ];
 
-  const foundEvidences = allEvidences.filter(e => discoveredClues.includes(e.id));
+  const foundEvidences = allEvidences.filter(e => unlockedClues.some(c => c.clueId === e.id));
 
   return (
     <div style={{ backgroundColor: '#0A0D10', minHeight: '100vh', display: 'flex', flexDirection: 'column', paddingBottom: '96px' }}>

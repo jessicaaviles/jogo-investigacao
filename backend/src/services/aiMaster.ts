@@ -6,39 +6,6 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 const BLOCKED_PATTERNS = /(ignore|esqueça|revele|mostre|prompt|instruções|system message|segredo|solução completa|ignore previous|forget|reveal the)/i;
 
-const generateNarrative = async (classification: string, factualExplanation: string, questionText: string): Promise<string> => {
-  const narrativePrompt = `Você é o Mestre IA de um jogo de mistério e investigação.
-O jogador fez a seguinte pergunta: "${questionText}"
-
-Responda APENAS à pergunta feita pelo jogador baseando-se no contexto abaixo.
-
-Classificação: ${classification}
-Contexto interno (use APENAS como base, não revele detalhes): ${factualExplanation}
-
-Regras ESTRITAS:
-1. Responda SEMPRE em português do Brasil (pt-BR).
-2. Comece obrigatoriamente com: YES → "Sim." | NO → "Não." | PARTIAL → "Parcialmente." | IRRELEVANT → "Irrelevante para o caso. Faça outra pergunta." | UNKNOWN → "Não."
-3. Após o prefixo, adicione NO MÁXIMO uma frase curta e vaga — sem revelar nomes, datas, locais ou detalhes concretos que não foram perguntados.
-4. NUNCA mencione fatos ou detalhes que vão além do que a pergunta tocou.
-5. Tom seco e misterioso — como um árbitro que sabe mais do que fala.`;
-
-
-  for (let attempt = 0; attempt < 2; attempt++) {
-    try {
-      const res = await ai.models.generateContent({
-        model: 'gemini-3.5-flash',
-        contents: narrativePrompt,
-        config: { temperature: 0.4 }
-      });
-      const text = res.text?.trim();
-      if (text && text.length > 5) return text.slice(0, 360);
-    } catch (_err) {
-      if (attempt === 0) await new Promise(r => setTimeout(r, 800));
-    }
-  }
-  return '';
-};
-
 export const processQuestion = async (roomId: string, questionText: string, caseVersionId: string) => {
   try {
     const cleanQuestion = String(questionText || '').trim().slice(0, 500);
@@ -68,36 +35,32 @@ export const processQuestion = async (roomId: string, questionText: string, case
     const responseSchema: Schema = {
       type: Type.OBJECT,
       properties: {
-        classification: { type: Type.STRING, description: "Deve ser exatamente um destes: YES, NO, PARTIAL, IRRELEVANT, UNKNOWN, AMBIGUOUS, MULTI_PREMISE" },
-        premises: { type: Type.ARRAY, items: { type: Type.STRING }, description: "As premissas extraídas da pergunta." },
-        factualExplanation: { type: Type.STRING, description: "Contexto que justifica a classificação, baseado APENAS nos fatos. Sempre em português do Brasil." }
+        verdict: { type: Type.STRING, description: "Deve ser: yes, no, partial, irrelevant, unknown, reformulate" },
+        shortAnswer: { type: Type.STRING, description: "Uma resposta prefixo curta: 'Sim.', 'Não.', 'Parcialmente.', etc." },
+        publicExplanation: { type: Type.STRING, description: "Comentário narrativo curto, sem revelar detalhes concretos que não foram perguntados." },
+        unlockClue: { type: Type.BOOLEAN, description: "True se a pergunta do jogador demonstrou que ele compreendeu ou descobriu uma evidência." },
+        clueIdToUnlock: { type: Type.STRING, nullable: true, description: "O ID exato da pista a ser destravada (ex: 'fireplace', 'desk_letter')." },
+        locationId: { type: Type.STRING, nullable: true, description: "O ID do local a ser destravado (ex: 'library', 'bedroom', 'garden')." }
       },
-      required: ["classification", "premises", "factualExplanation"]
+      required: ["verdict", "shortAnswer", "publicExplanation", "unlockClue"]
     };
 
-    const prompt = `Você atua como o motor lógico (Mestre IA) de um jogo de investigação brasileiro.
-Sua função é interpretar a pergunta do jogador e classificá-la ESTRITAMENTE baseada nas informações abaixo.
-Você NÃO pode inventar fatos, usar conhecimento externo ou tentar adivinhar o que não está escrito.
+    const prompt = `Você atua como o Mestre IA (árbitro) de um jogo de investigação.
+Sua função é interpretar a pergunta do jogador e validar se ele descobriu algo.
 Responda SEMPRE em português do Brasil (pt-BR).
 
-Resumo da Solução (Contexto Geral):
+Resumo da Solução e Regras Especiais de Desbloqueio:
 ${solutionSummary}
 
-Fatos Absolutos do Caso (Detalhes Específicos):
+Fatos Absolutos do Caso:
 ${factListText}
 
-Regras de Classificação:
-- YES: a pergunta/afirmação é verdadeira segundo os fatos.
-- NO: a pergunta/afirmação é falsa segundo os fatos.
-- PARTIAL: parte é verdade, parte é falsa ou incompleta.
-- IRRELEVANT: não tem relação nenhuma com os fatos ou com a solução.
-- UNKNOWN: os fatos não dizem nada sobre isso (não invente!).
-- AMBIGUOUS: a pergunta usa pronomes soltos ou não faz sentido direto.
-- MULTI_PREMISE: a pergunta contém múltiplas afirmações que precisam ser separadas.
+Regras ESTRITAS:
+1. Responda apenas "Sim", "Não", "Parcialmente", "Irrelevante" ou "Desconhecido".
+2. Não revele detalhes na \`publicExplanation\`. Aja de forma misteriosa e seca.
+3. Se a pergunta demonstrar que o jogador investigou corretamente um hotspot ou desvendou uma etapa, defina \`unlockClue\` como true e indique a \`clueIdToUnlock\` ou \`locationId\` apropriada conforme o gabarito das regras especiais.
 
-Pergunta do Jogador: "${questionText}"
-
-Analise a pergunta, extraia as premissas, compare com os Fatos Absolutos e gere a saída JSON.`;
+Pergunta do Jogador: "${questionText}"`;
 
     const response = await ai.models.generateContent({
       model: 'gemini-3.5-flash',
@@ -106,29 +69,22 @@ Analise a pergunta, extraia as premissas, compare com os Fatos Absolutos e gere 
     });
 
     if (!response.text) throw new Error("Resposta vazia do motor lógico");
-
+    
     const logicResult = JSON.parse(response.text);
-    const allowedClassifications = new Set(['YES', 'NO', 'PARTIAL', 'IRRELEVANT', 'UNKNOWN', 'BLOCKED', 'AMBIGUOUS', 'MULTI_PREMISE']);
-    if (!allowedClassifications.has(logicResult.classification) || !Array.isArray(logicResult.premises) || typeof logicResult.factualExplanation !== 'string') {
-      throw new Error('Invalid interpretation from AI');
+    
+    const uppercaseVerdict = String(logicResult.verdict).toUpperCase();
+    if (uppercaseVerdict === 'REFORMULATE') {
+      return { classification: 'AMBIGUOUS', rendered_text: logicResult.publicExplanation, fallback_used: false };
     }
 
-    if (['AMBIGUOUS', 'MULTI_PREMISE', 'BLOCKED'].includes(logicResult.classification)) {
-      const msgMap: Record<string, string> = {
-        AMBIGUOUS: 'A pergunta está ambígua — use termos mais específicos. Por exemplo: em vez de "alguém fez isso?", pergunte com nome e contexto.',
-        MULTI_PREMISE: 'A pergunta contém múltiplas afirmações. Separe em perguntas menores, uma por vez.',
-        BLOCKED: 'Essa pergunta não pode ser processada. Reformule focando nos eventos do caso.'
-      };
-      return { classification: logicResult.classification, rendered_text: msgMap[logicResult.classification] || 'Reformule a pergunta.', fallback_used: false };
-    }
-
-    const finalAnswerText = await generateNarrative(logicResult.classification, logicResult.factualExplanation, questionText);
-
-    if (!finalAnswerText) {
-      return { classification: 'UNKNOWN', rendered_text: 'O Mestre não conseguiu formular a resposta agora. Tente novamente.', fallback_used: true };
-    }
-
-    return { classification: logicResult.classification, rendered_text: finalAnswerText, fallback_used: false };
+    return { 
+      classification: uppercaseVerdict, 
+      rendered_text: `${logicResult.shortAnswer} ${logicResult.publicExplanation}`.trim(),
+      unlockClue: logicResult.unlockClue,
+      clueIdToUnlock: logicResult.clueIdToUnlock,
+      locationId: logicResult.locationId,
+      fallback_used: false 
+    };
 
   } catch (error) {
     console.error("Erro no Mestre IA:", error);

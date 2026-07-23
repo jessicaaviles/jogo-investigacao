@@ -7,24 +7,24 @@ const MapOverview: React.FC = () => {
   const navigate = useNavigate();
   const [selectedPin, setSelectedPin] = useState<string | null>('living_room');
 
-  const { discoveredClues } = useInvestigation();
-  const libraryUnlocked = discoveredClues.includes('fireplace');
-  const bedroomUnlocked = discoveredClues.includes('desk_letter');
-  const gardenUnlocked = discoveredClues.includes('mirror_msg');
+  const { unlockedLocations, unlockedClues } = useInvestigation();
+  const libraryUnlocked = unlockedLocations.includes('library');
+  const bedroomUnlocked = unlockedLocations.includes('bedroom');
+  const gardenUnlocked = unlockedLocations.includes('garden');
 
   const locations = [
     { id: 'bedroom', title: 'Quarto Principal', status: bedroomUnlocked ? 'investigating' : 'locked', top: '35%', left: '50%', lineDirection: 'right', totalPistas: 3, clueIds: ['mirror_msg', 'suitcase', 'pills'], image: '/backgrounds/scene_bedroom_landscape.png?v=11', desc: 'Aposentos de Clara. Um cômodo cheio de segredos bem guardados.' },
-    { id: 'library', title: 'Biblioteca', status: libraryUnlocked ? 'investigating' : 'locked', top: '40%', left: '65%', lineDirection: 'left', totalPistas: 3, clueIds: ['desk_letter', 'safe', 'cigar'], image: '/backgrounds/scene_library_landscape.png?v=11', desc: 'O escritório particular e santuário de Tomás.' },
-    { id: 'living_room', title: 'Sala de Estar', status: 'investigating', top: '43%', left: '53%', lineDirection: 'right', totalPistas: 3, clueIds: ['fireplace', 'blood', 'wine_glass'], image: '/backgrounds/scene_living_room_landscape.png?v=11', desc: 'Principal ponto de encontro da família. Foi aqui que Clara Mendes foi vista pela última vez.' },
+    { id: 'library', title: 'Biblioteca', status: libraryUnlocked ? 'investigating' : 'locked', top: '40%', left: '65%', lineDirection: 'left', totalPistas: 4, clueIds: ['desk_letter', 'safe', 'cigar', 'fireplace'], image: '/backgrounds/scene_library_landscape.png?v=11', desc: 'O escritório particular e santuário de Tomás.' },
+    { id: 'living_room', title: 'Sala de Estar', status: 'investigating', top: '43%', left: '53%', lineDirection: 'right', totalPistas: 4, clueIds: ['armchair', 'table', 'blood', 'wine_glass'], image: '/backgrounds/scene_living_room_landscape.png?v=11', desc: 'Principal ponto de encontro da família. Foi aqui que Clara Mendes foi vista pela última vez.' },
     { id: 'garden', title: 'Jardim', status: gardenUnlocked ? 'investigating' : 'locked', top: '56%', left: '75%', lineDirection: 'right', totalPistas: 3, clueIds: ['fountain', 'mud', 'animal_bones'], image: '/backgrounds/scene_garden_landscape.png?v=11', desc: 'Os vastos jardins da mansão contêm mais segredos do que parecem.' }
   ];
 
-  const totalPossibleClues = 12;
-  const progressPercent = Math.round((discoveredClues.length / totalPossibleClues) * 100);
+  const totalPossibleClues = 14;
+  const progressPercent = Math.round((unlockedClues.length / totalPossibleClues) * 100);
 
   const selectedLocation = locations.find(l => l.id === selectedPin) || locations[3]; // default to living room
-  const foundPistasInSelected = discoveredClues.filter(c => selectedLocation.clueIds.includes(c)).length;
-  const mockedFoundPistas = Math.min(foundPistasInSelected + (selectedLocation.status === 'locked' ? 0 : 2), selectedLocation.totalPistas); // Just for visual similarity to mockup
+  const foundPistasInSelected = unlockedClues.filter(c => selectedLocation.clueIds.includes(c.clueId)).length;
+  const mockedFoundPistas = foundPistasInSelected;
 
   return (
     <div style={{ backgroundColor: '#0A0D10', position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', overflow: 'hidden' }}>
@@ -101,7 +101,7 @@ const MapOverview: React.FC = () => {
       <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 2, pointerEvents: 'none' }}>
         {locations.map((loc) => {
           const isSelected = selectedPin === loc.id;
-          const found = Math.min(discoveredClues.filter(c => loc.clueIds.includes(c)).length + (loc.status === 'locked' ? 0 : 2), loc.totalPistas);
+          const found = unlockedClues.filter(c => loc.clueIds.includes(c.clueId)).length;
           
           let transform = 'translate(-50%, -100%)';
           let flexDir: any = 'column';
@@ -208,20 +208,27 @@ const MapOverview: React.FC = () => {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            {/* Progresso de Pistas (Esquerda) */}
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(197, 168, 128, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Search size={14} color="#C5A880" />
+            {selectedLocation.status === 'locked' ? (
+              <div style={{ flex: 1, padding: '0 8px', display: 'flex', alignItems: 'center' }}>
+                <p style={{ color: '#F8F9FA', fontSize: '11px', margin: 0, fontStyle: 'italic', lineHeight: 1.4 }}>
+                  "Ainda falta uma ligação que indique por que este local é relevante."
+                </p>
               </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ color: '#8E989F', fontSize: '11px', marginBottom: '4px' }}>
-                  <strong style={{ color: '#F8F9FA' }}>{mockedFoundPistas} de {selectedLocation.totalPistas}</strong> pistas encontradas
+            ) : (
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(197, 168, 128, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Search size={14} color="#C5A880" />
                 </div>
-                <div style={{ height: '2px', background: 'rgba(255,255,255,0.1)', borderRadius: '1px', overflow: 'hidden' }}>
-                  <div style={{ width: `${(mockedFoundPistas / selectedLocation.totalPistas) * 100}%`, height: '100%', background: '#C5A880' }} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ color: '#8E989F', fontSize: '11px', marginBottom: '4px' }}>
+                    <strong style={{ color: '#F8F9FA' }}>{mockedFoundPistas} de {selectedLocation.totalPistas}</strong> pistas encontradas
+                  </div>
+                  <div style={{ height: '2px', background: 'rgba(255,255,255,0.1)', borderRadius: '1px', overflow: 'hidden' }}>
+                    <div style={{ width: `${(mockedFoundPistas / selectedLocation.totalPistas) * 100}%`, height: '100%', background: '#C5A880' }} />
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Botão de Explorar (Direita) */}
             <button

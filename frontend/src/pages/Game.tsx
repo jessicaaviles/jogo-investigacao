@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Mic, Square, Volume2 } from 'lucide-react';
 import { useSocket } from '../contexts/useSocket';
 import Loading from '../components/Loading';
+import FinalTheoryForm from '../components/FinalTheoryForm';
 
 const dedupeHints = (hintsList: any[]) => {
   const seen = new Set();
@@ -547,33 +548,13 @@ const Game: React.FC = () => {
 
           {/* Outros status (SOLVING, REVEAL, GAME_OVER) */}
           {status === 'SOLVING' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '24px', margin: 0 }}>Formular Teoria</h3>
-              {myTheory ? (
-                <div style={{ ...cardStyle, textAlign: 'center', padding: '40px 20px' }}>
-                  <div style={{ fontSize: '40px', marginBottom: '12px' }}>✓</div>
-                  <h3 style={{ fontFamily: 'var(--font-serif)', color: 'var(--accent-gold)', margin: '0 0 8px' }}>Teoria Enviada!</h3>
-                  <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px', margin: 0 }}>Aguardando os outros investigadores...</p>
-                  <div style={{ marginTop: '12px', color: 'var(--accent-gold)', fontSize: '13px' }}>{theories.length} de {players.length} teorias submetidas.</div>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmitTheory} style={{ display: 'flex', flexDirection: 'column', gap: '16px', ...cardStyle } as any}>
-                  <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px', margin: 0 }}>Descreva detalhadamente a sua conclusão para o caso.</p>
-                  <label style={{ fontSize: '11px', color: 'var(--accent-gold)', textTransform: 'uppercase', letterSpacing: '1px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    Qual é a sua teoria?
-                    <textarea 
-                      required 
-                      rows={5}
-                      value={theoryText} 
-                      onChange={e => setTheoryText(e.target.value)} 
-                      placeholder="Ex: O zelador armou uma armadilha para o..."
-                      style={{ padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(0,0,0,0.3)', color: '#fff', fontSize: '15px', resize: 'vertical', fontFamily: 'inherit' }} 
-                    />
-                  </label>
-                  <button type="submit" style={{ padding: '14px', background: 'var(--accent-gold)', color: '#000', fontWeight: 700, border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '15px' }}>Enviar Minha Teoria</button>
-                </form>
-              )}
-            </div>
+            <FinalTheoryForm 
+              roomId={roomId!} 
+              userId={userId!} 
+              myTheory={myTheory} 
+              theories={theories} 
+              players={players} 
+            />
           )}
 
           {status === 'REVEAL' && (

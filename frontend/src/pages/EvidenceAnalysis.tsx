@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useSocket } from '../contexts/useSocket';
 import { Brain, Search, Fingerprint, Clock, Key, ChevronRight, Share2, Plus, Sparkles, Fullscreen, MessageSquare, ArrowLeft } from 'lucide-react';
 
 const CircularProgress = ({ percentage }: { percentage: number }) => {
@@ -29,6 +30,11 @@ const EvidenceAnalysis: React.FC = () => {
   const [activeTab, setActiveTab] = useState('Detalhes');
   const [analyzing, setAnalyzing] = useState(false);
   const [aiReport, setAiReport] = useState<any>(null);
+  const [question, setQuestion] = useState('');
+  const [showSpecialCard, setShowSpecialCard] = useState<{title: string, clueId: string} | null>(null);
+  const socket = useSocket();
+  const roomId = localStorage.getItem('lastRoomId') || 'blackwell_1';
+  const userId = localStorage.getItem('userId');
 
   // Mock Database Enriquecido
   const mockDatabase: Record<string, any> = {
@@ -272,20 +278,48 @@ const EvidenceAnalysis: React.FC = () => {
 
   useEffect(() => {
     if (localStorage.getItem(`analyzed_${evidenceId}`)) {
-      setAiReport(mockEvidence);
-    } else {
-      setAiReport(null);
+      setAiReport(mockEvidence.aiAnalysis);
     }
   }, [evidenceId, mockEvidence]);
 
-  const handleAnalyze = () => {
-    setAnalyzing(true);
-    setTimeout(() => {
-      setAiReport(mockEvidence);
+  useEffect(() => {
+    if (!socket) return;
+    
+    const handleProcessed = (data: any) => {
       setAnalyzing(false);
+      setAiReport(data.answer?.rendered_text);
       localStorage.setItem(`analyzed_${evidenceId}`, 'true');
-      setActiveTab('Análise da IA');
-    }, 1500);
+      
+      if (data.unlockClue && data.clueIdToUnlock) {
+        setShowSpecialCard({ title: 'Nova Pista Desbloqueada!', clueId: data.clueIdToUnlock });
+      } else {
+        setActiveTab('Análise da IA');
+      }
+    };
+
+    socket.on('question_processed', handleProcessed);
+    socket.on('question_needs_reformulation', () => setAnalyzing(false));
+    socket.on('room_error', () => setAnalyzing(false));
+    
+    return () => {
+      socket.off('question_processed', handleProcessed);
+      socket.off('question_needs_reformulation');
+      socket.off('room_error');
+    };
+  }, [socket, evidenceId]);
+
+  const handleSubmitQuestion = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!question.trim() || !socket) return;
+    
+    setAnalyzing(true);
+    socket.emit('submit_question', {
+      roomId,
+      userId,
+      questionText: `Sobre [${mockEvidence.title}]: ${question}`,
+      forceRepeat: false
+    });
+    setQuestion('');
   };
 
   return (
@@ -315,6 +349,23 @@ const EvidenceAnalysis: React.FC = () => {
       </div>
 
       <div style={{ position: 'relative', zIndex: 2, flex: 1, marginTop: '24px' }}>
+        
+        {/* Card Especial de Pista Desbloqueada */}
+        {showSpecialCard && (
+          <div style={{ margin: '0 24px 24px 24px', background: 'linear-gradient(135deg, rgba(184, 153, 83, 0.2) 0%, rgba(132, 147, 107, 0.2) 100%)', border: '1px solid #C5A880', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'center', textAlign: 'center' }}>
+            <Sparkles size={32} color="#C5A880" />
+            <div>
+              <h3 style={{ color: '#F8F9FA', fontSize: '18px', margin: '0 0 8px 0', fontWeight: 600 }}>{showSpecialCard.title}</h3>
+              <p style={{ color: '#E8EAED', fontSize: '14px', margin: 0 }}>O Mestre validou sua dedução. Uma nova pista foi revelada no painel da investigação.</p>
+            </div>
+            <button 
+              onClick={() => navigate(`/evidence/${showSpecialCard.clueId}`)}
+              style={{ background: '#C5A880', color: '#0A0D10', border: 'none', padding: '10px 20px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+            >
+              Ver Nova Pista <ChevronRight size={16} />
+            </button>
+          </div>
+        )}
           
         {/* Navigation Tabs */}
         <div style={{ display: 'flex', overflowX: 'auto', padding: '0 24px', gap: '24px', borderBottom: '1px solid rgba(255,255,255,0.05)', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none' }}>
@@ -368,24 +419,35 @@ const EvidenceAnalysis: React.FC = () => {
               <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '16px', padding: '24px' }}>
                 <div style={{ color: '#C5A880', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 600, marginBottom: '16px' }}>Análise da IA</div>
                 {!aiReport ? (
-                  <button 
-                    onClick={handleAnalyze} disabled={analyzing}
-                    style={{ 
-                      background: 'linear-gradient(90deg, rgba(197, 168, 128, 0.1) 0%, rgba(197, 168, 128, 0.05) 100%)', border: '1px solid rgba(197, 168, 128, 0.3)', color: '#C5A880', 
-                      padding: '12px 20px', borderRadius: '12px', fontSize: '13px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px',
-                      cursor: analyzing ? 'not-allowed' : 'pointer', opacity: analyzing ? 0.7 : 1, width: '100%', justifyContent: 'center'
-                    }}
-                  >
-                    <Brain size={16} /> 
-                    {analyzing ? 'Analisando amostras...' : 'Solicitar Análise da IA'}
-                  </button>
+                  <form onSubmit={handleSubmitQuestion} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <input 
+                      type="text" 
+                      value={question} 
+                      onChange={e => setQuestion(e.target.value)}
+                      placeholder="O que você quer perguntar à IA sobre isso?"
+                      style={{ padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.4)', color: '#fff' }}
+                      disabled={analyzing}
+                      required
+                    />
+                    <button 
+                      type="submit" disabled={analyzing}
+                      style={{ 
+                        background: 'linear-gradient(90deg, rgba(197, 168, 128, 0.1) 0%, rgba(197, 168, 128, 0.05) 100%)', border: '1px solid rgba(197, 168, 128, 0.3)', color: '#C5A880', 
+                        padding: '12px 20px', borderRadius: '12px', fontSize: '13px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px',
+                        cursor: analyzing ? 'not-allowed' : 'pointer', opacity: analyzing ? 0.7 : 1, width: '100%', justifyContent: 'center'
+                      }}
+                    >
+                      <Brain size={16} /> 
+                      {analyzing ? 'Enviando pergunta...' : 'Perguntar à IA'}
+                    </button>
+                  </form>
                 ) : (
                   <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
                     <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(197, 168, 128, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#C5A880', flexShrink: 0 }}>
                       <Sparkles size={20} />
                     </div>
                     <p style={{ color: '#8E989F', fontSize: '14px', lineHeight: 1.5, margin: 0, flex: 1 }}>
-                      {mockEvidence.aiAnalysis}
+                      {aiReport}
                     </p>
                     <ChevronRight size={16} color="#8E989F" />
                   </div>
@@ -403,17 +465,28 @@ const EvidenceAnalysis: React.FC = () => {
                   <p style={{ color: '#8E989F', fontSize: '14px', marginBottom: '32px', lineHeight: 1.6 }}>
                     A Inteligência Artificial ainda não examinou esta pista. Solicite a análise para revelar conexões ocultas, impressões digitais e hipóteses.
                   </p>
-                  <button 
-                    onClick={handleAnalyze} disabled={analyzing}
-                    style={{ 
-                      background: 'linear-gradient(90deg, #A88B63 0%, #C5A880 100%)', border: 'none', color: '#0A0D10', 
-                      padding: '12px 24px', borderRadius: '12px', fontSize: '13px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '8px',
-                      cursor: analyzing ? 'not-allowed' : 'pointer', opacity: analyzing ? 0.7 : 1
-                    }}
-                  >
-                    <Sparkles size={16} /> 
-                    {analyzing ? 'Analisando...' : 'Iniciar Escaneamento'}
-                  </button>
+                  <form onSubmit={handleSubmitQuestion} style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', maxWidth: '400px', margin: '0 auto' }}>
+                    <input 
+                      type="text" 
+                      value={question} 
+                      onChange={e => setQuestion(e.target.value)}
+                      placeholder="Faça uma pergunta sobre a pista..."
+                      style={{ padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.4)', color: '#fff' }}
+                      disabled={analyzing}
+                      required
+                    />
+                    <button 
+                      type="submit" disabled={analyzing}
+                      style={{ 
+                        background: 'linear-gradient(90deg, #A88B63 0%, #C5A880 100%)', border: 'none', color: '#0A0D10', 
+                        padding: '12px 24px', borderRadius: '12px', fontSize: '13px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                        cursor: analyzing ? 'not-allowed' : 'pointer', opacity: analyzing ? 0.7 : 1
+                      }}
+                    >
+                      <Sparkles size={16} /> 
+                      {analyzing ? 'Analisando...' : 'Iniciar Escaneamento'}
+                    </button>
+                  </form>
                 </div>
               ) : (
                 <>
@@ -423,7 +496,7 @@ const EvidenceAnalysis: React.FC = () => {
                       <Search size={14} /> Resumo da Análise
                     </div>
                     <p style={{ color: '#E8EAED', fontSize: '14px', lineHeight: 1.6, margin: 0 }}>
-                      {mockEvidence.aiAnalysis}
+                      {aiReport}
                     </p>
                   </div>
                   <CircularProgress percentage={mockEvidence.relevance} />

@@ -404,6 +404,26 @@ io.on('connection', (socket) => {
           }
         });
 
+        // 3.5 Lógica de Destravamento Cooperativo (Caso Blackwell)
+        const currentSettings = room.settings ? JSON.parse(String(room.settings)) : {};
+        let settingsModified = false;
+        
+        if (aiResponse.unlockClue && aiResponse.clueIdToUnlock) {
+          if (!currentSettings.unlockedClues) currentSettings.unlockedClues = [];
+          if (!currentSettings.unlockedClues.some((c: any) => c.clueId === aiResponse.clueIdToUnlock)) {
+            currentSettings.unlockedClues.push({ clueId: aiResponse.clueIdToUnlock, discoveredAt: new Date().toISOString(), discoveredBy: currentPlayer.display_name });
+            settingsModified = true;
+          }
+        }
+        
+        if (aiResponse.locationId) {
+          if (!currentSettings.unlockedLocations) currentSettings.unlockedLocations = ['living_room'];
+          if (!currentSettings.unlockedLocations.includes(aiResponse.locationId)) {
+            currentSettings.unlockedLocations.push(aiResponse.locationId);
+            settingsModified = true;
+          }
+        }
+
         // 4. Passar o Turno (igual ao pass_turn)
         await tx.turns.update({
           where: { id: currentTurn.id },
@@ -430,14 +450,29 @@ io.on('connection', (socket) => {
 
         await tx.rooms.update({
           where: { id: room.id },
-          data: { current_turn_id: newTurnId, current_round: nextRoundNumber }
+          data: { 
+            current_turn_id: newTurnId, 
+            current_round: nextRoundNumber,
+            ...(settingsModified ? { settings: JSON.stringify(currentSettings) } : {})
+          }
         });
       });
+
+      // Emissões de destravamento em tempo real
+      if (aiResponse.unlockClue && aiResponse.clueIdToUnlock) {
+        io.to(roomId).emit('clue_unlocked', { clueId: aiResponse.clueIdToUnlock, discoveredAt: new Date().toISOString(), discoveredBy: currentPlayer?.display_name || 'Investigador' });
+      }
+      if (aiResponse.locationId) {
+        io.to(roomId).emit('location_unlocked', { locationId: aiResponse.locationId });
+      }
 
       // 5. Emitir Resultados
        io.to(roomId).emit('question_processed', {
          question: { id: createdQuestionId, original_text: cleanQuestion },
         answer: { rendered_text: aiResponse.rendered_text },
+        unlockClue: aiResponse.unlockClue,
+        clueIdToUnlock: aiResponse.clueIdToUnlock,
+        locationId: aiResponse.locationId,
         askedBy: userId
       });
 

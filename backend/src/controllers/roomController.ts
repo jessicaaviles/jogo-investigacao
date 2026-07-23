@@ -103,7 +103,16 @@ export const createRoom = async (req: Request, res: Response) => {
              turn_order_mode: "random_fixed",
              vote_rule: "simple_majority",
              turn_timer_seconds: [null, 30, 60, 90].includes(requestedSettings?.turn_timer_seconds) ? requestedSettings.turn_timer_seconds : null,
-             hint_mode: 'progressive'
+             hint_mode: 'progressive',
+             unlockedLocations: ['living_room'],
+             unlockedClues: [],
+             readReceipts: {},
+             boardItems: [],
+             connections: [],
+             groups: [],
+             timeline: [],
+             finalVotes: {},
+             version: 1
            }),
           expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
         }

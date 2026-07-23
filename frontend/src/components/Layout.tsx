@@ -232,200 +232,202 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       )}
       
       {/* Cooperative Lobby Widget */}
-      <div className="lobby-wrapper" ref={lobbyRef} style={{ position: 'relative', marginRight: '8px' }}>
-        <button
-          onClick={() => setLobbyOpen(!lobbyOpen)}
-          style={{
-            background: roomId ? 'rgba(197, 168, 128, 0.15)' : 'rgba(255,255,255,0.03)',
-            border: roomId ? '1px solid rgba(197, 168, 128, 0.4)' : '1px solid rgba(255,255,255,0.1)',
-            borderRadius: '10px',
-            padding: '8px 12px',
-            color: roomId ? '#C5A880' : '#8E989F',
-            fontSize: '11px',
-            fontWeight: 600,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            height: '38px',
-            boxSizing: 'border-box'
-          }}
-        >
-          <Users size={16} />
-          <span className="lobby-btn-text" style={{ display: 'inline' }}>
-            {roomId ? `Sala: ${roomCode}` : 'Jogar em Grupo'}
-          </span>
-        </button>
-
-        {lobbyOpen && (
-          <div
+      {isImmersive && (
+        <div className="lobby-wrapper" ref={lobbyRef} style={{ position: 'relative', marginRight: '8px' }}>
+          <button
+            onClick={() => setLobbyOpen(!lobbyOpen)}
             style={{
-              position: 'absolute',
-              top: 'calc(100% + 12px)',
-              right: 0,
-              width: '280px',
-              background: 'rgba(15, 20, 23, 0.95)',
-              backdropFilter: 'blur(16px)',
-              border: '1px solid rgba(197, 168, 128, 0.2)',
-              borderRadius: '14px',
-              padding: '16px',
-              boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
-              zIndex: 100,
-              color: '#F8F9FA'
+              background: roomId ? 'rgba(197, 168, 128, 0.15)' : 'rgba(255,255,255,0.03)',
+              border: roomId ? '1px solid rgba(197, 168, 128, 0.4)' : '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '10px',
+              padding: '8px 12px',
+              color: roomId ? '#C5A880' : '#8E989F',
+              fontSize: '11px',
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              height: '38px',
+              boxSizing: 'border-box'
             }}
           >
-            {!roomId ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <div style={{ fontSize: '12px', fontWeight: 600, color: '#C5A880', textTransform: 'uppercase', letterSpacing: '1px' }}>Investigar em Grupo</div>
-                <p style={{ fontSize: '11px', color: '#8E989F', margin: 0, lineHeight: 1.4 }}>
-                  Crie uma sala ou digite o código de acesso para sincronizar pistas e discutir o caso com seus parceiros.
-                </p>
-                
-                <button
-                  onClick={handleCreateRoom}
-                  disabled={loadingLobby}
-                  style={{
-                    background: 'linear-gradient(90deg, #A88B63 0%, #C5A880 100%)',
-                    border: 'none',
-                    borderRadius: '8px',
-                    padding: '10px',
-                    color: '#0A0D10',
-                    fontSize: '12px',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px'
-                  }}
-                >
-                  <Plus size={14} /> {loadingLobby ? 'Criando...' : 'Criar Nova Sala'}
-                </button>
+            <Users size={16} />
+            <span className="lobby-btn-text" style={{ display: 'inline' }}>
+              {roomId ? `Sala: ${roomCode}` : 'Jogar em Grupo'}
+            </span>
+          </button>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.05)' }}></div>
-                  <span style={{ fontSize: '10px', color: '#4A5568' }}>OU</span>
-                  <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.05)' }}></div>
-                </div>
-
-                <div style={{ display: 'flex', gap: '6px' }}>
-                  <input
-                    type="text"
-                    placeholder="CÓDIGO"
-                    value={joinCodeInput}
-                    onChange={(e) => setJoinCodeInput(e.target.value)}
-                    maxLength={6}
+          {lobbyOpen && (
+            <div
+              style={{
+                position: 'absolute',
+                top: 'calc(100% + 12px)',
+                right: 0,
+                width: '280px',
+                background: 'rgba(15, 20, 23, 0.95)',
+                backdropFilter: 'blur(16px)',
+                border: '1px solid rgba(197, 168, 128, 0.2)',
+                borderRadius: '14px',
+                padding: '16px',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+                zIndex: 100,
+                color: '#F8F9FA'
+              }}
+            >
+              {!roomId ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 600, color: '#C5A880', textTransform: 'uppercase', letterSpacing: '1px' }}>Investigar em Grupo</div>
+                  <p style={{ fontSize: '11px', color: '#8E989F', margin: 0, lineHeight: 1.4 }}>
+                    Crie uma sala ou digite o código de acesso para sincronizar pistas e discutir o caso com seus parceiros.
+                  </p>
+                  
+                  <button
+                    onClick={handleCreateRoom}
+                    disabled={loadingLobby}
                     style={{
-                      flex: 1,
-                      background: 'rgba(255,255,255,0.03)',
-                      border: '1px solid rgba(255,255,255,0.1)',
+                      background: 'linear-gradient(90deg, #A88B63 0%, #C5A880 100%)',
+                      border: 'none',
+                      borderRadius: '8px',
+                      padding: '10px',
+                      color: '#0A0D10',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    <Plus size={14} /> {loadingLobby ? 'Criando...' : 'Criar Nova Sala'}
+                  </button>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.05)' }}></div>
+                    <span style={{ fontSize: '10px', color: '#4A5568' }}>OU</span>
+                    <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.05)' }}></div>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    <input
+                      type="text"
+                      placeholder="CÓDIGO"
+                      value={joinCodeInput}
+                      onChange={(e) => setJoinCodeInput(e.target.value)}
+                      maxLength={6}
+                      style={{
+                        flex: 1,
+                        background: 'rgba(255,255,255,0.03)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: '8px',
+                        padding: '8px',
+                        color: '#F8F9FA',
+                        fontSize: '12px',
+                        textTransform: 'uppercase',
+                        textAlign: 'center',
+                        letterSpacing: '2px'
+                      }}
+                    />
+                    <button
+                      onClick={handleJoinRoom}
+                      disabled={loadingLobby || !joinCodeInput.trim()}
+                      style={{
+                        background: 'rgba(255,255,255,0.08)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: '8px',
+                        padding: '8px 12px',
+                        color: '#F8F9FA',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <LogIn size={14} />
+                    </button>
+                  </div>
+
+                  {lobbyError && (
+                    <div style={{ color: '#E53E3E', fontSize: '10px', marginTop: '4px', textAlign: 'center' }}>
+                      {lobbyError}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <div style={{ fontSize: '10px', color: '#8E989F', textTransform: 'uppercase', letterSpacing: '1px' }}>Sua Sala</div>
+                      <div style={{ fontSize: '16px', fontWeight: 700, color: '#C5A880', letterSpacing: '1px', marginTop: '2px' }}>{roomCode}</div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(roomCode || '');
+                      }}
+                      style={{
+                        background: 'rgba(255,255,255,0.05)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: '6px',
+                        padding: '6px',
+                        color: '#F8F9FA',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                      title="Copiar Código"
+                    >
+                      <Copy size={12} />
+                    </button>
+                  </div>
+
+                  <div style={{ maxHeight: '120px', overflowY: 'auto', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '8px' }}>
+                    <div style={{ fontSize: '10px', color: '#8E989F', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Investigadores Conectados ({players.length})</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      {players.map((p: any, idx: number) => {
+                        const isMe = p.anonymous_user_id === localStorage.getItem('userId');
+                        return (
+                          <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px' }}>
+                            <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: p.connection_status === 'CONNECTED' ? '#48BB78' : '#A0AEC0' }} />
+                            <span style={{ color: '#E2E8F0', fontWeight: isMe ? 600 : 400 }}>
+                              {p.display_name || p.user?.default_display_name || 'Investigador'} {isMe && '(Você)'}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handleLeaveRoom}
+                    style={{
+                      background: 'rgba(229, 62, 62, 0.1)',
+                      border: '1px solid rgba(229, 62, 62, 0.2)',
                       borderRadius: '8px',
                       padding: '8px',
-                      color: '#F8F9FA',
-                      fontSize: '12px',
-                      textTransform: 'uppercase',
-                      textAlign: 'center',
-                      letterSpacing: '2px'
-                    }}
-                  />
-                  <button
-                    onClick={handleJoinRoom}
-                    disabled={loadingLobby || !joinCodeInput.trim()}
-                    style={{
-                      background: 'rgba(255,255,255,0.08)',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: '8px',
-                      padding: '8px 12px',
-                      color: '#F8F9FA',
-                      fontSize: '12px',
+                      color: '#E53E3E',
+                      fontSize: '11px',
                       fontWeight: 600,
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center'
+                      justifyContent: 'center',
+                      gap: '6px',
+                      marginTop: '4px'
                     }}
                   >
-                    <LogIn size={14} />
+                    <LogOut size={12} /> Sair da Sala
                   </button>
                 </div>
-
-                {lobbyError && (
-                  <div style={{ color: '#E53E3E', fontSize: '10px', marginTop: '4px', textAlign: 'center' }}>
-                    {lobbyError}
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <div style={{ fontSize: '10px', color: '#8E989F', textTransform: 'uppercase', letterSpacing: '1px' }}>Sua Sala</div>
-                    <div style={{ fontSize: '16px', fontWeight: 700, color: '#C5A880', letterSpacing: '1px', marginTop: '2px' }}>{roomCode}</div>
-                  </div>
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(roomCode || '');
-                    }}
-                    style={{
-                      background: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: '6px',
-                      padding: '6px',
-                      color: '#F8F9FA',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}
-                    title="Copiar Código"
-                  >
-                    <Copy size={12} />
-                  </button>
-                </div>
-
-                <div style={{ maxHeight: '120px', overflowY: 'auto', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '8px' }}>
-                  <div style={{ fontSize: '10px', color: '#8E989F', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Investigadores Conectados ({players.length})</div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    {players.map((p: any, idx: number) => {
-                      const isMe = p.anonymous_user_id === localStorage.getItem('userId');
-                      return (
-                        <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px' }}>
-                          <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: p.connection_status === 'CONNECTED' ? '#48BB78' : '#A0AEC0' }} />
-                          <span style={{ color: '#E2E8F0', fontWeight: isMe ? 600 : 400 }}>
-                            {p.display_name || p.user?.default_display_name || 'Investigador'} {isMe && '(Você)'}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <button
-                  onClick={handleLeaveRoom}
-                  style={{
-                    background: 'rgba(229, 62, 62, 0.1)',
-                    border: '1px solid rgba(229, 62, 62, 0.2)',
-                    borderRadius: '8px',
-                    padding: '8px',
-                    color: '#E53E3E',
-                    fontSize: '11px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px',
-                    marginTop: '4px'
-                  }}
-                >
-                  <LogOut size={12} /> Sair da Sala
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="menu-wrapper" ref={menuRef}>
         <button
